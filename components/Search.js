@@ -82,8 +82,10 @@ const Search = () => {
                         <motion.div
                             initial={{ opacity: 0, y: -50 }}
                             animate={{ opacity: 1, y: 0 }}
+                            key={song.id}
                         >
                             <Card
+                                key={song.id}
                                 name={song.name}
                                 artist={song.artists[0].name}
                                 time={song.duration}

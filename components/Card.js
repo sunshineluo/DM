@@ -19,6 +19,7 @@ export default function Card({ name, artist, time, onClick, data, id, key }) {
     }, [id]);
     return (
         <button
+            key={key}
             onClick={onClick}
             className="text-base sm:text-lg transition-all duration-300 cursor-pointer flex flex-row justify-between px-4 rounded-md w-full hover:bg-zinc-900 py-3"
         >
