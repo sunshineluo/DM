@@ -5,7 +5,7 @@ import AudioPlayer from 'react-h5-audio-player'
 import { motion } from 'framer-motion'
 
 const Search = () => {
-    const [searchTerm, setSearchTerm] = useState("");
+    const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [artistResults, setArtistResults] = useState([]);
     const handleSearch = async () => {
@@ -20,8 +20,8 @@ const Search = () => {
         setSearchResults(data.result.songs);
         setArtistResults(ad.result.artists);
     };
-    const [searchValue, setSearchValue] = useState("");
-    const [src, setSrc] = useState("");
+    const [searchValue, setSearchValue] = useState('');
+    const [src, setSrc] = useState('');
     return (
         <div>
             <Head>
@@ -62,9 +62,10 @@ const Search = () => {
 
                     {artistResults.map((artist) => (
                         <motion.div
+                            key={artist.name}
                             initial={{ opacity: 0, y: -50 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className=""
+                            className=''
                         >
                             <div className="flex flex-row hover:bg-zinc-900 rounded-md space-x-6 px-4 py-3 transition-all duration-300 cursor-pointer">
                                 <img src={artist.picUrl} className="rounded-full w-16 h-16" />
