@@ -3,35 +3,21 @@
 @tailwind utilities;
 
 @font-face {
-  font-family: 'Source Han Sans';
-  src: url(/fonts/SourceHanSansCN-Regular.otf) format('opentype');
+  font-family: 'Ping Fang';
+  src: url(/fonts/PingFangSC-Regular.woff2) format('woff2');
   font-display: swap;
   font-weight: 400;
 }
 
 @font-face {
-  font-family: 'Source Han Sans';
-  src: url(/fonts/SourceHanSansCN-Medium.otf) format('opentype');
-  font-display: swap;
-  font-weight: 500;
-}
-
-@font-face {
-  font-family: 'Source Han Sans';
-  src: url(/fonts/SourceHanSansCN-Bold.otf) format('opentype');
+  font-family: 'Ping Fang';
+  src: url(/fonts/PingFangSC-Semibold.woff2) format('woff2');
   font-display: swap;
   font-weight: 600;
 }
 
-@font-face {
-  font-family: 'Source Han Sans';
-  src: url(/fonts/SourceHanSansCN-Bold.otf) format('opentype');
-  font-display: swap;
-  font-weight: 700;
-}
-
 ::-webkit-scrollbar {
-  width: 2.5px;
+  width: 0px;
   height: 5px;
 }
 
@@ -39,21 +25,15 @@
   @apply bg-zinc-900 rounded-lg;
 }
 
-.bar ::-webkit-scrollbar-thumb {
-  @apply bg-zinc-100 rounded-lg;
-}
-
-::selection {
-  @apply bg-blue-400 text-white;
-}
-
 html {
   scroll-behavior: smooth;
-  font-family: 'Inter', 'Source Han Sans', sans-serif;
+  font-family: 'Inter', 'Ping Fang', sans-serif;
   -webkit-font-smoothing: antialiased;
-  @apply bg-zinc-950 text-gray-100;
+  @apply bg-zinc-100;
 }
 
 body {
-  font-family: 'Inter', 'Source Han Sans', sans-serif;
+  font-family: 'Inter', 'Ping Fang', sans-serif;
 }
+
+

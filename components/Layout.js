@@ -1,9 +1,10 @@
-export default function Layout(){
-    return(
+
+export default function Layout({children}) {
+    return (
         <div>
-            <div className="w-full fixed border border-b-zinc-200 border-b top-0 bg-white/75 backdrop-blur-lg py-4">
-               123
-            </div>
+                <div className="max-w-4xl mx-auto px-4 py-8">
+                    {children}
+                </div>
         </div>
     )
 }
