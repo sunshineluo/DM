@@ -40,6 +40,7 @@ const Search = () => {
         <div>
             <Head>
                 <title>IKER Music</title>
+                <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" />
             </Head>
             <div className="max-w-4xl py-8 mx-auto">
                 <div className="text-sm flex flex-row space-x-0.5 w-full">
