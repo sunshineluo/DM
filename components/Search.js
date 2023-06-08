@@ -6,6 +6,7 @@ import { motion } from 'framer-motion'
 import { Tab } from '@headlessui/react'
 import moment from 'moment'
 import VideoCard from "./VideoCard";
+import ArtistCard from "./ArtistCard";
 
 function cn(...classes) {
     return classes.filter(Boolean).join(' ');
@@ -41,7 +42,7 @@ const Search = () => {
                 <title>IKER Music</title>
             </Head>
             <div className="max-w-4xl py-8 mx-auto">
-                <div className="text-xs sm:text-sm flex flex-row space-x-1 w-full">
+                <div className="text-sm flex flex-row space-x-0.5 w-full">
                     <div>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="absolute mt-2.5 sm:mt-3 ml-3 opacity-75 w-4 h-4">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
@@ -64,7 +65,7 @@ const Search = () => {
                     </div>
                 </div>
 
-                <ul className={cn("mt-4 mb-24",
+                <ul className={cn("mt-2 mb-24",
                     searchValue !== '' ? 'hidden' : ''
                 )}>
 
@@ -74,11 +75,11 @@ const Search = () => {
                         initial={{ opacity: 0, y: -50 }}
                         animate={{ opacity: 1, y: 0 }}
                     >
-                      Coming soon...
+                        Coming soon...
                     </motion.div>
                 </ul>
 
-                <ul className="mt-4 mb-24">
+                <ul className="mt-2 mb-24">
                     <Tab.Group>
                         <Tab.List
                             className={cn('sticky top-0 bg-zinc-100 z-50 py-2 flex flex-row space-x-2',
@@ -107,24 +108,22 @@ const Search = () => {
                         </Tab.List>
                         <Tab.Panels>
                             <Tab.Panel>
-                                {artistResults.slice(0, 3).map((artist) => (
-                                    <div className="columns-1 md:columns-2 sm:columns-3">
+                                <div className="columns-1 md:columns-2 sm:columns-2">
+                                    {artistResults.slice(0, 3).map((artist) => (
                                         <motion.div
                                             key={artist.name}
                                             initial={{ opacity: 0, y: -50 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             className='border-b'
                                         >
-                                            <div className="flex flex-row space-x-6 px-2 py-3 transition-all duration-300 cursor-pointer">
-                                                <img src={artist.picUrl} className="rounded-lg w-12 h-12" />
-                                                <p className="text-sm sm:text-base mt-3 font-semibold">
-                                                    {artist.name}
-                                                    <span className="opacity-75 ml-2 font-normal text-xs sm:text-sm mt-1">{artist.alias}</span>
-                                                </p>
-                                            </div>
+                                            <ArtistCard
+                                                name={artist.name}
+                                                artist={artist.alias}
+                                                img={artist.picUrl}
+                                            />
                                         </motion.div>
-                                    </div>
-                                ))}
+                                    ))}
+                                </div>
 
                                 <div className="columns-1 md:columns-2 sm:columns-2">
 
@@ -168,22 +167,22 @@ const Search = () => {
                                 </div>
                             </Tab.Panel>
                             <Tab.Panel>
-                                {artistResults.map((artist) => (
-                                    <motion.div
-                                        key={artist.name}
-                                        initial={{ opacity: 0, y: -50 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        className='border-b'
-                                    >
-                                        <div className="flex flex-row space-x-6 px-2 py-3 transition-all duration-300 cursor-pointer">
-                                            <img src={artist.picUrl} className="rounded-lg w-12 h-12" />
-                                            <p className="text-sm sm:text-base mt-3 font-semibold">
-                                                {artist.name}
-                                                <span className="opacity-75 ml-2 font-normal text-xs sm:text-sm mt-1">{artist.alias}</span>
-                                            </p>
-                                        </div>
-                                    </motion.div>
-                                ))}
+                                <div className="columns-1 md:columns-2 sm:columns-2">
+                                    {artistResults.map((artist) => (
+                                        <motion.div
+                                            key={artist.name}
+                                            initial={{ opacity: 0, y: -50 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            className='border-b'
+                                        >
+                                            <ArtistCard
+                                                name={artist.name}
+                                                artist={artist.alias}
+                                                img={artist.picUrl}
+                                            />
+                                        </motion.div>
+                                    ))}
+                                </div>
                             </Tab.Panel>
                             <Tab.Panel>
                                 <div className="columns-1 md:columns-2 sm:columns-2">
@@ -195,7 +194,6 @@ const Search = () => {
                                             className='border-b'
                                         >
                                             <VideoCard
-                                                key={video.vid}
                                                 name={video.title}
                                                 time={video.durationms}
                                                 img={video.coverUrl}

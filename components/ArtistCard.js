@@ -5,7 +5,7 @@ function cn(...classes) {
     return classes.filter(Boolean).join(' ');
 }
 
-export default function Card({ name, artist, time, onClick, data, id, key }) {
+export default function ArtistCard({ name, artist, time, onClick, img, id, key }) {
     const [songDetails, setSongDetails] = useState({});
     const [isHover, setIsHover] = useState(false);
     useEffect(() => {
@@ -27,7 +27,7 @@ export default function Card({ name, artist, time, onClick, data, id, key }) {
             onClick={onClick}
             onMouseEnter={() => setIsHover(true)}
             onMouseLeave={() => setIsHover(false)}
-            className="text-sm sm:text-base transition-all duration-300 px-2 border-b cursor-pointer flex flex-row justify-between w-full py-3"
+            className="text-sm sm:text-base transition-all duration-300 px-2 cursor-pointer flex flex-row justify-between w-full py-3"
         >
             <div className='flex flex-row space-x-6'>
                 <div className="w-[15%]">
@@ -39,7 +39,7 @@ export default function Card({ name, artist, time, onClick, data, id, key }) {
                         </div>
                     )}
                     <img
-                        src={songDetails.coverUrl}
+                        src={img}
                         alt="Album cover"
                         className=
                         {cn('rounded-lg w-full h-full',
@@ -49,17 +49,9 @@ export default function Card({ name, artist, time, onClick, data, id, key }) {
                 </div>
                 <div className="w-[85%] text-left flex flex-col overflow-x-auto">
                     <h1 className='overflow-x-auto font-semibold'>{name}</h1>
-                    <p className="opacity-75 text-xs sm:text-sm">{artist}</p>
+                    <p className="opacity-75 text-xs sm:text-sm">{artist !== '' ? (<>{artist}</>) : (<>none</>)}</p>
                 </div>
             </div>
-            <div className='ml-2 text-xs sm:text-sm mt-3 opacity-75'>
-                {moment(time).format('mm:ss')}
-            </div>
-            <button onClick={()=>open(`https://music.163.com/song/media/outer/url?id=${id}.mp3`)}>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="mt-2 ml-2 opacity-75 w-5 h-5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 7.5h-.75A2.25 2.25 0 004.5 9.75v7.5a2.25 2.25 0 002.25 2.25h7.5a2.25 2.25 0 002.25-2.25v-7.5a2.25 2.25 0 00-2.25-2.25h-.75m-6 3.75l3 3m0 0l3-3m-3 3V1.5m6 9h.75a2.25 2.25 0 012.25 2.25v7.5a2.25 2.25 0 01-2.25 2.25h-7.5a2.25 2.25 0 01-2.25-2.25v-.75" />
-                </svg>
-            </button>
         </button>
     )
 }

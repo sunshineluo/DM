@@ -37,7 +37,6 @@ export default function VideoCard({ name, artist, time, clicktime, vi, onClick, 
     return (
         <div>
             <button
-                key={key}
                 onClick={onClick}
                 onMouseEnter={() => setIsHover(true)}
                 onMouseLeave={() => setIsHover(false)}
