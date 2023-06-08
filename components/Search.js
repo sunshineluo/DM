@@ -135,7 +135,6 @@ const Search = () => {
                                             key={song.id}
                                         >
                                             <Card
-                                                key={song.id}
                                                 name={song.name}
                                                 artist={song.artists[0].name}
                                                 time={song.duration}
@@ -157,7 +156,6 @@ const Search = () => {
                                             key={song.id}
                                         >
                                             <Card
-                                                key={song.id}
                                                 name={song.name}
                                                 artist={song.artists[0].name}
                                                 time={song.duration}
@@ -197,7 +195,6 @@ const Search = () => {
                                             className='border-b'
                                         >
                                             <VideoCard
-                                                id={video.vid}
                                                 key={video.vid}
                                                 name={video.title}
                                                 time={video.durationms}
