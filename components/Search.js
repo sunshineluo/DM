@@ -4,7 +4,7 @@ import Card from "./Card";
 import AudioPlayer from 'react-h5-audio-player'
 import { motion } from 'framer-motion'
 import { Tab } from '@headlessui/react'
-import moment from 'moment'
+import MVCard from "./MVCard";
 import VideoCard from "./VideoCard";
 import ArtistCard from "./ArtistCard";
 
@@ -16,6 +16,7 @@ const Search = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [artistResults, setArtistResults] = useState([]);
+    const [MVResults, setMVResults] = useState([]);
     const [videoResults, setVideoResults] = useState([]);
     const handleSearch = async () => {
         const response = await fetch(
@@ -24,14 +25,19 @@ const Search = () => {
         const artist = await fetch(
             `https://cf233.eu.org/search?keywords=${searchTerm}&type=100`
         )
+        const mv = await fetch(
+            `https://cf233.eu.org/search?keywords=${searchTerm}&type=1004`
+        )
         const video = await fetch(
             `https://cf233.eu.org/search?keywords=${searchTerm}&type=1014`
         )
         const data = await response.json();
         const ad = await artist.json();
+        const mi = await mv.json();
         const vi = await video.json();
         setSearchResults(data.result.songs);
         setArtistResults(ad.result.artists);
+        setMVResults(mi.result.mvs);
         setVideoResults(vi.result.videos);
     };
     const [searchValue, setSearchValue] = useState('');
@@ -43,7 +49,7 @@ const Search = () => {
                 <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" />
             </Head>
             <div className="max-w-4xl py-8 mx-auto">
-                <div className="text-sm flex flex-row space-x-0.5 w-full">
+                <div className="text-sm flex flex-row space-x-0.5 w-full overflow-x-auto">
                     <div>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="absolute mt-2.5 sm:mt-3 ml-3 opacity-75 w-4 h-4">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
@@ -83,7 +89,7 @@ const Search = () => {
                 <ul className="mt-2 mb-24">
                     <Tab.Group>
                         <Tab.List
-                            className={cn('sticky top-0 bg-zinc-100 z-50 py-2 flex flex-row space-x-2',
+                            className={cn('z-[60] sticky top-0 bg-zinc-100 py-1 flex flex-row space-x-2',
                                 searchValue === '' ? 'hidden' : '')}
                         >
                             <Tab
@@ -100,6 +106,11 @@ const Search = () => {
                                 className="focus:outline-none ui-selected:font-semibold ui-selected:border-b-2 ui-selected:rounded-none ui-selected:border-b-black px-2 py-1"
                             >
                                 歌手
+                            </Tab>
+                            <Tab
+                                className="focus:outline-none ui-selected:font-semibold ui-selected:border-b-2 ui-selected:rounded-none ui-selected:border-b-black px-2 py-1"
+                            >
+                                MV
                             </Tab>
                             <Tab
                                 className="focus:outline-none ui-selected:font-semibold ui-selected:border-b-2 ui-selected:rounded-none ui-selected:border-b-black px-2 py-1"
@@ -121,6 +132,7 @@ const Search = () => {
                                                 name={artist.name}
                                                 artist={artist.alias}
                                                 img={artist.picUrl}
+                                                id={artist.id}
                                             />
                                         </motion.div>
                                     ))}
@@ -180,6 +192,27 @@ const Search = () => {
                                                 name={artist.name}
                                                 artist={artist.alias}
                                                 img={artist.picUrl}
+                                                id={artist.id}
+                                            />
+                                        </motion.div>
+                                    ))}
+                                </div>
+                            </Tab.Panel>
+                            <Tab.Panel>
+                                <div className="columns-1 md:columns-2 sm:columns-2">
+                                    {MVResults.map((mv) => (
+                                        <motion.div
+                                            key={mv.name}
+                                            initial={{ opacity: 0, y: -50 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            className='border-b'
+                                        >
+                                            <MVCard
+                                                name={mv.name}
+                                                time={mv.durationms}
+                                                img={mv.cover}
+                                                clicktime={mv.playCount}
+                                                id={mv.id}
                                             />
                                         </motion.div>
                                     ))}
@@ -199,6 +232,7 @@ const Search = () => {
                                                 time={video.durationms}
                                                 img={video.coverUrl}
                                                 clicktime={video.playTime}
+                                                id={video.vid}
                                             />
                                         </motion.div>
                                     ))}

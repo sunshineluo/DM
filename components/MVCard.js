@@ -6,7 +6,7 @@ function cn(...classes) {
     return classes.filter(Boolean).join(' ');
 }
 
-export default function VideoCard({ name, artist, time, clicktime, vi, onClick, img, id, key }) {
+export default function MVCard({ name, artist, time, clicktime, vi, onClick, img, id, key }) {
     let [isOpen, setIsOpen] = useState(false)
     const [playUrl, setPlayUrl] = useState('')
 
@@ -22,11 +22,11 @@ export default function VideoCard({ name, artist, time, clicktime, vi, onClick, 
     useEffect(() => {
         const fetchMVDetails = async () => {
             const response = await fetch(
-                `https://cf233.eu.org/video/url?r=1080&id=${id}`
+                `https://cf233.eu.org/mv/url?r=1080&id=${id}`
             );
             const mdata = await response.json();
             const MVData = {
-                url: mdata.urls[0].url,
+                url: mdata.data.url,
             };
             setPlayUrl(MVData);
         };
@@ -132,6 +132,6 @@ export default function VideoCard({ name, artist, time, clicktime, vi, onClick, 
                     </div>
                 </Dialog>
             </Transition>
-        </div >
+        </div>
     )
 }

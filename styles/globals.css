@@ -17,8 +17,37 @@
 }
 
 ::-webkit-scrollbar {
-  width: 0px;
-  height: 5px;
+  width: 16px;
+  height: 16px;
+}
+
+::-webkit-scrollbar-thumb {
+  min-height: 44px;
+  min-width: 44px;
+  background-color: #d4d4d8;
+  border: 5px solid transparent;
+  background-clip: padding-box;
+  @apply rounded-lg;
+}
+
+@media (hover:hover) {
+  ::-webkit-scrollbar-thumb:hover {
+      --scrollbar-color: #000000;
+  }
+}
+
+::-webkit-scrollbar-thumb:active {
+  --scrollbar-color: #000000;
+}
+
+::-webkit-scrollbar-track {
+  display: none;
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-button,
+::-webkit-scrollbar-corner {
+  display: none
 }
 
 ::-webkit-scrollbar-thumb {
