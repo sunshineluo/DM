@@ -2,67 +2,51 @@
 @tailwind components;
 @tailwind utilities;
 
-@font-face {
-  font-family: 'Ping Fang';
-  src: url(/fonts/PingFangSC-Regular.woff2) format('woff2');
-  font-display: swap;
-  font-weight: 400;
-}
-
-@font-face {
-  font-family: 'Ping Fang';
-  src: url(/fonts/PingFangSC-Semibold.woff2) format('woff2');
-  font-display: swap;
-  font-weight: 600;
-}
-
 ::-webkit-scrollbar {
-  width: 16px;
-  height: 16px;
-}
-
-::-webkit-scrollbar-thumb {
-  min-height: 44px;
-  min-width: 44px;
-  background-color: #d4d4d8;
-  border: 5px solid transparent;
-  background-clip: padding-box;
-  @apply rounded-lg;
-}
-
-@media (hover:hover) {
-  ::-webkit-scrollbar-thumb:hover {
-      --scrollbar-color: #000000;
-  }
-}
-
-::-webkit-scrollbar-thumb:active {
-  --scrollbar-color: #000000;
-}
-
-::-webkit-scrollbar-track {
   display: none;
-  @apply bg-transparent;
-}
-
-::-webkit-scrollbar-button,
-::-webkit-scrollbar-corner {
-  display: none
-}
-
-::-webkit-scrollbar-thumb {
-  @apply bg-zinc-900 rounded-lg;
 }
 
 html {
   scroll-behavior: smooth;
-  font-family: 'Inter', 'Ping Fang', sans-serif;
+  font-family: "Inter", "Noto Sans SC", sans-serif;
   -webkit-font-smoothing: antialiased;
-  @apply bg-zinc-100;
+  @apply bg-neutral-50;
 }
 
 body {
-  font-family: 'Inter', 'Ping Fang', sans-serif;
+  font-family: "Inter", "Noto Sans SC", sans-serif;
 }
 
+.SliderRoot {
+  position: relative;
+  display: flex;
+  align-items: center;
+  user-select: none;
+  touch-action: none;
+  width: 85%;
+  height: 20px;
+}
 
+.SliderTrack {
+  @apply bg-neutral-500;
+  position: relative;
+  flex-grow: 1;
+  border-radius: 9999px;
+  height: 5px;
+}
+
+.SliderRange {
+  position: absolute;
+  border-radius: 9999px;
+  height: 100%;
+  @apply bg-neutral-700;
+}
+
+.SliderThumb {
+  display: block;
+  width: 15px;
+  height: 15px;
+  box-shadow: 0 2px 10px var(--black-a7);
+  border-radius: 10px;
+  @apply bg-neutral-700;
+}

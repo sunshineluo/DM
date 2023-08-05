@@ -10,6 +10,10 @@ module.exports = {
   ],
   theme: {
     extend: {},
+    screens: {
+      sm: { min: "1360px", max: "4096px" },
+      md: { min: "768px", max: "1360px" },
+    },
   },
   plugins: [require('@headlessui/tailwindcss')],
 }
