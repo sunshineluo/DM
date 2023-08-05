@@ -167,6 +167,7 @@ export default function Beta() {
       <div>
         {songInfo.map((song) => (
           <img
+            key={song.id}
             src={song.al.picUrl}
             alt="Album Cover"
             className="bg-no-repeat absolute h-screen z-[-1] left-0 top-0 inset-x-0 right-0 w-full"
@@ -184,7 +185,7 @@ export default function Beta() {
                   initial={{ scale: 1 }}
                   animate={{ scale: isPlaying ? 1 : 0.85 }}
                   className={cn(
-                    "hidden md:hidden sm:block mx-auto w-5/6 item-center rounded-xl",
+                    "hidden md:hidden sm:block mx-auto w-5/6 item-center rounded-xl"
                   )}
                 />
                 <motion.img
