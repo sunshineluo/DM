@@ -12,7 +12,7 @@ function cn(...classes) {
 export default function Beta() {
   const [lyrics, setLyrics] = useState([]);
   const [highlightedLine, setHighlightedLine] = useState("");
-  const [songId, setSongId] = useState("38592976");
+  const [songId, setSongId] = useState("1457772407");
   const [translatedLyrics, setTranslatedLyrics] = useState([]);
   const [songInfo, setSongInfo] = useState([]);
   const audioRef = useRef(null);
@@ -22,7 +22,8 @@ export default function Beta() {
   const [seekValue, setSeekValue] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [remainingTime, setRemainingTime] = useState(0);
-  const [display, setDisplay] = useState("");
+  const [display, setDisplay] = useState(false);
+  const [volume, setVolume] = useState(1.0);
 
   useEffect(() => {
     const handleResize = () => {
@@ -162,6 +163,11 @@ export default function Beta() {
     return `${minutes}:${seconds}`;
   };
 
+  const handleVolumeChange = (newValue) => {
+    const newVolume = parseFloat(newValue);
+    setVolume(newVolume);
+  };
+
   return (
     <div className="w-screen max-h-screen h-screen">
       <div>
@@ -177,7 +183,10 @@ export default function Beta() {
       <div className="flex flex-row w-full h-screen bg-neutral-100/75 backdrop-blur-3xl">
         <div className="w-full md:w-full sm:w-1/2 h-screen left-0 top-0 bottom-0 right-0 z-10">
           {songInfo.map((song) => (
-            <div className="flex flex-col mx-auto h-screen px-6 md:px-6 sm:px-24 py-16 md:py-24 sm:py-16 ml-12">
+            <div
+              key={song.id}
+              className="flex flex-col mx-auto h-screen px-6 md:px-6 sm:px-24 py-16 md:py-24 sm:py-16 ml-12"
+            >
               <div key={song.id} className="mx-auto">
                 <motion.img
                   src={song.al.picUrl}
@@ -204,7 +213,7 @@ export default function Beta() {
                   {song.name}
                 </h1>
                 <h2 className="text-center font-medium text-lg opacity-75">
-                  {song.ar[0].name}
+                  {song.ar.map((artist) => artist.name).join(" / ")}
                 </h2>
               </div>
 
@@ -218,9 +227,9 @@ export default function Beta() {
                 onPointerUp={handleSeek}
               >
                 <Slider.Track className="SliderTrack mt-6 backdrop-blur-lg bg-opacity-75 cursor-pointer">
-                  <Slider.Range className="SliderRange cursor=pointer" />
+                  <Slider.Range className="SliderRange cursor-pointer" />
                   <Slider.Thumb
-                    className="SliderThumb -mt-1"
+                    className="SliderThumb focus:outline-none -mt-1"
                     aria-label="Progress"
                   />
                 </Slider.Track>
@@ -260,6 +269,43 @@ export default function Beta() {
                   </button>
                 </div>
               </div>
+
+              <div className="flex flex-row space-x-4 mx-auto w-full">
+                <button onClick={() => setVolume(volume === 0 ? 1 : 0)}>
+                  {volume === 0 ? (
+                    <>
+                      <Icon
+                        icon="fa-solid:volume-mute"
+                        className="font-bold w-6 h-6 text-neutral-700 mt-[1.375rem]"
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <Icon
+                        icon="fa-solid:volume-up"
+                        className="font-bold w-6 h-6 text-neutral-700 mt-[1.375rem]"
+                      />
+                    </>
+                  )}
+                </button>
+
+                <Slider.Root
+                  className="SliderRoot "
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  value={[volume]}
+                  onValueChange={(newValue) => handleVolumeChange(newValue)}
+                >
+                  <Slider.Track className="SliderTrack mt-12 backdrop-blur-lg bg-opacity-75 cursor-pointer">
+                    <Slider.Range className="SliderRange cursor-pointer" />
+                    <Slider.Thumb
+                      className="SliderThumb focus:outline-none -mt-1"
+                      aria-label="Volume"
+                    />
+                  </Slider.Track>
+                </Slider.Root>
+              </div>
             </div>
           ))}
 
@@ -268,6 +314,7 @@ export default function Beta() {
             playing={isPlaying}
             onPlay={() => setIsPlaying(true)}
             onPause={() => setIsPlaying(false)}
+            volume={volume}
             url={`https://music.163.com/song/media/outer/url?id=${songId}.mp3`}
             onProgress={(progress) => {
               handleTimeUpdate(progress);
