@@ -44,7 +44,7 @@ export default function Beta() {
 
   useEffect(() => {
     // 从 localStorage 中获取之前存储的索引值
-    const storedIndex = localStorage.getItem('currentSongIndex');
+    const storedIndex = localStorage.getItem("currentSongIndex");
     if (storedIndex !== null) {
       setCurrentSongIndex(JSON.parse(storedIndex));
     }
@@ -52,7 +52,7 @@ export default function Beta() {
 
   useEffect(() => {
     // 每当 currentSongIndex 变化时，将其存储到 localStorage 中
-    localStorage.setItem('currentSongIndex', JSON.stringify(currentSongIndex));
+    localStorage.setItem("currentSongIndex", JSON.stringify(currentSongIndex));
   }, [currentSongIndex]);
 
   const handleSongChange = (index) => {
@@ -250,11 +250,11 @@ export default function Beta() {
   return (
     <div className="w-full max-h-screen h-screen fixed overflow-y-auto">
       <Head>
-          {songInfo.map((song) => (
-            <title>
-              {song.name} - {song.ar.map((artist) => artist.name).join(" / ")}
-            </title>
-          ))}
+        {songInfo.map((song) => (
+          <title key={song.id}> 
+            {song.name} - {song.ar.map((artist) => artist.name).join(" / ")}
+          </title>
+        ))}
       </Head>
       <div>
         {songInfo.map((song) => (
