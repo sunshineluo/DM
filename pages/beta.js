@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import ReactPlayer from "react-player";
 import { Icon } from "@iconify/react";
 import * as Slider from "@radix-ui/react-slider";
+import Head from "next/head";
 
 function cn(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -40,6 +41,23 @@ export default function Beta() {
     const storedDisplay = localStorage.getItem("display");
     return storedDisplay !== null ? JSON.parse(storedDisplay) : true; // 设置默认值为true
   });
+
+  useEffect(() => {
+    // 从 localStorage 中获取之前存储的索引值
+    const storedIndex = localStorage.getItem('currentSongIndex');
+    if (storedIndex !== null) {
+      setCurrentSongIndex(JSON.parse(storedIndex));
+    }
+  }, []);
+
+  useEffect(() => {
+    // 每当 currentSongIndex 变化时，将其存储到 localStorage 中
+    localStorage.setItem('currentSongIndex', JSON.stringify(currentSongIndex));
+  }, [currentSongIndex]);
+
+  const handleSongChange = (index) => {
+    setCurrentSongIndex(index);
+  };
 
   useEffect(() => {
     const handleResize = () => {
@@ -148,16 +166,19 @@ export default function Beta() {
     setHighlightedLine(currentHighlightedLine);
 
     // 滚动到当前高亮行
-    const targetElement = lyricsContainerRef.current.querySelector(
-      `p[data-text="${currentHighlightedLine
-        .replace(/"/g, '\\"')
-        .replace(/'/g, "\\'")}"]`
-    );
-    if (targetElement) {
-      targetElement.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
+    if (currentHighlightedLine) {
+      const targetElement = lyricsContainerRef.current?.querySelector(
+        `p[data-text="${currentHighlightedLine
+          .replace(/"/g, '\\"')
+          .replace(/'/g, "\\'")}"]`
+      );
+
+      if (targetElement) {
+        targetElement.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      }
     }
   };
 
@@ -227,7 +248,14 @@ export default function Beta() {
   let translatedIndex = -1;
 
   return (
-    <div className="w-full max-h-screen h-screen fixed">
+    <div className="w-full max-h-screen h-screen fixed overflow-y-auto">
+      <Head>
+          {songInfo.map((song) => (
+            <title>
+              {song.name} - {song.ar.map((artist) => artist.name).join(" / ")}
+            </title>
+          ))}
+      </Head>
       <div>
         {songInfo.map((song) => (
           <img
@@ -241,7 +269,7 @@ export default function Beta() {
       <div className="flex flex-row w-full h-screen bg-neutral-100/75 backdrop-blur-3xl">
         <div
           className={cn(
-            "transition-all duration-500 w-full md:w-full sm:w-1/2 h-screen left-0 right-0 z-50 fixed bottom-0 overflow-y-auto",
+            "transition-all duration-500 w-full md:w-full sm:w-1/2 h-screen left-0 right-0 z-50 fixed select-none bottom-0 overflow-y-auto",
             display === false
               ? "w-screen"
               : "top-[45vh] md:top-[60vh] sm:top-0 z-[99999] py-0 md:py-12 sm:py-0 "
@@ -307,7 +335,7 @@ export default function Beta() {
                 <div className="opacity-75">-{formatTime(remainingTime)}</div>
               </div>
 
-              <div className="flex flex-row justify-between text-neutral-700 px-6">
+              <div className="flex flex-row justify-between text-neutral-700 px-6 md:px-8 sm:px-10">
                 {" "}
                 <button>
                   <Icon
@@ -420,7 +448,7 @@ export default function Beta() {
         <AnimatePresence>
           <motion.div
             className={cn(
-              "text-left flex right-0 py-12 overflow-y-auto fixed z-20 pointer-events-none select-none",
+              "text-left flex right-0 py-12 overflow-y-auto fixed z-20 select-none",
               display === false
                 ? "hidden"
                 : "block h-[50vh] md:h-[65vh] mx-auto md:mx-auto sm:mr-auto sm:h-screen max-w-sm md:max-w-3xl sm:max-w-none right-0 w-full md:w-full sm:w-[55%] ",
@@ -456,7 +484,7 @@ export default function Beta() {
                     <span>{line.text}</span>
                     {!shouldHideTranslation(line.text) && (
                       <span
-                        className={`font-medium text-2xl md:text-3xl sm:text-4xl text-neutral-500 ${
+                        className={`font-medium mt-4 text-2xl md:text-3xl sm:text-4xl text-neutral-500 ${
                           shouldMoveTranslation ? "moved-translation" : ""
                         } ${shouldMoveTranslation || isHidden ? "hidden" : ""}`}
                       >
