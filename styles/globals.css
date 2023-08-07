@@ -31,22 +31,21 @@ body {
   @apply bg-neutral-500;
   position: relative;
   flex-grow: 1;
-  border-radius: 9999px;
   height: 5px;
+  @apply rounded-full;
 }
 
 .SliderRange {
   position: absolute;
-  border-radius: 9999px;
   height: 100%;
-  @apply bg-neutral-700;
+  @apply bg-neutral-700 rounded-l-full overflow-hidden;
 }
 
 .SliderThumb {
-  display: block;
   width: 15px;
   height: 15px;
   box-shadow: 0 2px 10px var(--black-a7);
   border-radius: 10px;
   @apply bg-neutral-700;
+  display: none;
 }
