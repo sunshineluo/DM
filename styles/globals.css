@@ -38,7 +38,7 @@ body {
 .SliderRange {
   position: absolute;
   height: 100%;
-  @apply bg-neutral-700 rounded-l-full overflow-hidden;
+  @apply bg-neutral-700;
 }
 
 .SliderThumb {
@@ -48,4 +48,13 @@ body {
   border-radius: 10px;
   @apply bg-neutral-700;
   display: none;
+}
+
+.container {
+  column-count: 2; /* 将容器分为两列 */
+  column-gap: 0; /* 列之间没有间隔 */
+}
+
+.text {
+  break-inside: avoid-column; /* 不允许文本跨列断行 */
 }

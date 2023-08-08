@@ -26,7 +26,10 @@ export default function Beta() {
     "1352247646",
     "2020818962",
   ]); // 歌曲ID数组
-  const [currentSongIndex, setCurrentSongIndex] = useState(0); // 当前歌曲索引
+  const initialSongIndex =
+    parseInt(localStorage.getItem("currentSongIndex"), 10) || 0;
+  const [currentSongIndex, setCurrentSongIndex] = useState(initialSongIndex); // 当前歌曲索引
+  const [playMode, setPlayMode] = useState("default"); // 默认为顺序播放模式
   const [translatedLyrics, setTranslatedLyrics] = useState([]);
   const [songInfo, setSongInfo] = useState([]);
   const audioRef = useRef(null);
@@ -164,11 +167,12 @@ export default function Beta() {
     }
 
     setHighlightedLine(currentHighlightedLine);
+  };
 
-    // 滚动到当前高亮行
-    if (currentHighlightedLine) {
+  useEffect(() => {
+    if (highlightedLine) {
       const targetElement = lyricsContainerRef.current?.querySelector(
-        `p[data-text="${currentHighlightedLine
+        `p[data-text="${highlightedLine
           .replace(/"/g, '\\"')
           .replace(/'/g, "\\'")}"]`
       );
@@ -180,7 +184,7 @@ export default function Beta() {
         });
       }
     }
-  };
+  }, [highlightedLine]);
 
   const handleProgress = (progress) => {
     setPlayed(progress.played);
@@ -218,8 +222,8 @@ export default function Beta() {
 
   const shouldHideTranslation = (text) => {
     const commonWords = [
-      "作曲",
-      "作词",
+      "作曲 :",
+      "作词 :",
       "演唱",
       "编曲",
       "制作",
@@ -244,14 +248,86 @@ export default function Beta() {
     return commonWords.some((word) => text.includes(word));
   };
 
+  const handlePlayMode = () => {
+    // 切换播放模式
+    if (playMode === "default") {
+      setPlayMode("loop");
+    } else if (playMode === "loop") {
+      setPlayMode("shuffle");
+    } else {
+      setPlayMode("default");
+    }
+  };
+
   let originalIndex = 0;
   let translatedIndex = -1;
 
+  function shuffleArray(array) {
+    const newArray = [...array]; // 创建一个新数组，并复制原始数组的元素
+
+    for (let i = newArray.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [newArray[i], newArray[j]] = [newArray[j], newArray[i]]; // 交换位置
+    }
+
+    return newArray;
+  }
+
+  const handleEnded = () => {
+    if (playMode === "default") {
+      // 播放下一首音频
+      setCurrentSongIndex((prevIndex) => (prevIndex + 1) % songIds.length);
+      setIsPlaying(true);
+    } else if (playMode === "loop") {
+      // 继续播放当前音频
+      audioRef.current.seekTo(0);
+      setIsPlaying(true);
+    } else if (playMode === "shuffle") {
+      // 创建一个随机排列的数组
+      const shuffledIndexes = shuffleArray(
+        Array.from({ length: songIds.length }, (_, i) => i)
+      );
+      // 获取当前音频索引
+      const currentIndex = shuffledIndexes.findIndex(
+        (index) => index === currentSongIndex
+      );
+      // 播放下一首随机音频
+      setCurrentSongIndex(
+        shuffledIndexes[(currentIndex + 1) % shuffledIndexes.length]
+      );
+      setIsPlaying(true);
+    }
+  };
+
+  const elementRef = useRef(null);
+
+  const toggleFullscreen = () => {
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    } else {
+      elementRef.current.requestFullscreen();
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeydown);
+    return () => {
+      document.removeEventListener("keydown", handleKeydown);
+    };
+  }, []);
+
+  const handleKeydown = (event) => {
+    if (event.key === "F11") {
+      event.preventDefault();
+      toggleFullscreen();
+    }
+  };
+
   return (
-    <div className="w-full max-h-screen h-screen fixed overflow-y-auto">
+    <div ref={elementRef} className="w-full max-h-screen h-screen fixed">
       <Head>
         {songInfo.map((song) => (
-          <title key={song.id}> 
+          <title key={song.id}>
             {song.name} - {song.ar.map((artist) => artist.name).join(" / ")}
           </title>
         ))}
@@ -271,14 +347,14 @@ export default function Beta() {
           className={cn(
             "transition-all duration-500 w-full md:w-full sm:w-1/2 h-screen left-0 right-0 z-50 fixed select-none bottom-0 overflow-y-auto",
             display === false
-              ? "w-screen"
-              : "top-[45vh] md:top-[60vh] sm:top-0 z-[99999] py-0 md:py-12 sm:py-0 "
+              ? "top-0 md:top-0 sm:top-0 w-screen"
+              : "top-[50vh] md:top-[60vh] sm:top-0 z-[99999] py-0 md:py-12 sm:py-0 "
           )}
         >
           {songInfo.map((song) => (
             <div
               key={song.id}
-              className="flex flex-col mx-auto h-screen px-0 md:px-32 sm:px-32 py-12"
+              className="flex flex-col mx-auto h-screen px-0 md:px-32 sm:px-32 py-4 md:py-12 sm:py-12"
             >
               <div key={song.id} className="mx-auto">
                 <motion.img
@@ -322,7 +398,12 @@ export default function Beta() {
                 onPointerUp={handleSeek}
               >
                 <Slider.Track className="SliderTrack mt-6 backdrop-blur-lg bg-opacity-75 cursor-pointer">
-                  <Slider.Range className="SliderRange cursor-pointer" />
+                  <Slider.Range
+                    className={cn(
+                      "SliderRange cursor-pointer",
+                      played === 1 ? "rounded-full" : "rounded-l-full"
+                    )}
+                  />
                   <Slider.Thumb
                     className="SliderThumb focus:outline-none -mt-1"
                     aria-label="Progress"
@@ -337,11 +418,22 @@ export default function Beta() {
 
               <div className="flex flex-row justify-between text-neutral-700 px-6 md:px-8 sm:px-10">
                 {" "}
-                <button>
-                  <Icon
-                    icon="icon-park-outline:play-cycle"
-                    className="w-6 h-6 opacity-75 "
-                  />
+                <button onClick={handlePlayMode}>
+                  {playMode === "default" && (
+                    <Icon
+                      icon="bi:repeat"
+                      className="w-8 h-8 opacity-75"
+                    />
+                  )}
+                  {playMode === "loop" && (
+                    <Icon
+                      icon="bi:repeat-1"
+                      className="w-8 h-8 opacity-75"
+                    />
+                  )}
+                  {playMode === "shuffle" && (
+                    <Icon icon="bi:shuffle" className="w-8 h-8 opacity-75" />
+                  )}
                 </button>
                 <div className="w-[57.5%] md:w-[45%] sm:w-[45%] mx-auto mt-5 mb-5">
                   <div className="mx-auto flex flex-row justify-between z-30">
@@ -389,8 +481,14 @@ export default function Beta() {
                   onClick={() => setDisplay(display === false ? true : false)}
                 >
                   <Icon
-                    icon="fa6-solid:file-word"
-                    className="w-6 h-6 opacity-75 block md:block sm:hidden"
+                    icon="solar:password-minimalistic-bold"
+                    className="w-8 h-8 opacity-75 block md:block sm:hidden"
+                  />
+                </button>
+                <button onClick={toggleFullscreen}>
+                  <Icon
+                    icon="solar:full-screen-square-bold"
+                    className="w-8 h-8 opacity-75 hidden md:hidden sm:block"
                   />
                 </button>
               </div>
@@ -412,7 +510,12 @@ export default function Beta() {
                   onValueChange={(newValue) => handleVolumeChange(newValue)}
                 >
                   <Slider.Track className="SliderTrack mt-12 backdrop-blur-lg bg-opacity-75 cursor-pointer">
-                    <Slider.Range className="SliderRange cursor-pointer" />
+                    <Slider.Range
+                      className={cn(
+                        "SliderRange cursor-pointer",
+                        volume === 1 ? "rounded-full" : "rounded-l-full"
+                      )}
+                    />
                     <Slider.Thumb
                       className="SliderThumb focus:outline-none -mt-1"
                       aria-label="Volume"
@@ -420,7 +523,7 @@ export default function Beta() {
                   </Slider.Track>
                 </Slider.Root>
 
-                <button>
+                <button onClick={() => setVolume(1)}>
                   <Icon
                     icon="fa-solid:volume-up"
                     className="font-bold w-6 h-6 text-neutral-700 mt-[1.375rem]"
@@ -441,7 +544,8 @@ export default function Beta() {
               handleTimeUpdate(progress);
               handleProgress(progress);
             }}
-            className="fixed top-0"
+            onEnded={handleEnded}
+            className="fixed top-0 hidden"
           />
         </div>
 
@@ -473,24 +577,28 @@ export default function Beta() {
                   <motion.p
                     key={index}
                     className={cn(
-                      "text-left h-auto max-h-min w-full flex flex-col space-y-1 tracking-tighter transition-all duration-500 cursor-pointer text-neutral-700 rounded-3xl px-8 py-6 md:py-8 sm:py-10 leading-snug flex-1 font-semibold",
+                      "text-left h-auto max-h-min w-full max-w-3xl flex flex-col space-y-1 tracking-tighter transition-all duration-500 cursor-pointer text-neutral-700 rounded-3xl px-8 py-4 md:py-7 sm:py-10 leading-normal flex-1 font-semibold",
                       line.text === highlightedLine
-                        ? "font-semibold text-4xl md:text-5xl sm:text-6xl  text-neutral-600"
+                        ? "font-semibold text-4xl md:text-5xl sm:text-6xl text-neutral-600"
                         : "text-3xl md:text-4xl sm:text-5xl blur-[2px] text-neutral-600 font-semibold"
                     )}
                     onClick={() => audioRef.current.seekTo(line.timestamp)}
                     data-text={line.text}
                   >
-                    <span>{line.text}</span>
+                    <span className="mb-1 md:mb-2 sm:mb-4 leading-normal">
+                      {line.text}
+                    </span>
+
                     {!shouldHideTranslation(line.text) && (
                       <span
-                        className={`font-medium mt-4 text-2xl md:text-3xl sm:text-4xl text-neutral-500 ${
+                        className={`font-medium mt-8 text-2xl md:text-3xl sm:text-4xl text-neutral-500 ${
                           shouldMoveTranslation ? "moved-translation" : ""
                         } ${shouldMoveTranslation || isHidden ? "hidden" : ""}`}
                       >
                         {translatedLyrics[translatedIndex]?.text}
                       </span>
                     )}
+
                     {shouldMoveTranslation && (
                       <motion.p className="hidden">&nbsp;</motion.p>
                     )}
