@@ -11,6 +11,13 @@ const Playlist = () => {
   const id = router.query.id || null;
   const [playlistDetail, setPlaylistDetail] = useState(null);
   const [playlistTrack, setPlaylistTrack] = useState(null);
+  const [searchTerm, setSearchTerm] = useState(""); // 搜索关键词状态
+
+  const filteredTracks = playlistTrack
+    ? playlistTrack.filter((track) =>
+        track.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : [];
 
   const getPlaylistDetail = async () => {
     try {
@@ -34,7 +41,7 @@ const Playlist = () => {
         {
           params: {
             id: id,
-            limit: 100,
+            limit: 1000,
           },
         }
       );
@@ -53,12 +60,17 @@ const Playlist = () => {
     }
   }, [id]);
 
-  const { songIds, addToPlaylist } = useContext(SongIdsContext);
+  const { songIds, addAllToPlaylist, addToPlaylist } =
+    useContext(SongIdsContext);
 
   const handleAddToPlaylist = (trackId) => {
     addToPlaylist(trackId);
   };
 
+  const handlePlayAll = () => {
+    const trackIds = playlistTrack.map((track) => track.id);
+    addAllToPlaylist(trackIds); // 将所有歌曲ID传递给 addAllToPlaylist 函数
+  };
 
   return (
     <div>
@@ -97,7 +109,7 @@ const Playlist = () => {
                           />
                         )}
                         <div className="flex flex-col space-y-2 mt-3 md:mt-6 sm:mt-6">
-                          <h1 className="font-medium text-3xl">
+                          <h1 className="font-medium text-2xl md:text-3xl sm:text-3xl">
                             {detail.name}
                           </h1>
                           <p className="text-lg opacity-75">
@@ -111,13 +123,32 @@ const Playlist = () => {
                 )
             )}
 
-          <button className="text-xl mt-12 text-red-600 flex flex-row space-x-2 ml-4 md:ml-0 sm:ml-0">
-            <Icon icon="bi:play-circle-fill" className="mt-1 mr-1.5" />
-            播放所有
-          </button>
+          <div className="flex flex-row justify-between">
+            <div>
+              <button
+                className="text-xl mt-12 text-red-600 flex flex-row space-x-2 ml-4 md:ml-0 sm:ml-0"
+                onClick={handlePlayAll}
+              >
+                <Icon icon="bi:play-circle-fill" className="mt-1 mr-1.5" />
+                播放全部
+              </button>
+            </div>
+            <div className="mt-9 flex flex-row w-1/2 md:w-1/3 sm:w-1/3">
+              <Icon
+                icon="bi:search"
+                className="absolute text-neutral-700 opacity-75 w-5 h-5 mt-3.5 md:mt-3 sm:mt-3 ml-3"
+              />
+              <input
+                type="search"
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="搜索歌单..."
+                className="w-full px-10 md:px-12 sm:px-12 py-2 focus:outline-none text-lg focus:ring-2 focus:ring-red-600 border-2 rounded-xl"
+              />
+            </div>
+          </div>
           <div className="mt-6">
-            {playlistTrack !== null &&
-              playlistTrack.map((track, index) => (
+            {filteredTracks.length > 0 ? (
+              filteredTracks.map((track, index) => (
                 <button
                   key={track.id}
                   className={`flex flex-row space-x-4 w-full rounded-none md:rounded-xl sm:rounded-xl px-6 py-4 ${
@@ -134,12 +165,15 @@ const Playlist = () => {
                       {track.name}
                     </span>
                     <span className="text-base opacity-75 text-left">
-                      {track.ar.map((artist) => artist.name).join(" / ")} -
+                      {track.ar.map((artist) => artist.name).join(" / ")} -{" "}
                       {track.al.name}
                     </span>
                   </div>
                 </button>
-              ))}
+              ))
+            ) : (
+              <p>没有找到匹配的歌曲。</p>
+            )}
           </div>
         </div>
       </div>

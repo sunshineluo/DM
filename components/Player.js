@@ -348,6 +348,10 @@ export default function Player({ ids, full }) {
     }
   }, [playIds]);
 
+  const handleAddToPlaylist = (trackId) => {
+    addToPlaylist(trackId);
+  };
+
   return (
     <div ref={elementRef} className="w-full max-h-screen h-screen fixed">
       <div>
@@ -370,18 +374,22 @@ export default function Player({ ids, full }) {
               <div className="flex flex-col justify-start mt-6 overflow-y-auto">
                 {playlistDetails.length > 0 &&
                   playlistDetails.map((track, index) => {
-                    const handleDeleteSong = () => {
-                      removeFromPlaylist(track.id);
+                    const handleDeleteSong = (id) => {
+                      // 在这里处理删除操作，使用传入的id参数
+                      removeFromPlaylist(id);
                     };
                     return (
-                      <div>
-                        <button
+                      <div key={track.id}>
+                        <div
                           key={track.id}
-                          className={`flex flex-row justify-between w-full rounded-none md:rounded-xl sm:rounded-xl px-6 py-4 ${
+                          className={`cursor-pointer flex flex-row justify-between w-full rounded-xl px-6 py-4 ${
                             index % 2 === 0 ? "bg-neutral-200" : "odd"
                           }`}
                         >
-                          <div className="flex flex-row space-x-4">
+                          <div
+                            onClick={() => handleAddToPlaylist(track.id)}
+                            className="flex flex-row space-x-4"
+                          >
                             <img
                               src={track.al.picUrl}
                               className="rounded-xl w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
@@ -399,23 +407,18 @@ export default function Player({ ids, full }) {
                             </div>
                           </div>
                           <button
-                            onClick={handleDeleteSong(track.id)}
-                            className="text-red-600 mt-4 w-24 text-right"
+                            onClick={() => handleDeleteSong(track.id)}
+                            className="text-red-600 w-24 md:w-16 sm:w-8 text-right"
                           >
                             删除
                           </button>
-                        </button>
+                        </div>
                       </div>
                     );
                   })}
               </div>
             </Dialog.Content>
           </Dialog.Portal>
-          <Dialog.Close asChild>
-            <button className="Button green fixed bottom-8 rounded-xl bg-neutral-300 text-xl text-neutral-700 opacity-100 px-8 py-2">
-              关闭播放列表
-            </button>
-          </Dialog.Close>
         </Dialog.Root>
       </div>
       <ReactPlayer
@@ -435,7 +438,7 @@ export default function Player({ ids, full }) {
       {isFull === "false" && (
         <div className="fixed bottom-0 w-full bg-neutral-200/75 backdrop-blur-lg border-t-[1.5px] border-t-neutral-200/50">
           <div className="max-w-4xl mx-auto px-0 md:px-8 sm:px-8">
-            {songInfo.length > 0 &&
+            {songInfo && songInfo.length > 0 &&
               songInfo.map((song) => (
                 <div key={song.id} className="flex flex-row">
                   <div className="flex flex-row space-y-4 space-x-2 md:space-x-4 sm:space-x-4">
