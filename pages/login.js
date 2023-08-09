@@ -49,27 +49,12 @@ export default function QrLogin() {
       if (statusRes.code === 803) {
         clearInterval(timer);
         alert("授权登录成功");
-        await getLoginStatus();
+        getLoginStatus();
       }
     }, 3000);
   }
 
   login();
-
-  const getUserInfo = async () => {
-    try {
-      const response = await axios.get(
-        "https://cf233.eu.org/user/detail?uid=32953014"
-      );
-      const { data } = response;
-      const userInfo = data.data;
-
-      // 处理用户信息
-      console.log(userInfo);
-    } catch (error) {
-      console.error("Failed to get user info", error);
-    }
-  };
 
   return (
     <div>

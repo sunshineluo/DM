@@ -45,7 +45,7 @@ export default function Dashboard() {
     <div>
       <img
         src={userData.data.profile.backgroundUrl}
-        className="fixed z-[-1] w-full blur-lg h-screen"
+        className="fixed z-[-1] w-full blur-lg h-screen hidden"
       />
       <div className="bg-neutral-100/75 backdrop-blur-3xl w-full min-h-screen">
         <div className="max-w-4xl mx-auto px-6 py-16 overflow-y-auto">
