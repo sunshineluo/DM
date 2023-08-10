@@ -3,11 +3,11 @@ import Search from "../components/Search"
 
 export default function Home({ playlist, singer }) {
   return (
-    <Layout>
-
-      <Search />
-
-    </Layout>
+    <div className="font-mono">
+      /login
+      /dashboard
+      /search
+    </div>
   )
 }
 

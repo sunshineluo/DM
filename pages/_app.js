@@ -8,6 +8,7 @@ import "inter-ui/inter.css";
 import "@fontsource/noto-sans-sc/400.css";
 import "@fontsource/noto-sans-sc/500.css";
 import "@fontsource/noto-sans-sc/700.css";
+import Navbar from "@/components/Navbar";
 
 export default function App({ Component, pageProps }) {
   const [showChild, setShowChild] = useState(false);
@@ -20,6 +21,7 @@ export default function App({ Component, pageProps }) {
   }
   return (
     <SongIdsProvider>
+      <Navbar />
       <Component {...pageProps} />
       <Player full="false" />
     </SongIdsProvider>

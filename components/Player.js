@@ -188,10 +188,25 @@ export default function Player({ ids, full }) {
     }
   }, [highlightedLine]);
 
+  useEffect(() => {
+    // 从 localStorage 中获取已播放的时间
+    const savedPlayedTime = localStorage.getItem('playedTime');
+    if (savedPlayedTime) {
+      const parsedTime = parseFloat(savedPlayedTime);
+      setPlayed(parsedTime);
+      setCurrentTime(parsedTime);
+      audioRef.current.seekTo(parsedTime);
+    }
+  }, []);
+
   const handleProgress = (progress) => {
+    const playedTime = progress.playedSeconds;
     setPlayed(progress.played);
-    setCurrentTime(progress.playedSeconds);
-    setRemainingTime(audioRef.current.getDuration() - progress.playedSeconds);
+    setCurrentTime(playedTime);
+    setRemainingTime(audioRef.current.getDuration() - playedTime);
+
+    // 保存已播放的时间到 localStorage
+    localStorage.setItem('playedTime', playedTime.toString());
   };
 
   const handleSeekChange = (newValue) => {
@@ -325,8 +340,13 @@ export default function Player({ ids, full }) {
     }
   };
 
-  const { getAllSongIds } = useContext(SongIdsContext);
+  const { getAllSongIds, removeAllFromPlaylist, addAllToPlaylist } =
+    useContext(SongIdsContext);
   const playIds = getAllSongIds();
+
+  const handleRemoveAll = () => {
+    removeAllFromPlaylist();
+  };
 
   useEffect(() => {
     const fetchPlaylistDetails = async () => {
@@ -337,7 +357,6 @@ export default function Player({ ids, full }) {
           },
         });
         setPlaylistDetails(response.data.songs);
-        console.log(playlistDetails);
       } catch (error) {
         console.error("Error fetching playlist details: ", error);
       }
@@ -348,79 +367,18 @@ export default function Player({ ids, full }) {
     }
   }, [playIds]);
 
+  const handlePlayAll = () => {
+    const trackIds = playlistDetails.map((track) => track.id);
+    addAllToPlaylist(trackIds); // 将所有歌曲ID传递给 addAllToPlaylist 函数
+  };
+
   const handleAddToPlaylist = (trackId) => {
     addToPlaylist(trackId);
   };
 
   return (
     <div ref={elementRef} className="w-full max-h-screen h-screen fixed">
-      <div>
-        <Dialog.Root>
-          <Dialog.Trigger asChild>
-            <button className="fixed top-12 md:top-12 sm:top-32 left-2 md:left-8 sm:left-12 z-[9999] flex flex-col">
-              <Icon
-                icon="bi:archive-fill"
-                className="w-4 md:w-8 h-4 md:h-8 sm:w-8 sm:h-8 opacity-75 text-neutral-700"
-              />
-            </button>
-          </Dialog.Trigger>
-          <Dialog.Portal>
-            <Dialog.Overlay className="DialogOverlay bg-black/25 backdrop-blur-3xl" />
-            <Dialog.Content className="DialogContent fixed max-w-4xl mx-auto w-full h-screen bg-neutral-100 overflow-y-auto backdrop-blur-lg z-[999]">
-              <Dialog.Title className="DialogTitle font-medium text-3xl">
-                播放列表({playlistDetails.length})
-              </Dialog.Title>
-
-              <div className="flex flex-col justify-start mt-6 overflow-y-auto">
-                {playlistDetails.length > 0 &&
-                  playlistDetails.map((track, index) => {
-                    const handleDeleteSong = (id) => {
-                      // 在这里处理删除操作，使用传入的id参数
-                      removeFromPlaylist(id);
-                    };
-                    return (
-                      <div key={track.id}>
-                        <div
-                          key={track.id}
-                          className={`cursor-pointer flex flex-row justify-between w-full rounded-xl px-6 py-4 ${
-                            index % 2 === 0 ? "bg-neutral-200" : "odd"
-                          }`}
-                        >
-                          <div
-                            onClick={() => handleAddToPlaylist(track.id)}
-                            className="flex flex-row space-x-4"
-                          >
-                            <img
-                              src={track.al.picUrl}
-                              className="rounded-xl w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
-                            />
-                            <div className="flex flex-col space-y-1 mt-1">
-                              <span className="font-medium text-left w-full flex-nowrap flex overflow-hidden">
-                                {track.name}
-                              </span>
-                              <span className="text-base opacity-75 text-left">
-                                {track.ar
-                                  .map((artist) => artist.name)
-                                  .join(" / ")}{" "}
-                                -{track.al.name}
-                              </span>
-                            </div>
-                          </div>
-                          <button
-                            onClick={() => handleDeleteSong(track.id)}
-                            className="text-red-600 w-24 md:w-16 sm:w-8 text-right"
-                          >
-                            删除
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
-              </div>
-            </Dialog.Content>
-          </Dialog.Portal>
-        </Dialog.Root>
-      </div>
+      <div></div>
       <ReactPlayer
         ref={audioRef}
         playing={isPlaying}
@@ -438,9 +396,10 @@ export default function Player({ ids, full }) {
       {isFull === "false" && (
         <div className="fixed bottom-0 w-full bg-neutral-200/75 backdrop-blur-lg border-t-[1.5px] border-t-neutral-200/50">
           <div className="max-w-4xl mx-auto px-0 md:px-8 sm:px-8">
-            {songInfo && songInfo.length > 0 &&
+            {songInfo &&
+              songInfo.length > 0 &&
               songInfo.map((song) => (
-                <div key={song.id} className="flex flex-row">
+                <div key={song.id} className="flex flex-row overflow-x-auto">
                   <div className="flex flex-row space-y-4 space-x-2 md:space-x-4 sm:space-x-4">
                     <div className="py-2 md:py-4 sm:py-4 flex flex-row space-x-4 px-6 md:px-4 sm:px-4 w-56 md:w-72 sm:w-72">
                       <img
@@ -451,10 +410,10 @@ export default function Player({ ids, full }) {
                         className="rounded-xl w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16 cursor-pointer"
                       />
                       <div className="flex flex-col space-y-1 mt-1 ">
-                        <span className="text-base font-medium text-center w-full flex-nowrap flex overflow-hidden truncate">
+                        <span className="text-base font-medium text-center w-36 flex-nowrap flex truncate">
                           {song.name}
                         </span>
-                        <span className="text-base opacity-75 text-left whitespace-nowrap">
+                        <span className="text-base opacity-75 text-left w-54 truncate flex-nowrap flex">
                           {song.ar.map((artist) => artist.name).join(" / ")}
                         </span>
                       </div>
@@ -525,22 +484,86 @@ export default function Player({ ids, full }) {
                             </button>
                           </div>
                         </div>
-                        <button
-                          onClick={() =>
-                            setDisplay(display === false ? true : false)
-                          }
-                        >
-                          <Icon
-                            icon="solar:password-minimalistic-bold"
-                            className="w-4 md:w-6 sm:w-6 h-6 opacity-75 block md:block sm:hidden"
-                          />
-                        </button>
-                        <button onClick={toggleFullscreen}>
-                          <Icon
-                            icon="bi:card-list"
-                            className="w-6 h-6 opacity-75 hidden md:hidden sm:block"
-                          />
-                        </button>
+                        <Dialog.Root>
+                          <Dialog.Trigger asChild>
+                            <button>
+                              <Icon
+                                icon="bi:card-list"
+                                className="w-4 md:w-6 sm:w-6 h-6 opacity-75"
+                              />
+                            </button>
+                          </Dialog.Trigger>
+                          <Dialog.Portal>
+                            <Dialog.Overlay className="DialogOverlay bg-black/25 backdrop-blur-3xl" />
+                            <Dialog.Content className="DialogContent fixed max-w-4xl mx-auto w-full h-screen bg-neutral-100 overflow-y-auto backdrop-blur-lg z-[999]">
+                              <Dialog.Title className="DialogTitle font-medium text-3xl">
+                                播放列表({playlistDetails.length})
+                              </Dialog.Title>
+
+                              <div className="flex flex-row justify-between text-red-600 mt-6 px-3">
+                                <button onClick={handlePlayAll}>
+                                  播放全部
+                                </button>
+                                <button onClick={handleRemoveAll}>
+                                  删除全部
+                                </button>
+                              </div>
+
+                              <div className="flex flex-col justify-start mt-4 overflow-y-auto">
+                                {playlistDetails.length > 0 &&
+                                  playlistDetails.map((track, index) => {
+                                    const handleDeleteSong = (id) => {
+                                      // 在这里处理删除操作，使用传入的id参数
+                                      removeFromPlaylist(id);
+                                    };
+                                    return (
+                                      <div key={track.id}>
+                                        <div
+                                          key={track.id}
+                                          className={`cursor-pointer flex flex-row justify-between w-full rounded-xl px-6 py-4 ${
+                                            index % 2 === 0
+                                              ? "bg-neutral-200"
+                                              : "odd"
+                                          }`}
+                                        >
+                                          <div
+                                            onClick={() =>
+                                              handleAddToPlaylist(track.id)
+                                            }
+                                            className="flex flex-row space-x-4"
+                                          >
+                                            <img
+                                              src={track.al.picUrl}
+                                              className="rounded-xl w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
+                                            />
+                                            <div className="flex flex-col space-y-1 mt-1">
+                                              <span className="font-medium text-left w-full flex-nowrap flex overflow-hidden">
+                                                {track.name}
+                                              </span>
+                                              <span className="text-base opacity-75 text-left">
+                                                {track.ar
+                                                  .map((artist) => artist.name)
+                                                  .join(" / ")}{" "}
+                                                -{track.al.name}
+                                              </span>
+                                            </div>
+                                          </div>
+                                          <button
+                                            onClick={() =>
+                                              handleDeleteSong(track.id)
+                                            }
+                                            className="text-red-600 w-24 md:w-16 sm:w-8 text-right"
+                                          >
+                                            删除
+                                          </button>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                              </div>
+                            </Dialog.Content>
+                          </Dialog.Portal>
+                        </Dialog.Root>
                       </div>
                       <div>
                         <Slider.Root
@@ -578,7 +601,7 @@ export default function Player({ ids, full }) {
       {isFull === "true" && (
         <motion.div className="fixed top-0 w-full h-screen">
           <button
-            className="fixed top-2 md:top-24 sm:top-8 inset-x-0 left-0 md:left-4 sm:left-8 right-0 z-[99999]"
+            className="fixed top-2 md:top-24 sm:top-8 inset-x-0 left-0 md:left-4 sm:left-8 right-0 z-[99999] hidden md:hidden sm:block"
             onClick={() => setIsFull("false")}
           >
             <Icon
@@ -621,7 +644,7 @@ export default function Player({ ids, full }) {
                           : { scale: 1 }
                       }
                       className={cn(
-                        "hidden md:hidden sm:block mx-auto w-5/6 item-center rounded-xl"
+                        "hidden md:hidden sm:block mx-auto w-5/6 object-cover item-center rounded-xl"
                       )}
                     />
                     <motion.img
@@ -666,8 +689,10 @@ export default function Player({ ids, full }) {
                   </Slider.Root>
 
                   <div className="w-[85%] mx-auto mt-3 flex flex-row justify-between font-medium">
-                    <div className="opacity-75">{formatTime(currentTime)}</div>
-                    <div className="opacity-75">
+                    <div className="text-sm md:text-base sm:text-base opacity-75">
+                      {formatTime(currentTime)}
+                    </div>
+                    <div className="text-sm md:text-base sm:text-base opacity-75">
                       -{formatTime(remainingTime)}
                     </div>
                   </div>
@@ -676,22 +701,25 @@ export default function Player({ ids, full }) {
                     {" "}
                     <button onClick={handlePlayMode}>
                       {playMode === "default" && (
-                        <Icon icon="bi:repeat" className="w-8 h-8 opacity-75" />
+                        <Icon
+                          icon="bi:repeat"
+                          className="w-6 md:w-8 sm:w-8 h-8 opacity-75"
+                        />
                       )}
                       {playMode === "loop" && (
                         <Icon
                           icon="bi:repeat-1"
-                          className="w-8 h-8 opacity-75"
+                          className="w-6 md:w-8 sm:w-8 h-8 opacity-75"
                         />
                       )}
                       {playMode === "shuffle" && (
                         <Icon
                           icon="bi:shuffle"
-                          className="w-8 h-8 opacity-75"
+                          className="w-6 md:w-8 sm:w-8 h-8 opacity-75"
                         />
                       )}
                     </button>
-                    <div className="w-[57.5%] md:w-[45%] sm:w-[45%] mx-auto mt-5 mb-5">
+                    <div className="w-[50%] md:w-[45%] sm:w-[45%] mx-auto mt-5 mb-5">
                       <div className="mx-auto flex flex-row justify-between z-30">
                         <button
                           onClick={() =>
@@ -702,19 +730,19 @@ export default function Player({ ids, full }) {
                           }
                         >
                           <Icon
-                            className="font-bold w-12 h-12 opacity-80 hover:opacity-100"
+                            className="font-bold w-9 md:w-12 sm:w-12 h-12 opacity-80 hover:opacity-100"
                             icon="bi:rewind-fill"
                           />
                         </button>
                         <button onClick={() => setIsPlaying(!isPlaying)}>
                           {isPlaying === true ? (
                             <Icon
-                              className="font-bold w-12 h-12"
+                              className="font-bold w-9 md:w-12 sm:w-12 h-12 opacity-80 hover:opacity-100"
                               icon="clarity:pause-solid"
                             />
                           ) : (
                             <Icon
-                              className="font-bold w-12 h-12"
+                              className="font-bold w-9 md:w-12 sm:w-12 h-12 opacity-80 hover:opacity-100"
                               icon="clarity:play-solid"
                             />
                           )}
@@ -727,7 +755,7 @@ export default function Player({ ids, full }) {
                           }
                         >
                           <Icon
-                            className="font-bold w-12 h-12 opacity-80 hover:opacity-100"
+                            className="font-bold w-9 md:w-12 sm:w-12 h-12 opacity-80 hover:opacity-100"
                             icon="bi:fast-forward-fill"
                           />
                         </button>
@@ -740,22 +768,92 @@ export default function Player({ ids, full }) {
                     >
                       <Icon
                         icon="solar:password-minimalistic-bold"
-                        className="w-8 h-8 opacity-75 block md:block sm:hidden"
+                        className="w-6 md:w-8 sm:w-8 h-8 opacity-75 block md:block sm:hidden"
                       />
                     </button>
-                    <button onClick={toggleFullscreen}>
-                      <Icon
-                        icon="solar:full-screen-square-bold"
-                        className="w-8 h-8 opacity-75 hidden md:hidden sm:block"
-                      />
-                    </button>
+                    <Dialog.Root>
+                      <Dialog.Trigger asChild>
+                        <button>
+                          <Icon
+                            icon="bi:card-list"
+                            className="w-8 h-8 opacity-75 hidden md:hidden sm:block"
+                          />
+                        </button>
+                      </Dialog.Trigger>
+                      <Dialog.Portal>
+                        <Dialog.Overlay className="DialogOverlay bg-black/25 backdrop-blur-3xl" />
+                        <Dialog.Content className="DialogContent fixed max-w-4xl mx-auto w-full h-screen bg-neutral-100 overflow-y-auto backdrop-blur-lg z-[999]">
+                          <Dialog.Title className="DialogTitle font-medium text-3xl">
+                            播放列表({playlistDetails.length})
+                          </Dialog.Title>
+
+                          <div className="flex flex-row justify-between text-red-600 mt-6 px-3">
+                            <button onClick={handlePlayAll}>播放全部</button>
+                            <button onClick={handleRemoveAll}>删除全部</button>
+                          </div>
+
+                          <div className="flex flex-col justify-start mt-4 overflow-y-auto">
+                            {playlistDetails.length > 0 &&
+                              playlistDetails.map((track, index) => {
+                                const handleDeleteSong = (id) => {
+                                  // 在这里处理删除操作，使用传入的id参数
+                                  removeFromPlaylist(id);
+                                };
+                                return (
+                                  <div key={track.id}>
+                                    <div
+                                      key={track.id}
+                                      className={`cursor-pointer flex flex-row justify-between w-full rounded-xl px-6 py-4 ${
+                                        index % 2 === 0
+                                          ? "bg-neutral-200"
+                                          : "odd"
+                                      }`}
+                                    >
+                                      <div
+                                        onClick={() =>
+                                          handleAddToPlaylist(track.id)
+                                        }
+                                        className="flex flex-row space-x-4"
+                                      >
+                                        <img
+                                          src={track.al.picUrl}
+                                          className="rounded-xl w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
+                                        />
+                                        <div className="flex flex-col space-y-1 mt-1">
+                                          <span className="font-medium text-left w-full flex-nowrap flex overflow-hidden">
+                                            {track.name}
+                                          </span>
+                                          <span className="text-base opacity-75 text-left">
+                                            {track.ar
+                                              .map((artist) => artist.name)
+                                              .join(" / ")}{" "}
+                                            -{track.al.name}
+                                          </span>
+                                        </div>
+                                      </div>
+                                      <button
+                                        onClick={() =>
+                                          handleDeleteSong(track.id)
+                                        }
+                                        className="text-red-600 w-24 md:w-16 sm:w-8 text-right"
+                                      >
+                                        删除
+                                      </button>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                          </div>
+                        </Dialog.Content>
+                      </Dialog.Portal>
+                    </Dialog.Root>
                   </div>
 
                   <div className="flex flex-row mx-auto w-[85%] space-x-3">
                     <button onClick={() => setVolume(0)}>
                       <Icon
                         icon="ion:volume-off"
-                        className="font-bold w-6 h-6 text-neutral-700 mt-[1.375rem]"
+                        className="font-bold w-5 md:w-5 sm:w-6 h-6 text-neutral-700  mt-4 md:mt-[1.375rem] sm:mt-[1.375rem]"
                       />
                     </button>
 
@@ -767,7 +865,7 @@ export default function Player({ ids, full }) {
                       value={[volume]}
                       onValueChange={(newValue) => handleVolumeChange(newValue)}
                     >
-                      <Slider.Track className="SliderTrack mt-12 backdrop-blur-lg bg-opacity-75 cursor-pointer">
+                      <Slider.Track className="SliderTrack mt-9 md:mt-12 sm:mt-12 backdrop-blur-lg bg-opacity-75 cursor-pointer">
                         <Slider.Range
                           className={cn(
                             "SliderRange cursor-pointer",
@@ -784,8 +882,95 @@ export default function Player({ ids, full }) {
                     <button onClick={() => setVolume(1)}>
                       <Icon
                         icon="fa-solid:volume-up"
-                        className="font-bold w-6 h-6 text-neutral-700 mt-[1.375rem]"
+                        className="font-bold w-5 md:w-5 sm:w-6 h-6 text-neutral-700 mt-4 md:mt-[1.375rem] sm:mt-[1.375rem]"
                       />
+                    </button>
+                  </div>
+
+                  <div className="flex flex-row justify-between mx-auto mt-6 px-4 md:flex sm:hidden">
+                    <button onClick={() => setIsFull("false")}>
+                      <Icon
+                        icon="bi:arrows-fullscreen"
+                        className="font-bold w-5 md:w-5 mr-24 sm:w-6 h-6 text-neutral-700 "
+                      />
+                    </button>
+                    <button>
+                      <Dialog.Root>
+                        <Dialog.Trigger asChild>
+                          <Icon
+                            icon="bi:card-list"
+                            className="font-bold w-7 h-7  text-neutral-700"
+                          />
+                        </Dialog.Trigger>
+                        <Dialog.Portal>
+                          <Dialog.Overlay className="DialogOverlay bg-black/25 backdrop-blur-3xl" />
+                          <Dialog.Content className="DialogContent fixed max-w-4xl mx-auto w-full h-screen bg-neutral-100 overflow-y-auto backdrop-blur-lg z-[999]">
+                            <Dialog.Title className="DialogTitle font-medium text-3xl">
+                              播放列表({playlistDetails.length})
+                            </Dialog.Title>
+
+                            <div className="flex flex-row justify-between text-red-600 mt-6 px-3">
+                              <button onClick={handlePlayAll}>播放全部</button>
+                              <button onClick={handleRemoveAll}>
+                                删除全部
+                              </button>
+                            </div>
+
+                            <div className="flex flex-col justify-start mt-4 overflow-y-auto">
+                              {playlistDetails.length > 0 &&
+                                playlistDetails.map((track, index) => {
+                                  const handleDeleteSong = (id) => {
+                                    // 在这里处理删除操作，使用传入的id参数
+                                    removeFromPlaylist(id);
+                                  };
+                                  return (
+                                    <div key={track.id}>
+                                      <div
+                                        key={track.id}
+                                        className={`cursor-pointer flex flex-row justify-between w-full rounded-xl px-6 py-4 ${
+                                          index % 2 === 0
+                                            ? "bg-neutral-200"
+                                            : "odd"
+                                        }`}
+                                      >
+                                        <div
+                                          onClick={() =>
+                                            handleAddToPlaylist(track.id)
+                                          }
+                                          className="flex flex-row space-x-4"
+                                        >
+                                          <img
+                                            src={track.al.picUrl}
+                                            className="rounded-xl w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
+                                          />
+                                          <div className="flex flex-col space-y-1 mt-1">
+                                            <span className="font-medium text-left w-full flex-nowrap flex overflow-hidden">
+                                              {track.name}
+                                            </span>
+                                            <span className="text-base opacity-75 text-left">
+                                              {track.ar
+                                                .map((artist) => artist.name)
+                                                .join(" / ")}{" "}
+                                              -{track.al.name}
+                                            </span>
+                                          </div>
+                                        </div>
+                                        <button
+                                          onClick={() =>
+                                            handleDeleteSong(track.id)
+                                          }
+                                          className="text-red-600 w-24 md:w-16 sm:w-8 text-right"
+                                        >
+                                          删除
+                                        </button>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                            </div>
+                          </Dialog.Content>
+                        </Dialog.Portal>
+                      </Dialog.Root>
                     </button>
                   </div>
                 </div>

@@ -74,7 +74,7 @@ body {
   transform: translate(-50%, -50%);
   width: 90vw;
   max-width: 450px;
-  max-height: 85vh;
+  max-height: 80vh;
   animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
   @apply rounded-xl border-2 px-6 md:px-12 sm:px-16 py-12;
 }
@@ -108,3 +108,29 @@ body {
     transform: translate(-50%, -50%) scale(1);
   }
 }
+
+.TabsList {
+  flex-shrink: 0;
+  display: flex;
+  border-bottom: 1px solid var(--mauve-6);
+}
+
+.TabsTrigger {
+  font-family: inherit;
+  background-color: white;
+  padding: 0 20px;
+  height: 45px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  color: var(--mauve-11);
+  user-select: none;
+  @apply text-base md:text-lg sm:text-lg;
+}
+
+.TabsTrigger[data-state='active'] {
+  @apply bg-red-600 text-white rounded-full font-medium;
+}
+

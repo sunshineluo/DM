@@ -57,6 +57,11 @@ export const SongIdsProvider = ({ children }) => {
     return songIds;
   };
 
+  const removeAllFromPlaylist = () => {
+    setSongIds([]);
+    setCurrentSongIndex(0);
+  };
+
   return (
     <SongIdsContext.Provider
     value={{
@@ -67,6 +72,7 @@ export const SongIdsProvider = ({ children }) => {
       setCurrentSongIndex,
       getAllSongIds,
       addAllToPlaylist,
+      removeAllFromPlaylist, 
     }}
   >
     {children}

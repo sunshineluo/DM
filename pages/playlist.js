@@ -94,7 +94,7 @@ const Playlist = () => {
             )
         )}
       <div className="bg-neutral-100/75 backdrop-blur-3xl min-h-screen overflow-y-auto">
-        <div className="max-w-4xl mx-auto py-24 px-0 md:px-6 sm:px-6">
+        <div className="max-w-4xl mx-auto py-8 px-0 md:px-6 sm:px-6">
           {playlistDetail !== null &&
             playlistDetail.map(
               (detail, index) =>
@@ -126,28 +126,28 @@ const Playlist = () => {
           <div className="flex flex-row justify-between">
             <div>
               <button
-                className="text-xl mt-12 text-red-600 flex flex-row space-x-2 ml-4 md:ml-0 sm:ml-0"
+                className="text-lg md:text-xl sm:text-xl mt-12 text-red-600 flex flex-row space-x-2 ml-4 md:ml-0 sm:ml-0"
                 onClick={handlePlayAll}
               >
                 <Icon icon="bi:play-circle-fill" className="mt-1 mr-1.5" />
                 播放全部
               </button>
             </div>
-            <div className="mt-9 flex flex-row w-1/2 md:w-1/3 sm:w-1/3">
+            <div className="mt-10 flex flex-row w-1/2 md:w-1/3 sm:w-1/3">
               <Icon
                 icon="bi:search"
-                className="absolute text-neutral-700 opacity-75 w-5 h-5 mt-3.5 md:mt-3 sm:mt-3 ml-3"
+                className="absolute text-neutral-700 opacity-75 w-5 h-5 mt-2.5 md:mt-3 sm:mt-3 ml-2.5"
               />
               <input
                 type="search"
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="搜索歌单..."
-                className="w-full px-10 md:px-12 sm:px-12 py-2 focus:outline-none text-lg focus:ring-2 focus:ring-red-600 border-2 rounded-xl"
+                className="w-full px-10  py-1.5 focus:outline-none text-lg focus:ring-2 focus:ring-red-600 border-2 rounded-xl"
               />
             </div>
           </div>
-          <div className="mt-6">
-            {filteredTracks.length > 0 ? (
+          <div className="mt-6 mb-16">
+            {filteredTracks.length > 0 || searchTerm !== "" ? (
               filteredTracks.map((track, index) => (
                 <button
                   key={track.id}
@@ -172,7 +172,9 @@ const Playlist = () => {
                 </button>
               ))
             ) : (
-              <p>没有找到匹配的歌曲。</p>
+              <p className="flex flex-row">
+                <Icon icon="eos-icons:loading" className="w-8 h-8"  />
+              </p>
             )}
           </div>
         </div>
