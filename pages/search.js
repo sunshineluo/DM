@@ -122,16 +122,16 @@ const MusicSearch = () => {
       <Tabs.Root className="TabsRoot" defaultValue="tab1">
         <ul className="mb-16 px-0 md:px-6 sm:px-6">
           <Tabs.List
-            className="TabsList mt-6 px-6 max-w-xl mx-auto"
+            className="TabsList mt-6 px-6 max-w-xl mx-auto flex flex-row space-x-4 overflow-x-auto"
             aria-label="类别"
           >
-            <Tabs.Trigger className="TabsTrigger" value="tab1">
+            <Tabs.Trigger className="TabsTrigger bg-white" value="tab1">
               单曲
             </Tabs.Trigger>
-            <Tabs.Trigger className="TabsTrigger" value="tab2">
+            <Tabs.Trigger className="TabsTrigger bg-white" value="tab2">
               艺术家
             </Tabs.Trigger>
-            <Tabs.Trigger className="TabsTrigger" value="tab3">
+            <Tabs.Trigger className="TabsTrigger bg-white" value="tab3">
               歌单
             </Tabs.Trigger>
           </Tabs.List>

@@ -30,8 +30,8 @@ export default function Navbar() {
               href={item.href}
               className={cn(
                 "rounded-full px-4 md:px-6 sm:px-6 py-1.5 md:py-2 sm:py-2",
-                router.asPath === item.href &&
-                  "bg-red-600 text-white font-medium"
+                router.asPath === item.href ?
+                  "bg-red-600 text-white font-medium" : "bg-white border-[1.5px]"
               )}
             >
               <button>{item.title}</button>

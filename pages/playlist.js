@@ -172,7 +172,7 @@ const Playlist = () => {
                 </button>
               ))
             ) : (
-              <p className="flex flex-row">
+              <p className="flex flex-row px-6 md:px-0 sm:px-0">
                 <Icon icon="eos-icons:loading" className="w-8 h-8"  />
               </p>
             )}

@@ -17,6 +17,10 @@ body {
   font-family: "Inter", "Noto Sans SC", sans-serif;
 }
 
+::selection {
+  @apply bg-red-600 text-white;
+}
+
 .SliderRoot {
   position: relative;
   display: flex;
@@ -118,8 +122,6 @@ body {
 .TabsTrigger {
   font-family: inherit;
   background-color: white;
-  padding: 0 20px;
-  height: 45px;
   flex: 1;
   display: flex;
   align-items: center;
@@ -127,10 +129,9 @@ body {
   line-height: 1;
   color: var(--mauve-11);
   user-select: none;
-  @apply text-base md:text-lg sm:text-lg;
+  @apply text-base md:text-lg sm:text-lg px-6 py-1.5 md:py-2 sm:py-2 border-[1.5px] rounded-full bg-white;
 }
 
-.TabsTrigger[data-state='active'] {
+.TabsTrigger[data-state="active"] {
   @apply bg-red-600 text-white rounded-full font-medium;
 }
-
