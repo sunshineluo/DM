@@ -48,16 +48,16 @@ const MusicSearch = () => {
       const artistData = await artistResponse.json();
       const playlistData = await playlistResponse.json();
 
-      if (songData.code === 200) {
+      if (songData && songData.code === 200) {
         const songIds = songData.result.songs.map((song) => song.id);
         await fetchSongDetails(songIds);
       }
 
-      if (artistData.code === 200) {
+      if (artistData && artistData.code === 200) {
         setArtistDetail(artistData.result.artists);
       }
 
-      if (playlistData.code === 200) {
+      if (playlistData && playlistData.code === 200) {
         setPlaylistDetail(playlistData.result.playlists);
       }
 
@@ -73,7 +73,7 @@ const MusicSearch = () => {
         `https://cf233.eu.org/song/detail?ids=${songIds.join(",")}`
       );
       const data = await response.json();
-      if (data.code === 200) {
+      if (data && data.code === 200) {
         setSongDetail(data.songs);
       }
     } catch (error) {
