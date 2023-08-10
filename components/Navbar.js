@@ -39,7 +39,7 @@ export default function Navbar() {
           ))}
         </div>
         <div>
-          {userData.data.profile.userId ? (
+          {userData && userData.data && userData.data.profile && userData.data.profile.userId ?(
             <button
               onClick={() => router.push("/dashboard")}
               className="px-4 md:px-6 sm:px-6"
