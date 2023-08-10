@@ -190,7 +190,7 @@ export default function Player({ ids, full }) {
 
   useEffect(() => {
     // 从 localStorage 中获取已播放的时间
-    const savedPlayedTime = localStorage.getItem('playedTime');
+    const savedPlayedTime = localStorage.getItem("playedTime");
     if (savedPlayedTime) {
       const parsedTime = parseFloat(savedPlayedTime);
       setPlayed(parsedTime);
@@ -206,7 +206,7 @@ export default function Player({ ids, full }) {
     setRemainingTime(audioRef.current.getDuration() - playedTime);
 
     // 保存已播放的时间到 localStorage
-    localStorage.setItem('playedTime', playedTime.toString());
+    localStorage.setItem("playedTime", playedTime.toString());
   };
 
   const handleSeekChange = (newValue) => {
@@ -737,12 +737,12 @@ export default function Player({ ids, full }) {
                         <button onClick={() => setIsPlaying(!isPlaying)}>
                           {isPlaying === true ? (
                             <Icon
-                              className="font-bold w-9 md:w-12 sm:w-12 h-12 opacity-80 hover:opacity-100"
+                              className="font-bold w-9 md:w-12 sm:w-12 h-12"
                               icon="clarity:pause-solid"
                             />
                           ) : (
                             <Icon
-                              className="font-bold w-9 md:w-12 sm:w-12 h-12 opacity-80 hover:opacity-100"
+                              className="font-bold w-9 md:w-12 sm:w-12 h-12"
                               icon="clarity:play-solid"
                             />
                           )}
