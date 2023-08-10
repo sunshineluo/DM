@@ -162,46 +162,50 @@ const MusicSearch = () => {
               ))}
           </Tabs.Content>
           <Tabs.Content className="TabsContent mt-8" value="tab2">
-            {artistDetail.map((artist, index) => (
-              <button
-                key={artist.id}
-                className={`flex flex-row space-x-4 w-full rounded-none md:rounded-xl sm:rounded-xl px-6 py-4 ${
-                  index % 2 === 0 ? "bg-neutral-200" : "odd"
-                }`}
-              >
-                <img
-                  src={artist.picUrl}
-                  className="rounded-full w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
-                />
-                <div className="flex flex-col space-y-1 mt-1">
-                  <span className="font-medium text-left w-full text-xl  mt-3 flex-nowrap flex overflow-hidden">
-                    {artist.name}
-                  </span>
-                </div>
-              </button>
-            ))}
+            {artistDetail &&
+              artistDetail.map((artist, index) => (
+                <button
+                  key={artist.id}
+                  className={`flex flex-row space-x-4 w-full rounded-none md:rounded-xl sm:rounded-xl px-6 py-4 ${
+                    index % 2 === 0 ? "bg-neutral-200" : "odd"
+                  }`}
+                >
+                  <img
+                    src={artist.picUrl}
+                    className="rounded-full w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
+                  />
+                  <div className="flex flex-col space-y-1 mt-1">
+                    <span className="font-medium text-left w-full text-xl  mt-3 flex-nowrap flex overflow-hidden">
+                      {artist.name}
+                    </span>
+                  </div>
+                </button>
+              ))}
           </Tabs.Content>
           <Tabs.Content className="TabsContent mt-8" value="tab3">
-            {playlistDetail.map((playlist, index) => (
-              <button
-                key={playlist.id}
-                onClick={() => router.push(`/playlist?id=${playlist.id}`)}
-                className={`flex flex-row space-x-4 w-full rounded-none md:rounded-xl sm:rounded-xl px-6 py-4 ${
-                  index % 2 === 0 ? "bg-neutral-200" : "odd"
-                }`}
-              >
-                <img
-                  src={playlist.coverImgUrl}
-                  className="rounded-xl w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
-                />
-                <div className="flex flex-col space-y-1 mt-1">
-                  <span className="font-medium text-left w-full flex-nowrap flex overflow-hidden">
-                    {playlist.name}
-                  </span>
-                  <span className="opacity-75 text-left">{playlist.description}</span>
-                </div>
-              </button>
-            ))}
+            {playlistDetail &&
+              playlistDetail.map((playlist, index) => (
+                <button
+                  key={playlist.id}
+                  onClick={() => router.push(`/playlist?id=${playlist.id}`)}
+                  className={`flex flex-row space-x-4 w-full rounded-none md:rounded-xl sm:rounded-xl px-6 py-4 ${
+                    index % 2 === 0 ? "bg-neutral-200" : "odd"
+                  }`}
+                >
+                  <img
+                    src={playlist.coverImgUrl}
+                    className="rounded-xl w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
+                  />
+                  <div className="flex flex-col space-y-1 mt-1">
+                    <span className="font-medium text-left w-full flex-nowrap flex overflow-hidden">
+                      {playlist.name}
+                    </span>
+                    <span className="opacity-75 text-left">
+                      {playlist.description}
+                    </span>
+                  </div>
+                </button>
+              ))}
           </Tabs.Content>
         </ul>
       </Tabs.Root>
