@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-export default function highquality() {
+export default function Highquality() {
   const [playlists, setPlaylists] = useState([]);
 
   useEffect(() => {
