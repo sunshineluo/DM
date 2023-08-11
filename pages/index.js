@@ -118,7 +118,7 @@ export default function Home() {
         新歌速递
       </h2>
 
-      <div className="mt-6 columns-1 md:columns-2 sm:columns-2">
+      <div className="mt-6 mb-16 columns-1 md:columns-2 sm:columns-2">
         {songDetails &&
           songDetails.slice(0,12).map((track, index) => (
             <button

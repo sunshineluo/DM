@@ -151,7 +151,7 @@ const MusicSearch = () => {
               {hotSearchList.map((item, index) => (
                 <p
                   onClick={() => setKeywords(item.searchWord)}
-                  key={item.id}
+                  key={index}
                   className="cursor-pointer my-4 text-lg md:text-xl sm:text-xl font-medium py-2 px-6 rounded-xl bg-neutral-200 dark:bg-neutral-800"
                 >
                   <div className="flex flex-row">
@@ -159,7 +159,14 @@ const MusicSearch = () => {
                       <span className="opacity-50"> {index + 1}</span>{" "}
                       <span>{item.searchWord}</span>
                     </div>
-                    <div>{item.iconUrl && (<img src={item.iconUrl} className="h-4 md:h-6 sm:h-6 ml-1 md:ml-2 sm:ml-2 mt-1 md:mt-0 sm:mt-0" />)}</div>
+                    <div>
+                      {item.iconUrl && (
+                        <img
+                          src={item.iconUrl}
+                          className="h-4 md:h-6 sm:h-6 ml-1 md:ml-2 sm:ml-2 mt-1 md:mt-0 sm:mt-0"
+                        />
+                      )}
+                    </div>
                   </div>
                 </p>
               ))}
