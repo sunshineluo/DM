@@ -51,19 +51,19 @@ export default function Dashboard() {
         src={userData.data.profile.backgroundUrl}
         className="fixed z-[-1] w-full blur-lg h-screen hidden"
       />
-      <div className="bg-neutral-100/75 backdrop-blur-3xl w-full min-h-screen">
+      <div className="bg-neutral-100/75 dark:bg-neutral-900/75 backdrop-blur-3xl w-full min-h-screen">
         <div className="max-w-4xl mx-auto px-0 py-8 overflow-y-auto">
           <div className="px-6">
             <img
               src={userData.data.profile.avatarUrl}
-              className="opacity-75 mb-10 border-2 border-neutral-200/50 w-32 h-32 rounded-full"
+              className="opacity-75 mb-10 border-2 border-neutral-200/50 dark:border-neutral-800/50 w-32 h-32 rounded-full"
             />
           </div>
           <h1 className="px-6 text-3xl md:text-4xl sm:text-5xl flex flex-col md:flex-row sm:flex-row">
-            <span className="font-medium text-neutral-700">
+            <span className="font-medium text-neutral-700 dark:text-neutral-400">
               {userData.data.profile.nickname},
             </span>{" "}
-            <span className="font-medium text-neutral-900">
+            <span className="font-medium text-neutral-900 dark:text-neutral-100">
               您今天看上去很聪明！
             </span>
           </h1>
@@ -126,7 +126,7 @@ export default function Dashboard() {
             </p>
           </div>
           <div className="mt-16">
-            <h2 className="px-6 text-neutral-700 font-medium text-lg md:text-3xl sm:text-4xl">
+            <h2 className="px-6 text-neutral-700 dark:text-neutral-300 font-medium text-lg md:text-3xl sm:text-4xl">
               用户歌单
             </h2>
 
@@ -137,7 +137,7 @@ export default function Dashboard() {
                     key={playlist.id}
                     onClick={() => router.push(`/playlist?id=${playlist.id}`)}
                     className={`flex flex-row space-x-4 w-full rounded-none md:rounded-xl sm:rounded-xl px-6 py-4 ${
-                      index % 2 === 0 ? "bg-neutral-200" : "odd"
+                      index % 2 === 0 ? "bg-neutral-200 dark:bg-neutral-800" : "odd"
                     }`}
                   >
                     <img

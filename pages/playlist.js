@@ -93,7 +93,7 @@ const Playlist = () => {
               />
             )
         )}
-      <div className="bg-neutral-100/75 backdrop-blur-3xl min-h-screen overflow-y-auto">
+      <div className="bg-neutral-100/75 dark:bg-neutral-900/75 backdrop-blur-3xl min-h-screen overflow-y-auto">
         <div className="max-w-4xl mx-auto py-8 px-0 md:px-6 sm:px-6">
           {playlistDetail !== null &&
             playlistDetail.map(
@@ -136,13 +136,13 @@ const Playlist = () => {
             <div className="mt-10 flex flex-row w-1/2 md:w-1/3 sm:w-1/3">
               <Icon
                 icon="bi:search"
-                className="absolute text-neutral-700 opacity-75 w-5 h-5 mt-2.5 md:mt-3 sm:mt-3 ml-2.5"
+                className="absolute text-neutral-700 dark:text-neutral-300 opacity-75 w-5 h-5 mt-2.5 md:mt-3 sm:mt-3 ml-2.5"
               />
               <input
                 type="search"
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="搜索歌单..."
-                className="w-full px-10  py-1.5 focus:outline-none text-lg focus:ring-2 focus:ring-red-600 border-2 rounded-xl"
+                className="w-full px-10  py-1.5 focus:outline-none dark:border-neutral-800 text-lg focus:ring-2 focus:ring-red-600 border-2 rounded-xl"
               />
             </div>
           </div>
@@ -152,7 +152,7 @@ const Playlist = () => {
                 <button
                   key={track.id}
                   className={`flex flex-row space-x-4 w-full rounded-none md:rounded-xl sm:rounded-xl px-6 py-4 ${
-                    index % 2 === 0 ? "bg-neutral-200" : "odd"
+                    index % 2 === 0 ? "bg-neutral-200 dark:bg-neutral-800" : "odd"
                   }`}
                   onClick={() => handleAddToPlaylist(track.id)}
                 >

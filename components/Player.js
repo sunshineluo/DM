@@ -39,24 +39,40 @@ export default function Player({ ids, full }) {
     setCurrentTrackIndex,
   } = useContext(SongIdsContext);
   const [playlistDetails, setPlaylistDetails] = useState([]);
+  const [isLiked, setIsLiked] = useState(false);
 
   useEffect(() => {
-    // 从 localStorage 中获取之前存储的索引值
-    const storedIndex = localStorage.getItem("currentSongIndex");
-    if (storedIndex !== null) {
-      setCurrentSongIndex(JSON.parse(storedIndex));
+    // 页面加载时，从本地存储中获取之前存储的播放状态和进度
+    const storedIsPlaying = localStorage.getItem("isPlaying");
+    const storedCurrentTime = localStorage.getItem("currentTime");
+
+    if (storedIsPlaying !== null) {
+      setIsPlaying(JSON.parse(storedIsPlaying));
     }
+    if (storedCurrentTime !== null) {
+      setCurrentTime(parseFloat(storedCurrentTime));
+    }
+
+    // 每当 currentSongIndex 变化时，将其存储到 localStorage 中
+    localStorage.setItem("currentSongIndex", JSON.stringify(currentSongIndex));
   }, []);
 
   useEffect(() => {
-    // 每当 currentSongIndex 变化时，将其存储到 localStorage 中
-    localStorage.setItem("currentSongIndex", JSON.stringify(currentSongIndex));
-  }, [currentSongIndex]);
+    // 每当 isPlaying 变化时，将其存储到本地存储中
+    localStorage.setItem("isPlaying", JSON.stringify(isPlaying));
+  }, [isPlaying]);
 
-  const handleSongChange = (index) => {
-    addToPlaylist(index); // 将新添加的歌曲索引传递给 addToPlaylist
-    setCurrentSongIndex(index);
-  };
+  useEffect(() => {
+    // 每当 currentTime 变化时，将其存储到本地存储中
+    localStorage.setItem("currentTime", currentTime.toString());
+  }, [currentTime]);
+
+  useEffect(() => {
+    const storedCurrentTime = localStorage.getItem("currentTime");
+    if (storedCurrentTime) {
+      setCurrentTime(parseFloat(storedCurrentTime));
+    }
+  }, []);
 
   useEffect(() => {
     if (currentSongIndex >= songIds.length) {
@@ -115,6 +131,9 @@ export default function Player({ ids, full }) {
         const translatedLyricsText = translatedLyricsData.tlyric.lyric;
         const parsedTranslatedLyrics = parseLyrics(translatedLyricsText);
         setTranslatedLyrics(parsedTranslatedLyrics);
+
+        // 在获取歌曲数据后，将播放状态设置为 true
+        setIsPlaying(true);
       } catch (error) {
         console.log(error);
       }
@@ -376,9 +395,63 @@ export default function Player({ ids, full }) {
     addToPlaylist(trackId);
   };
 
+  const songId = songIds[currentSongIndex];
+  const userDataStr = localStorage.getItem("userData");
+  const userData = JSON.parse(userDataStr);
+
+  useEffect(() => {
+    if (userData) {
+      checkLikedMusic(userData.data.account.id, songId);
+    }
+  }, [userData, songId]);
+
+  const checkLikedMusic = async (userId, songId) => {
+    try {
+      const response = await axios.get(
+        `https://cf233.eu.org/likelist?uid=${userId}`,
+        {
+          withCredentials: true,
+        }
+      );
+
+      if (response.data.code === 200) {
+        const likedMusicIds = response.data.ids;
+        const isLiked = likedMusicIds.includes(songId);
+        setIsLiked(isLiked);
+      } else {
+        console.log("获取喜欢音乐列表失败");
+      }
+    } catch (error) {
+      console.error(error);
+      // 处理错误情况
+    }
+  };
+
+  const toggleLikeMusic = async () => {
+    try {
+      const response = await axios.get(`https://cf233.eu.org/like`, {
+        params: {
+          id: songId,
+          like: !isLiked,
+        },
+        withCredentials: true,
+      });
+
+      if (response.data.code === 200) {
+        setIsLiked(!isLiked);
+      } else {
+        console.log("喜欢失败");
+      }
+    } catch (error) {
+      console.error(error);
+      // 处理错误情况
+    }
+  };
+
   return (
     <div ref={elementRef} className="w-full max-h-screen h-screen fixed">
-      <div></div>
+      <div>
+      </div>
       <ReactPlayer
         ref={audioRef}
         playing={isPlaying}
@@ -394,7 +467,7 @@ export default function Player({ ids, full }) {
         className="fixed top-0 hidden"
       />
       {isFull === "false" && (
-        <div className="fixed bottom-0 w-full bg-neutral-200/75 backdrop-blur-lg border-t-[1.5px] border-t-neutral-200/50">
+        <div className="fixed bottom-0 w-full bg-neutral-200/75 dark:bg-neutral-800/75 backdrop-blur-lg border-t-[1.5px] border-t-neutral-200/50 dark:border-t-neutral-800/50">
           <div className="max-w-4xl mx-auto px-0 md:px-8 sm:px-8">
             {songInfo &&
               songInfo.length > 0 &&
@@ -410,40 +483,55 @@ export default function Player({ ids, full }) {
                         className="rounded-xl w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16 cursor-pointer"
                       />
                       <div className="flex flex-col space-y-1 mt-1 ">
-                        <span className="text-base font-medium text-center w-36 flex-nowrap flex truncate">
+                        <span className="text-base font-medium text-center w-18 md:w-36 sm:w-36 flex-nowrap flex truncate">
                           {song.name}
                         </span>
-                        <span className="text-base opacity-75 text-left w-54 truncate flex-nowrap flex">
+                        <span className="text-base opacity-75 text-left w-16 md:w-54 sm:w-54 truncate flex-nowrap flex">
                           {song.ar.map((artist) => artist.name).join(" / ")}
                         </span>
                       </div>
                     </div>
                     <div className="py-0 md:py-4 sm:py-4 flex flex-col space-y-1 justify-center w-full">
                       {" "}
-                      <div className="flex flex-row w-56 md:w-96 sm:w-96 justify-between text-neutral-700 px-6 md:px-8 sm:px-10">
+                      <div className="flex flex-row space-x-4 w-56 md:w-96 sm:w-96 justify-between text-neutral-700 dark:text-neutral-300 px-6 md:px-8 sm:px-10">
                         {" "}
-                        <button onClick={handlePlayMode}>
-                          {playMode === "default" && (
-                            <Icon
-                              icon="bi:repeat"
-                              className="w-4 md:w-6 sm:w-6 h-6 opacity-75"
-                            />
-                          )}
-                          {playMode === "loop" && (
-                            <Icon
-                              icon="bi:repeat-1"
-                              className="w-4 md:w-6 sm:w-6 h-6 opacity-75"
-                            />
-                          )}
-                          {playMode === "shuffle" && (
-                            <Icon
-                              icon="bi:shuffle"
-                              className="w-4 md:w-6 sm:w-6 h-6 opacity-75"
-                            />
-                          )}
-                        </button>
+                        <div className="flex flex-row space-x-4">
+                          <button onClick={handlePlayMode}>
+                            {playMode === "default" && (
+                              <Icon
+                                icon="bi:repeat"
+                                className="w-4 md:w-6 sm:w-6 h-6 opacity-75"
+                              />
+                            )}
+                            {playMode === "loop" && (
+                              <Icon
+                                icon="bi:repeat-1"
+                                className="w-4 md:w-6 sm:w-6 h-6 opacity-75"
+                              />
+                            )}
+                            {playMode === "shuffle" && (
+                              <Icon
+                                icon="bi:shuffle"
+                                className="w-4 md:w-6 sm:w-6 h-6 opacity-75"
+                              />
+                            )}
+                          </button>
+                          <button onClick={toggleLikeMusic}>
+                            {isLiked ? (
+                              <Icon
+                                icon="bi:heart-fill"
+                                className="w-4 md:w-6 sm:w-6 h-6 opacity-75"
+                              />
+                            ) : (
+                              <Icon
+                                icon="bi:heart"
+                                className="w-4 md:w-6 sm:w-6 h-6 opacity-75"
+                              />
+                            )}
+                          </button>
+                        </div>
                         <div className="w-[57.5%] md:w-[45%] sm:w-[45%] mx-auto">
-                          <div className="mx-auto flex flex-row justify-between z-30">
+                          <div className="mx-auto flex flex-row justify-between space-x-4 z-30">
                             <button
                               onClick={() =>
                                 setCurrentSongIndex(
@@ -485,22 +573,30 @@ export default function Player({ ids, full }) {
                           </div>
                         </div>
                         <Dialog.Root>
-                          <Dialog.Trigger asChild>
+                          <div className="flex flex-row space-x-4">
                             <button>
                               <Icon
-                                icon="bi:card-list"
-                                className="w-4 md:w-6 sm:w-6 h-6 opacity-75"
+                                className="hidden font-bold w-7 md:w-9 sm:w-9 h-9 opacity-80 hover:opacity-100"
+                                icon="bi:fast-forward-fill"
                               />
                             </button>
-                          </Dialog.Trigger>
+                            <Dialog.Trigger asChild>
+                              <button>
+                                <Icon
+                                  icon="bi:card-list"
+                                  className="w-4 md:w-6 sm:w-6 h-6 opacity-75"
+                                />
+                              </button>
+                            </Dialog.Trigger>
+                          </div>
                           <Dialog.Portal>
                             <Dialog.Overlay className="DialogOverlay bg-black/25 backdrop-blur-3xl" />
-                            <Dialog.Content className="DialogContent fixed max-w-4xl mx-auto w-full h-screen bg-neutral-100 overflow-y-auto backdrop-blur-lg z-[999]">
+                            <Dialog.Content className="DialogContent fixed max-w-4xl mx-auto w-full h-screen bg-neutral-100 dark:bg-neutral-900 overflow-y-auto backdrop-blur-lg z-[999]">
                               <Dialog.Title className="DialogTitle font-medium text-3xl">
                                 播放列表({playlistDetails.length})
                               </Dialog.Title>
 
-                              <div className="flex flex-row justify-between text-red-600 mt-6 px-3">
+                              <div className="flex flex-row justify-between text-red-600 dark:text-red-400 mt-6 px-3">
                                 <button onClick={handlePlayAll}>
                                   播放全部
                                 </button>
@@ -522,7 +618,7 @@ export default function Player({ ids, full }) {
                                           key={track.id}
                                           className={`cursor-pointer flex flex-row justify-between w-full rounded-xl px-6 py-4 ${
                                             index % 2 === 0
-                                              ? "bg-neutral-200"
+                                              ? "bg-neutral-200 dark:bg-neutral-800"
                                               : "odd"
                                           }`}
                                         >
@@ -552,7 +648,7 @@ export default function Player({ ids, full }) {
                                             onClick={() =>
                                               handleDeleteSong(track.id)
                                             }
-                                            className="text-red-600 w-24 md:w-16 sm:w-8 text-right"
+                                            className="text-red-600 dark:text-red-400 w-24 md:w-16 sm:w-8 text-right"
                                           >
                                             删除
                                           </button>
@@ -606,7 +702,7 @@ export default function Player({ ids, full }) {
           >
             <Icon
               icon="bi:x"
-              className="w-8 md:w-12 h-8 md:h-12 sm:w-16 sm:h-16 opacity-75 text-neutral-700"
+              className="w-8 md:w-12 h-8 md:h-12 sm:w-16 sm:h-16 opacity-75 text-neutral-700 dark:text-neutral-300"
             />
           </button>
           <div>
@@ -619,7 +715,7 @@ export default function Player({ ids, full }) {
               />
             ))}
           </div>
-          <div className="flex flex-row w-full h-screen bg-neutral-100/75 backdrop-blur-3xl">
+          <div className="flex flex-row w-full h-screen bg-neutral-100/75 dark:bg-neutral-900/75 backdrop-blur-3xl">
             <div
               className={cn(
                 "transition-all duration-500 w-full md:w-full sm:w-1/2 h-screen left-0 right-0 z-50 fixed select-none bottom-0 overflow-y-auto",
@@ -657,10 +753,10 @@ export default function Player({ ids, full }) {
                         display === false ? "block" : "hidden"
                       )}
                     />
-                    <h1 className="text-center font-semibold text-lg mt-4">
+                    <h1 className="text-center font-medium text-base md:text-lg sm:text-lg mt-4">
                       {song.name}
                     </h1>
-                    <h2 className="text-center font-medium text-lg opacity-75">
+                    <h2 className="text-center font-medium text-base md:text-lg sm:text-lg opacity-75">
                       {song.ar.map((artist) => artist.name).join(" / ")}
                     </h2>
                   </div>
@@ -697,28 +793,42 @@ export default function Player({ ids, full }) {
                     </div>
                   </div>
 
-                  <div className="flex flex-row justify-between text-neutral-700 px-6 md:px-8 sm:px-10">
-                    {" "}
-                    <button onClick={handlePlayMode}>
-                      {playMode === "default" && (
-                        <Icon
-                          icon="bi:repeat"
-                          className="w-6 md:w-8 sm:w-8 h-8 opacity-75"
-                        />
-                      )}
-                      {playMode === "loop" && (
-                        <Icon
-                          icon="bi:repeat-1"
-                          className="w-6 md:w-8 sm:w-8 h-8 opacity-75"
-                        />
-                      )}
-                      {playMode === "shuffle" && (
-                        <Icon
-                          icon="bi:shuffle"
-                          className="w-6 md:w-8 sm:w-8 h-8 opacity-75"
-                        />
-                      )}
-                    </button>
+                  <div className="flex flex-row justify-between text-neutral-700 dark:text-neutral-300 px-6 md:px-8 sm:px-10">
+                    <div className="flex flex-row space-x-6">
+                      <button onClick={handlePlayMode}>
+                        {playMode === "default" && (
+                          <Icon
+                            icon="bi:repeat"
+                            className="w-6 md:w-8 sm:w-8 h-8 opacity-75"
+                          />
+                        )}
+                        {playMode === "loop" && (
+                          <Icon
+                            icon="bi:repeat-1"
+                            className="w-6 md:w-8 sm:w-8 h-8 opacity-75"
+                          />
+                        )}
+                        {playMode === "shuffle" && (
+                          <Icon
+                            icon="bi:shuffle"
+                            className="w-6 md:w-8 sm:w-8 h-8 opacity-75"
+                          />
+                        )}
+                      </button>
+                      <button onClick={toggleLikeMusic}>
+                        {isLiked ? (
+                          <Icon
+                            icon="bi:heart-fill"
+                            className="w-6 md:w-8 sm:w-8 h-8 opacity-75"
+                          />
+                        ) : (
+                          <Icon
+                            icon="bi:heart"
+                            className="w-6 md:w-8 sm:w-8 h-8 opacity-75"
+                          />
+                        )}
+                      </button>
+                    </div>
                     <div className="w-[50%] md:w-[45%] sm:w-[45%] mx-auto mt-5 mb-5">
                       <div className="mx-auto flex flex-row justify-between z-30">
                         <button
@@ -772,22 +882,31 @@ export default function Player({ ids, full }) {
                       />
                     </button>
                     <Dialog.Root>
-                      <Dialog.Trigger asChild>
+                      <div className="flex flex-row space-x-6">
+                        {" "}
                         <button>
                           <Icon
-                            icon="bi:card-list"
-                            className="w-8 h-8 opacity-75 hidden md:hidden sm:block"
+                            icon="solar:password-minimalistic-bold"
+                            className="hidden w-6 md:w-8 sm:w-8 h-8 opacity-75"
                           />
                         </button>
-                      </Dialog.Trigger>
+                        <Dialog.Trigger asChild>
+                          <button>
+                            <Icon
+                              icon="bi:card-list"
+                              className="w-8 h-8 opacity-75 hidden md:hidden sm:block"
+                            />
+                          </button>
+                        </Dialog.Trigger>
+                      </div>
                       <Dialog.Portal>
                         <Dialog.Overlay className="DialogOverlay bg-black/25 backdrop-blur-3xl" />
-                        <Dialog.Content className="DialogContent fixed max-w-4xl mx-auto w-full h-screen bg-neutral-100 overflow-y-auto backdrop-blur-lg z-[999]">
+                        <Dialog.Content className="DialogContent fixed max-w-4xl mx-auto w-full h-screen bg-neutral-100 dark:bg-neutral-900 overflow-y-auto backdrop-blur-lg z-[999]">
                           <Dialog.Title className="DialogTitle font-medium text-3xl">
                             播放列表({playlistDetails.length})
                           </Dialog.Title>
 
-                          <div className="flex flex-row justify-between text-red-600 mt-6 px-3">
+                          <div className="flex flex-row justify-between text-red-600 dark:text-red-400 mt-6 px-3">
                             <button onClick={handlePlayAll}>播放全部</button>
                             <button onClick={handleRemoveAll}>删除全部</button>
                           </div>
@@ -805,7 +924,7 @@ export default function Player({ ids, full }) {
                                       key={track.id}
                                       className={`cursor-pointer flex flex-row justify-between w-full rounded-xl px-6 py-4 ${
                                         index % 2 === 0
-                                          ? "bg-neutral-200"
+                                          ? "bg-neutral-200 dark:bg-neutral-800"
                                           : "odd"
                                       }`}
                                     >
@@ -835,7 +954,7 @@ export default function Player({ ids, full }) {
                                         onClick={() =>
                                           handleDeleteSong(track.id)
                                         }
-                                        className="text-red-600 w-24 md:w-16 sm:w-8 text-right"
+                                        className="text-red-600 dark:text-red-400 w-24 md:w-16 sm:w-8 text-right"
                                       >
                                         删除
                                       </button>
@@ -853,7 +972,7 @@ export default function Player({ ids, full }) {
                     <button onClick={() => setVolume(0)}>
                       <Icon
                         icon="ion:volume-off"
-                        className="font-bold w-5 md:w-5 sm:w-6 h-6 text-neutral-700  mt-4 md:mt-[1.375rem] sm:mt-[1.375rem]"
+                        className="font-bold w-5 md:w-5 sm:w-6 h-6 text-neutral-700 dark:text-neutral-300  mt-4 md:mt-[1.375rem] sm:mt-[1.375rem]"
                       />
                     </button>
 
@@ -882,7 +1001,7 @@ export default function Player({ ids, full }) {
                     <button onClick={() => setVolume(1)}>
                       <Icon
                         icon="fa-solid:volume-up"
-                        className="font-bold w-5 md:w-5 sm:w-6 h-6 text-neutral-700 mt-4 md:mt-[1.375rem] sm:mt-[1.375rem]"
+                        className="font-bold w-5 md:w-5 sm:w-6 h-6 text-neutral-700 dark:text-neutral-300 mt-4 md:mt-[1.375rem] sm:mt-[1.375rem]"
                       />
                     </button>
                   </div>
@@ -891,7 +1010,7 @@ export default function Player({ ids, full }) {
                     <button onClick={() => setIsFull("false")}>
                       <Icon
                         icon="bi:arrows-fullscreen"
-                        className="font-bold w-5 md:w-5 mr-24 sm:w-6 h-6 text-neutral-700 "
+                        className="font-bold w-5 md:w-5 mr-24 sm:w-6 h-6 text-neutral-700 dark:text-neutral-300 "
                       />
                     </button>
                     <button>
@@ -899,17 +1018,17 @@ export default function Player({ ids, full }) {
                         <Dialog.Trigger asChild>
                           <Icon
                             icon="bi:card-list"
-                            className="font-bold w-7 h-7  text-neutral-700"
+                            className="font-bold w-7 h-7  text-neutral-700 dark:text-neutral-300"
                           />
                         </Dialog.Trigger>
                         <Dialog.Portal>
                           <Dialog.Overlay className="DialogOverlay bg-black/25 backdrop-blur-3xl" />
-                          <Dialog.Content className="DialogContent fixed max-w-4xl mx-auto w-full h-screen bg-neutral-100 overflow-y-auto backdrop-blur-lg z-[999]">
+                          <Dialog.Content className="DialogContent fixed max-w-4xl mx-auto w-full h-screen bg-neutral-100 dark:bg-neutral-900 overflow-y-auto backdrop-blur-lg z-[999]">
                             <Dialog.Title className="DialogTitle font-medium text-3xl">
                               播放列表({playlistDetails.length})
                             </Dialog.Title>
 
-                            <div className="flex flex-row justify-between text-red-600 mt-6 px-3">
+                            <div className="flex flex-row justify-between text-red-600 dark:text-red-400 mt-6 px-3">
                               <button onClick={handlePlayAll}>播放全部</button>
                               <button onClick={handleRemoveAll}>
                                 删除全部
@@ -929,7 +1048,7 @@ export default function Player({ ids, full }) {
                                         key={track.id}
                                         className={`cursor-pointer flex flex-row justify-between w-full rounded-xl px-6 py-4 ${
                                           index % 2 === 0
-                                            ? "bg-neutral-200"
+                                            ? "bg-neutral-200 dark:bg-neutral-800"
                                             : "odd"
                                         }`}
                                       >
@@ -959,7 +1078,7 @@ export default function Player({ ids, full }) {
                                           onClick={() =>
                                             handleDeleteSong(track.id)
                                           }
-                                          className="text-red-600 w-24 md:w-16 sm:w-8 text-right"
+                                          className="text-red-600 dark:text-red-400 w-24 md:w-16 sm:w-8 text-right"
                                         >
                                           删除
                                         </button>
@@ -1006,10 +1125,10 @@ export default function Player({ ids, full }) {
                       <motion.p
                         key={index}
                         className={cn(
-                          "text-left h-auto max-h-min w-full max-w-3xl flex flex-col space-y-1 tracking-tighter transition-all duration-500 cursor-pointer text-neutral-700 rounded-3xl px-8 py-4 md:py-7 sm:py-10 leading-normal flex-1 font-semibold",
+                          "text-left h-auto max-h-min w-full max-w-3xl flex flex-col space-y-1 tracking-tighter transition-all duration-500 cursor-pointer text-neutral-700 dark:text-neutral-300 rounded-3xl px-6 md:px-0 sm:px-0 py-4 md:py-7 sm:py-10 leading-normal flex-1 font-semibold",
                           line.text === highlightedLine
-                            ? "font-semibold text-4xl md:text-5xl sm:text-6xl text-neutral-600"
-                            : "text-3xl md:text-4xl sm:text-5xl blur-[2px] text-neutral-600 font-semibold"
+                            ? "font-semibold text-4xl md:text-5xl sm:text-6xl text-neutral-600 dark:text-neutral-300"
+                            : "text-3xl md:text-4xl sm:text-5xl blur-[2px] text-neutral-600 dark:text-neutral-300 font-semibold"
                         )}
                         onClick={() => audioRef.current.seekTo(line.timestamp)}
                         data-text={line.text}
@@ -1020,7 +1139,7 @@ export default function Player({ ids, full }) {
 
                         {!shouldHideTranslation(line.text) && (
                           <span
-                            className={`font-medium mt-8 text-2xl md:text-3xl sm:text-4xl text-neutral-500 ${
+                            className={`font-medium mt-8 text-2xl md:text-3xl sm:text-4xl text-neutral-500 dark:text-neutral-400 ${
                               shouldMoveTranslation ? "moved-translation" : ""
                             } ${
                               shouldMoveTranslation || isHidden ? "hidden" : ""

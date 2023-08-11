@@ -79,7 +79,7 @@ export default function QrLogin() {
       >
         已经登录？点我跳转
       </p>
-      <div className="max-w-lg mx-auto bg-neutral-200 mt-6 overflow-x-auto">
+      <div className="max-w-lg mx-auto bg-neutral-200 dark:bg-neutral-800 mt-6 overflow-x-auto">
         <p className="opacity-75 font-mono text-center mb-4">console.log ↓</p>
         <div id="info" className="info font-mono"></div>
       </div>
