@@ -444,7 +444,7 @@ export default function Player({ ids, full }) {
   };
 
   return (
-    <div ref={elementRef} className="w-full max-h-screen h-screen">
+    <div ref={elementRef} className="fixed w-full max-h-screen h-screen">
       <div></div>
       <ReactPlayer
         ref={audioRef}
