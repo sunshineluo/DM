@@ -4,7 +4,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { Icon } from "@iconify/react";
 import { SongIdsContext } from "@/components/SongIdsContext";
 
-export default function newsongs() {
+export default function Newsongs() {
   const router = useRouter();
   const [newSongs, setNewSongs] = useState([]);
   const [songIds, setSongIds] = useState([]);
