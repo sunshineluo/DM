@@ -3,38 +3,43 @@ import moment from "moment";
 import axios from "axios";
 import { useRouter } from "next/router";
 import Head from "next/head";
+import { Icon } from "@iconify/react";
 
 export default function Dashboard() {
   const [userDetail, setUserDetail] = useState([]);
   const [playlists, setPlaylists] = useState([]);
+  const [isPlaylistLoading, setIsPlaylistLoading] = useState(false);
   const userDataStr = localStorage.getItem("userData");
   const userData = JSON.parse(userDataStr);
 
-  async function getUserDetail(userData) {
-    try {
-      const response = await axios.get(
-        `https://cf233.eu.org/user/detail?uid=${userData.data.account.id}`
-      );
-      const userDetails = response.data;
-      setUserDetail([userDetails]);
-      // 处理用户详情数据
-
-      // 获取用户歌单
-      const playlistResponse = await axios.get(
-        `https://cf233.eu.org/user/playlist?uid=${userData.data.account.id}`
-      );
-      const playlistData = playlistResponse.data;
-      setPlaylists(playlistData.playlist);
-
-      // 处理用户歌单数据
-    } catch (error) {
-      console.error(error);
-      // 处理错误
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await axios.get(
+          `https://cf233.eu.org/user/detail?uid=${userData.data.account.id}`
+        );
+        const userDetails = response.data;
+        setUserDetail([userDetails]);
+    
+        setIsPlaylistLoading(true);
+    
+        const playlistResponse = await axios.get(
+          `https://cf233.eu.org/user/playlist?uid=${userData.data.account.id}`
+        );
+        const playlistData = playlistResponse.data;
+        setPlaylists(playlistData.playlist);
+    
+      } catch (error) {
+        console.error(error);
+        // 处理错误
+      } finally {
+        setIsPlaylistLoading(false);
+      }
     }
-  }
+  
+    fetchData();  // 调用 fetchData 函数来获取用户详情和歌单数据
+  }, []);  // 空数组作为依赖项，确保只在组件挂载后调用一次
 
-  // 调用函数并传入 userData 作为参数
-  getUserDetail(userData);
 
   const router = useRouter();
 
@@ -130,14 +135,16 @@ export default function Dashboard() {
               用户歌单
             </h2>
 
-            <div className="px-0 md:px-6 sm:px-6 mt-10 mb-12">
+            <div className="px-0 md:px-6 sm:px-6 mt-10 mb-16">
               {playlists.length > 0 &&
                 playlists.map((playlist, index) => (
                   <button
                     key={playlist.id}
                     onClick={() => router.push(`/playlist?id=${playlist.id}`)}
                     className={`flex flex-row space-x-4 w-full rounded-none md:rounded-xl sm:rounded-xl px-6 py-4 ${
-                      index % 2 === 0 ? "bg-neutral-200 dark:bg-neutral-800" : "odd"
+                      index % 2 === 0
+                        ? "bg-neutral-200 dark:bg-neutral-800"
+                        : "odd"
                     }`}
                   >
                     <img
@@ -154,6 +161,12 @@ export default function Dashboard() {
                     </div>
                   </button>
                 ))}
+
+              {isPlaylistLoading && (
+                <p className="flex flex-row px-6 md:px-0 sm:px-0 justify-start mt-6 mb-12">
+                  <Icon icon="eos-icons:loading" className="w-8 h-8" />
+                </p>
+              )}
             </div>
           </div>
         </div>

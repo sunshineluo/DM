@@ -22,6 +22,9 @@ export default function Navbar() {
   if (router.asPath.includes("/highquality")) {
     router.asPath = "/";
   }
+  if (router.asPath.includes("/newsongs")) {
+    router.asPath = "/";
+  }
   const userDataStr = localStorage.getItem("userData");
   const userData = JSON.parse(userDataStr);
   const { theme, setTheme } = useTheme();

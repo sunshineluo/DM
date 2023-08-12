@@ -1,20 +1,23 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { Icon } from "@iconify/react";
 
 export default function Highquality() {
   const [playlists, setPlaylists] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchHighQualityPlaylists = async () => {
       try {
+        setIsLoading(true);
         const response = await fetch(
           `https://cf233.eu.org/top/playlist/highquality?cat=全部`
         );
         const data = await response.json();
         if (data && data.code === 200) {
           setPlaylists(data.playlists);
+          setIsLoading(false);
         }
       } catch (error) {
         console.log(
@@ -41,22 +44,31 @@ export default function Highquality() {
         {playlists.length > 0 &&
           playlists.map((playlist, index) => (
             <button
-              key={playlist.ld}
+              key={playlist.id}
               onClick={() => router.push(`/playlist?id=${playlist.id}`)}
               className="flex flex-col w-full h-[35.5rem] overflow-hidden"
             >
-              <img src={playlist.coverImgUrl} className="rounded-xl w-full mt-8" />
+              <img
+                src={playlist.coverImgUrl}
+                className="rounded-xl w-full mt-8"
+              />
               <div className=" px-2 py-2 md:py-4 sm:py-4">
                 <h1 className="font-medium text-base md:text-xl sm:text-xl text-left">
                   {playlist.name}
                 </h1>
 
-                <p className="mt-2 opacity-75 text-xs md:text-sm sm:text-sm">
+                <p className="mt-2 opacity-75 text-xs md:text-sm sm:text-sm truncate">
                   {playlist.description}
                 </p>
               </div>
             </button>
           ))}
+
+        {isLoading && (
+          <p className="flex flex-row px-6 md:px-6 sm:px-6 justify-start mt-6">
+            <Icon icon="eos-icons:loading" className="w-8 h-8" />
+          </p>
+        )}
       </div>
     </div>
   );

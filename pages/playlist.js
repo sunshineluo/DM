@@ -109,10 +109,10 @@ const Playlist = () => {
                           />
                         )}
                         <div className="flex flex-col space-y-2 mt-3 md:mt-6 sm:mt-6">
-                          <h1 className="font-medium text-2xl md:text-3xl sm:text-3xl">
+                          <h1 className="font-medium text-xl md:text-3xl sm:text-3xl">
                             {detail.name}
                           </h1>
-                          <p className="text-lg opacity-75">
+                          <p className="text-base md:text-lg sm:text-lg opacity-75">
                             更新于
                             {moment(detail.updateTime).format("YYYY年MM月DD日")}
                           </p>
@@ -142,7 +142,7 @@ const Playlist = () => {
                 type="search"
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="搜索歌单..."
-                className="w-full px-10  py-1.5 focus:outline-none dark:border-neutral-800 text-lg focus:ring-2 focus:ring-red-600 border-2 rounded-xl"
+                className="w-full px-10  py-1.5 focus:outline-none bg-white dark:bg-black dark:border-neutral-800 text-lg focus:ring-2 focus:ring-red-600 border-2 rounded-xl"
               />
             </div>
           </div>

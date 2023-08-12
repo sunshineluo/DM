@@ -45,7 +45,7 @@ const MusicSearch = () => {
   const handleSearch = async (e) => {
     e.preventDefault(); // 阻止表单默认提交行为
     setIsLoading(true);
-
+  
     try {
       const [songResponse, artistResponse, playlistResponse] =
         await Promise.all([
@@ -65,28 +65,29 @@ const MusicSearch = () => {
             )}`
           ),
         ]);
-
+  
       const songData = await songResponse.json();
       const artistData = await artistResponse.json();
       const playlistData = await playlistResponse.json();
-
+  
       if (songData && songData.code === 200) {
         const songIds = songData.result.songs.map((song) => song.id);
         await fetchSongDetails(songIds);
       }
-
+  
       if (artistData && artistData.code === 200) {
         setArtistDetail(artistData.result.artists);
       }
-
+  
       if (playlistData && playlistData.code === 200) {
         setPlaylistDetail(playlistData.result.playlists);
       }
-
+  
       localStorage.setItem("searchKeywords", keywords); // 将搜索关键词保存在本地存储中
-      setIsLoading(false);
     } catch (error) {
       console.log("An error occurred while searching:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -133,7 +134,7 @@ const MusicSearch = () => {
             value={keywords}
             onChange={(e) => setKeywords(e.target.value)}
             placeholder="好音乐一搜即得"
-            className="text-neutral-700 dark:text-neutral-300 bg-neutral-200 dark:bg-neutral-800 dark:border-neutral-700 border-neutral-300 w-full md:w-[32rem] sm:w-[36rem] px-10 py-1.5 md:py-2 sm:py-2 focus:outline-none text-lg md:text-xl sm:text-xl focus:ring-2 focus:ring-red-600 border-2 rounded-xl"
+            className="text-neutral-700 dark:text-neutral-300 bg-white dark:bg-black dark:border-neutral-800 border-neutral-200 w-full md:w-[32rem] sm:w-[36rem] px-10 py-1.5 md:py-2 sm:py-2 focus:outline-none text-lg md:text-xl sm:text-xl focus:ring-2 focus:ring-red-600 border-2 rounded-xl"
           />
           <button type="submit" className="hidden">
             Search
@@ -142,7 +143,7 @@ const MusicSearch = () => {
         </form>
       </div>
 
-      {!songDetail.length > 0 && (
+      {!songDetail.length > 0 && isLoading === false && (
         <div className="opacity-75 text-center mt-4">
           <h1>热搜列表</h1>
 
@@ -152,7 +153,7 @@ const MusicSearch = () => {
                 <p
                   onClick={() => setKeywords(item.searchWord)}
                   key={index}
-                  className="cursor-pointer my-4 text-lg md:text-xl sm:text-xl font-medium py-2 px-6 rounded-xl bg-neutral-200 dark:bg-neutral-800"
+                  className="cursor-pointer mb-4 text-base md:text-xl sm:text-xl font-medium py-2 px-6 rounded-xl bg-neutral-200 dark:bg-neutral-800"
                 >
                   <div className="flex flex-row">
                     <div>
@@ -196,7 +197,7 @@ const MusicSearch = () => {
             )}
           </Tabs.List>
           <Tabs.Content className="mt-8 w-auto" value="tab1">
-            {songDetail &&
+            {songDetail && !isLoading &&
               songDetail.map((track, index) => (
                 <button
                   key={track.id}
@@ -230,7 +231,7 @@ const MusicSearch = () => {
             )}
           </Tabs.Content>
           <Tabs.Content className="TabsContent mt-8" value="tab2">
-            {artistDetail &&
+            {artistDetail && !isLoading &&
               artistDetail.map((artist, index) => (
                 <button
                   key={artist.id}
@@ -258,7 +259,7 @@ const MusicSearch = () => {
             )}
           </Tabs.Content>
           <Tabs.Content className="TabsContent mt-8" value="tab3">
-            {playlistDetail &&
+            {playlistDetail && !isLoading &&
               playlistDetail.map((playlist, index) => (
                 <button
                   key={playlist.id}

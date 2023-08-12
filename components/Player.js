@@ -83,7 +83,7 @@ export default function Player({ ids, full }) {
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
-      if (width < 1023) {
+      if (width < 767) {
         setDisplay(false);
       } else {
         setDisplay(true);
@@ -98,11 +98,6 @@ export default function Player({ ids, full }) {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-
-  useEffect(() => {
-    // 在本地存储中保存display的值
-    localStorage.setItem("display", JSON.stringify(display));
-  }, [display]);
 
   useEffect(() => {
     const fetchSongData = async () => {
@@ -429,17 +424,17 @@ export default function Player({ ids, full }) {
 
   const toggleLikeMusic = async () => {
     try {
+      setIsLiked(!isLiked); // 直接更新喜欢状态，不等待服务器响应
+
       const response = await axios.get(`https://cf233.eu.org/like`, {
         params: {
           id: songId,
-          like: !isLiked,
+          like: !isLiked, // 反转当前的喜欢状态
         },
         withCredentials: true,
       });
 
-      if (response.data.code === 200) {
-        setIsLiked(!isLiked);
-      } else {
+      if (response.data.code !== 200) {
         console.log("喜欢失败");
       }
     } catch (error) {
@@ -449,9 +444,8 @@ export default function Player({ ids, full }) {
   };
 
   return (
-    <div ref={elementRef} className="w-full max-h-screen h-screen fixed">
-      <div>
-      </div>
+    <div ref={elementRef} className="w-full max-h-screen h-screen">
+      <div></div>
       <ReactPlayer
         ref={audioRef}
         playing={isPlaying}
@@ -467,7 +461,7 @@ export default function Player({ ids, full }) {
         className="fixed top-0 hidden"
       />
       {isFull === "false" && (
-        <div className="fixed bottom-0 w-full bg-neutral-200/75 dark:bg-neutral-800/75 backdrop-blur-lg border-t-[1.5px] border-t-neutral-200/50 dark:border-t-neutral-800/50">
+        <div className="fixed bottom-0 w-full overflow-x-auto bg-neutral-200/75 dark:bg-neutral-800/75 backdrop-blur-lg border-t-[1.5px] border-t-neutral-200/50 dark:border-t-neutral-800/50">
           <div className="max-w-4xl mx-auto px-0 md:px-8 sm:px-8">
             {songInfo &&
               songInfo.length > 0 &&
@@ -697,7 +691,7 @@ export default function Player({ ids, full }) {
       {isFull === "true" && (
         <motion.div className="fixed top-0 w-full h-screen">
           <button
-            className="fixed top-2 md:top-24 sm:top-8 inset-x-0 left-0 md:left-4 sm:left-8 right-0 z-[99999] hidden md:hidden sm:block"
+            className="fixed top-2 md:top-4 sm:top-8 inset-x-0 left-0 md:left-4 sm:left-8 right-0 z-[99999] hidden md:block sm:block"
             onClick={() => setIsFull("false")}
           >
             <Icon
@@ -715,19 +709,19 @@ export default function Player({ ids, full }) {
               />
             ))}
           </div>
-          <div className="flex flex-row w-full h-screen bg-neutral-100/75 dark:bg-neutral-900/75 backdrop-blur-3xl">
+          <div className="flex flex-row w-full h-screen bg-neutral-100/75 dark:bg-neutral-900/75 backdrop-blur-3xl overflow-y-auto">
             <div
               className={cn(
-                "transition-all duration-500 w-full md:w-full sm:w-1/2 h-screen left-0 right-0 z-50 fixed select-none bottom-0 overflow-y-auto",
-                display === false
+                "transition-all duration-500 w-full md:w-1/2 sm:w-1/2  h-screen left-0 right-0 z-50 select-none bottom-0 overflow-y-auto ",
+                !display
                   ? "top-0 md:top-0 sm:top-0 w-screen"
-                  : "top-[50vh] md:top-[60vh] sm:top-0 z-[99999] py-0 md:py-12 sm:py-0 "
+                  : "fixed md:relative sm:relative top-[50vh] md:top-0 sm:top-0 z-[99999] py-0 md:py-6 sm:py-0 "
               )}
             >
               {songInfo.map((song) => (
                 <div
                   key={song.id}
-                  className="flex flex-col mx-auto h-screen px-0 md:px-32 sm:px-32 py-4 md:py-12 sm:py-12"
+                  className="flex flex-col mx-auto h-screen px-0 md:px-0 sm:px-32 py-4 md:py-12 sm:py-12"
                 >
                   <div key={song.id} className="mx-auto">
                     <motion.img
@@ -735,12 +729,13 @@ export default function Player({ ids, full }) {
                       alt="Album Cover"
                       initial={{ scale: 1 }}
                       animate={
-                        display === false
+                        !display
                           ? { scale: isPlaying ? 1 : 0.85 }
                           : { scale: 1 }
                       }
                       className={cn(
-                        "hidden md:hidden sm:block mx-auto w-5/6 object-cover item-center rounded-xl"
+                        "mx-auto w-5/6 object-cover item-center rounded-xl",
+                        display ? "hidden md:block sm:block" : "hidden"
                       )}
                     />
                     <motion.img
@@ -750,13 +745,13 @@ export default function Player({ ids, full }) {
                       animate={{ scale: isPlaying ? 1 : 0.85 }}
                       className={cn(
                         "mx-auto w-5/6 item-center rounded-xl",
-                        display === false ? "block" : "hidden"
+                        !display ? "block" : "hidden"
                       )}
                     />
                     <h1 className="text-center font-medium text-base md:text-lg sm:text-lg mt-4">
                       {song.name}
                     </h1>
-                    <h2 className="text-center font-medium text-base md:text-lg sm:text-lg opacity-75">
+                    <h2 className="text-center font-medium text-base md:text-lg sm:text-lg opacity-75 truncate">
                       {song.ar.map((artist) => artist.name).join(" / ")}
                     </h2>
                   </div>
@@ -799,19 +794,19 @@ export default function Player({ ids, full }) {
                         {playMode === "default" && (
                           <Icon
                             icon="bi:repeat"
-                            className="w-6 md:w-8 sm:w-8 h-8 opacity-75"
+                            className="w-4 md:w-6 sm:w-8 h-8 opacity-75"
                           />
                         )}
                         {playMode === "loop" && (
                           <Icon
                             icon="bi:repeat-1"
-                            className="w-6 md:w-8 sm:w-8 h-8 opacity-75"
+                            className="w-4 md:w-6 sm:w-8 h-8 opacity-75"
                           />
                         )}
                         {playMode === "shuffle" && (
                           <Icon
                             icon="bi:shuffle"
-                            className="w-6 md:w-8 sm:w-8 h-8 opacity-75"
+                            className="w-4 md:w-6 sm:w-8 h-8 opacity-75"
                           />
                         )}
                       </button>
@@ -819,17 +814,17 @@ export default function Player({ ids, full }) {
                         {isLiked ? (
                           <Icon
                             icon="bi:heart-fill"
-                            className="w-6 md:w-8 sm:w-8 h-8 opacity-75"
+                            className="w-4 md:w-6 sm:w-8 h-8 opacity-75"
                           />
                         ) : (
                           <Icon
                             icon="bi:heart"
-                            className="w-6 md:w-8 sm:w-8 h-8 opacity-75"
+                            className="w-4 md:w-6 sm:w-8 h-8 opacity-75"
                           />
                         )}
                       </button>
                     </div>
-                    <div className="w-[50%] md:w-[45%] sm:w-[45%] mx-auto mt-5 mb-5">
+                    <div className="w-[50%] md:w-[40%] sm:w-[45%] mx-auto mt-5 mb-5">
                       <div className="mx-auto flex flex-row justify-between z-30">
                         <button
                           onClick={() =>
@@ -840,19 +835,19 @@ export default function Player({ ids, full }) {
                           }
                         >
                           <Icon
-                            className="font-bold w-9 md:w-12 sm:w-12 h-12 opacity-80 hover:opacity-100"
+                            className="font-bold w-9 md:w-10 sm:w-12 h-12 opacity-80 hover:opacity-100"
                             icon="bi:rewind-fill"
                           />
                         </button>
                         <button onClick={() => setIsPlaying(!isPlaying)}>
                           {isPlaying === true ? (
                             <Icon
-                              className="font-bold w-9 md:w-12 sm:w-12 h-12"
+                              className="font-bold w-9 md:w-10 sm:w-12 h-12"
                               icon="clarity:pause-solid"
                             />
                           ) : (
                             <Icon
-                              className="font-bold w-9 md:w-12 sm:w-12 h-12"
+                              className="font-bold w-9 md:w-10 sm:w-12 h-12"
                               icon="clarity:play-solid"
                             />
                           )}
@@ -865,7 +860,7 @@ export default function Player({ ids, full }) {
                           }
                         >
                           <Icon
-                            className="font-bold w-9 md:w-12 sm:w-12 h-12 opacity-80 hover:opacity-100"
+                            className="font-bold w-9 md:w-10 sm:w-12 h-12 opacity-80 hover:opacity-100"
                             icon="bi:fast-forward-fill"
                           />
                         </button>
@@ -878,7 +873,7 @@ export default function Player({ ids, full }) {
                     >
                       <Icon
                         icon="solar:password-minimalistic-bold"
-                        className="w-6 md:w-8 sm:w-8 h-8 opacity-75 block md:block sm:hidden"
+                        className="w-5 md:w-8 sm:w-8 h-8 opacity-75 block md:hidden sm:hidden"
                       />
                     </button>
                     <Dialog.Root>
@@ -894,7 +889,7 @@ export default function Player({ ids, full }) {
                           <button>
                             <Icon
                               icon="bi:card-list"
-                              className="w-8 h-8 opacity-75 hidden md:hidden sm:block"
+                              className="w-0 md:w-6 sm:w-8 h-8 opacity-75 hidden md:block sm:block"
                             />
                           </button>
                         </Dialog.Trigger>
@@ -1006,7 +1001,7 @@ export default function Player({ ids, full }) {
                     </button>
                   </div>
 
-                  <div className="flex flex-row justify-between mx-auto mt-6 px-4 md:flex sm:hidden">
+                  <div className="flex flex-row justify-between mx-auto mt-6 px-4 md:hidden sm:hidden">
                     <button onClick={() => setIsFull("false")}>
                       <Icon
                         icon="bi:arrows-fullscreen"
@@ -1099,10 +1094,10 @@ export default function Player({ ids, full }) {
             <AnimatePresence>
               <motion.div
                 className={cn(
-                  "text-left flex right-0 py-12 overflow-y-auto fixed z-20 select-none",
-                  display === false
+                  "text-left flex right-0 py-12 overflow-y-auto z-20 select-none",
+                  !display
                     ? "hidden"
-                    : "block h-[50vh] md:h-[65vh] mx-auto md:mx-auto sm:mr-auto sm:h-screen max-w-sm md:max-w-3xl sm:max-w-none right-0 w-full md:w-full sm:w-[55%] ",
+                    : "fixed md:relative sm:relative block h-[50vh] md:h-screen sm:h-screen mx-auto md:mx-auto sm:mr-auto max-w-sm md:max-w-3xl sm:max-w-none px-4 right-0 w-full md:w-1/2 sm:w-1/2",
                   "justify-center md:justify-center sm:justify-start"
                 )}
               >
@@ -1136,22 +1131,6 @@ export default function Player({ ids, full }) {
                         <span className="mb-1 md:mb-2 sm:mb-4 leading-normal">
                           {line.text}
                         </span>
-
-                        {!shouldHideTranslation(line.text) && (
-                          <span
-                            className={`font-medium mt-8 text-2xl md:text-3xl sm:text-4xl text-neutral-500 dark:text-neutral-400 ${
-                              shouldMoveTranslation ? "moved-translation" : ""
-                            } ${
-                              shouldMoveTranslation || isHidden ? "hidden" : ""
-                            }`}
-                          >
-                            {translatedLyrics[translatedIndex]?.text}
-                          </span>
-                        )}
-
-                        {shouldMoveTranslation && (
-                          <motion.p className="hidden">&nbsp;</motion.p>
-                        )}
                       </motion.p>
                     );
                   })}
