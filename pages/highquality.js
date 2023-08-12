@@ -2,6 +2,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useState, useEffect } from "react";
 import { Icon } from "@iconify/react";
+import LazyLoad from "react-lazy-load";
 
 export default function Highquality() {
   const [playlists, setPlaylists] = useState([]);
@@ -48,10 +49,13 @@ export default function Highquality() {
               onClick={() => router.push(`/playlist?id=${playlist.id}`)}
               className="flex flex-col w-full h-[35.5rem] overflow-hidden"
             >
-              <img
-                src={playlist.coverImgUrl}
-                className="rounded-xl w-full mt-8"
-              />
+              <LazyLoad offset={100}>
+                <img
+                  src={playlist.coverImgUrl}
+                  className="rounded-xl w-full mt-8"
+                />
+              </LazyLoad>
+
               <div className=" px-2 py-2 md:py-4 sm:py-4">
                 <h1 className="font-medium text-base md:text-xl sm:text-xl text-left">
                   {playlist.name}

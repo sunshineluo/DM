@@ -4,6 +4,7 @@ import axios from "axios";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import { Icon } from "@iconify/react";
+import LazyLoad from "react-lazy-load";
 
 export default function Dashboard() {
   const [userDetail, setUserDetail] = useState([]);
@@ -20,15 +21,14 @@ export default function Dashboard() {
         );
         const userDetails = response.data;
         setUserDetail([userDetails]);
-    
+
         setIsPlaylistLoading(true);
-    
+
         const playlistResponse = await axios.get(
           `https://cf233.eu.org/user/playlist?uid=${userData.data.account.id}`
         );
         const playlistData = playlistResponse.data;
         setPlaylists(playlistData.playlist);
-    
       } catch (error) {
         console.error(error);
         // 处理错误
@@ -36,10 +36,9 @@ export default function Dashboard() {
         setIsPlaylistLoading(false);
       }
     }
-  
-    fetchData();  // 调用 fetchData 函数来获取用户详情和歌单数据
-  }, []);  // 空数组作为依赖项，确保只在组件挂载后调用一次
 
+    fetchData(); // 调用 fetchData 函数来获取用户详情和歌单数据
+  }, []); // 空数组作为依赖项，确保只在组件挂载后调用一次
 
   const router = useRouter();
 
@@ -147,10 +146,13 @@ export default function Dashboard() {
                         : "odd"
                     }`}
                   >
-                    <img
-                      src={playlist.coverImgUrl}
-                      className="rounded-xl w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
-                    />
+                    <LazyLoad offset={100}>
+                      <img
+                        src={playlist.coverImgUrl}
+                        className="rounded-xl w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
+                      />
+                    </LazyLoad>
+
                     <div className="flex flex-col space-y-1 mt-1">
                       <span className="font-medium text-lg text-left w-full flex-nowrap flex overflow-hidden">
                         {playlist.name}

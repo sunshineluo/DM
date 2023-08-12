@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import React, { useState, useEffect, useContext } from "react";
 import { Icon } from "@iconify/react";
 import { SongIdsContext } from "@/components/SongIdsContext";
+import LazyLoad from 'react-lazy-load';
 
 export default function Newsongs() {
   const router = useRouter();

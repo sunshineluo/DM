@@ -5,6 +5,7 @@ import moment from "moment";
 import { Icon } from "@iconify/react";
 import Head from "next/head";
 import { SongIdsContext } from "@/components/SongIdsContext";
+import LazyLoad from "react-lazy-load";
 
 const Playlist = () => {
   const router = useRouter();
@@ -103,10 +104,12 @@ const Playlist = () => {
                     <div className="">
                       <div className="flex flex-row space-x-4 md:space-x-6 sm:space-x-8 ml-4 md:ml-0 sm:ml-0">
                         {detail.coverImgUrl && (
-                          <img
-                            src={detail.coverImgUrl}
-                            className="rounded-xl w-24 h-24 md:h-32  md:w-32 sm:w-32 sm:h-32"
-                          />
+                          <LazyLoad offset={100}>
+                            <img
+                              src={detail.coverImgUrl}
+                              className="rounded-xl w-24 h-24 md:h-32  md:w-32 sm:w-32 sm:h-32"
+                            />
+                          </LazyLoad>
                         )}
                         <div className="flex flex-col space-y-2 mt-3 md:mt-6 sm:mt-6">
                           <h1 className="font-medium text-xl md:text-3xl sm:text-3xl">
@@ -152,14 +155,18 @@ const Playlist = () => {
                 <button
                   key={track.id}
                   className={`flex flex-row space-x-4 w-full rounded-none md:rounded-xl sm:rounded-xl px-6 py-4 ${
-                    index % 2 === 0 ? "bg-neutral-200 dark:bg-neutral-800" : "odd"
+                    index % 2 === 0
+                      ? "bg-neutral-200 dark:bg-neutral-800"
+                      : "odd"
                   }`}
                   onClick={() => handleAddToPlaylist(track.id)}
                 >
-                  <img
-                    src={track.al.picUrl}
-                    className="rounded-xl w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
-                  />
+                  <LazyLoad offset={100}>
+                    <img
+                      src={track.al.picUrl}
+                      className="rounded-xl w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
+                    />
+                  </LazyLoad>
                   <div className="flex flex-col space-y-1 mt-1">
                     <span className="font-medium text-left w-full flex-nowrap flex overflow-hidden">
                       {track.name}
@@ -173,7 +180,7 @@ const Playlist = () => {
               ))
             ) : (
               <p className="flex flex-row px-6 md:px-0 sm:px-0">
-                <Icon icon="eos-icons:loading" className="w-8 h-8"  />
+                <Icon icon="eos-icons:loading" className="w-8 h-8" />
               </p>
             )}
           </div>

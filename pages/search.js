@@ -4,6 +4,7 @@ import { SongIdsContext } from "@/components/SongIdsContext";
 import Head from "next/head";
 import * as Tabs from "@radix-ui/react-tabs";
 import { useRouter } from "next/router";
+import LazyLoad from "react-lazy-load";
 
 const MusicSearch = () => {
   const [keywords, setKeywords] = useState("");
@@ -45,7 +46,7 @@ const MusicSearch = () => {
   const handleSearch = async (e) => {
     e.preventDefault(); // 阻止表单默认提交行为
     setIsLoading(true);
-  
+
     try {
       const [songResponse, artistResponse, playlistResponse] =
         await Promise.all([
@@ -65,24 +66,24 @@ const MusicSearch = () => {
             )}`
           ),
         ]);
-  
+
       const songData = await songResponse.json();
       const artistData = await artistResponse.json();
       const playlistData = await playlistResponse.json();
-  
+
       if (songData && songData.code === 200) {
         const songIds = songData.result.songs.map((song) => song.id);
         await fetchSongDetails(songIds);
       }
-  
+
       if (artistData && artistData.code === 200) {
         setArtistDetail(artistData.result.artists);
       }
-  
+
       if (playlistData && playlistData.code === 200) {
         setPlaylistDetail(playlistData.result.playlists);
       }
-  
+
       localStorage.setItem("searchKeywords", keywords); // 将搜索关键词保存在本地存储中
     } catch (error) {
       console.log("An error occurred while searching:", error);
@@ -197,7 +198,8 @@ const MusicSearch = () => {
             )}
           </Tabs.List>
           <Tabs.Content className="mt-8 w-auto" value="tab1">
-            {songDetail && !isLoading &&
+            {songDetail &&
+              !isLoading &&
               songDetail.map((track, index) => (
                 <button
                   key={track.id}
@@ -208,10 +210,12 @@ const MusicSearch = () => {
                   }`}
                   onClick={() => handleAddToPlaylist(track.id)}
                 >
-                  <img
-                    src={track.al.picUrl}
-                    className="rounded-xl w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
-                  />
+                  <LazyLoad offset={100}>
+                    <img
+                      src={track.al.picUrl}
+                      className="rounded-xl w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
+                    />
+                  </LazyLoad>
                   <div className="flex flex-col space-y-1 mt-1">
                     <span className="font-medium text-left w-full flex-nowrap flex overflow-hidden">
                       {track.name}
@@ -231,7 +235,8 @@ const MusicSearch = () => {
             )}
           </Tabs.Content>
           <Tabs.Content className="TabsContent mt-8" value="tab2">
-            {artistDetail && !isLoading &&
+            {artistDetail &&
+              !isLoading &&
               artistDetail.map((artist, index) => (
                 <button
                   key={artist.id}
@@ -241,10 +246,14 @@ const MusicSearch = () => {
                       : "odd"
                   }`}
                 >
-                  <img
-                    src={artist.picUrl}
-                    className="rounded-full w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
-                  />
+                  <LazyLoad offset={100}>
+                    {" "}
+                    <img
+                      src={artist.picUrl}
+                      className="rounded-full w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
+                    />
+                  </LazyLoad>
+
                   <div className="flex flex-col space-y-1 mt-1">
                     <span className="font-medium text-left w-full text-xl  mt-3 flex-nowrap flex overflow-hidden">
                       {artist.name}
@@ -259,7 +268,8 @@ const MusicSearch = () => {
             )}
           </Tabs.Content>
           <Tabs.Content className="TabsContent mt-8" value="tab3">
-            {playlistDetail && !isLoading &&
+            {playlistDetail &&
+              !isLoading &&
               playlistDetail.map((playlist, index) => (
                 <button
                   key={playlist.id}
@@ -270,10 +280,14 @@ const MusicSearch = () => {
                       : "odd"
                   }`}
                 >
-                  <img
-                    src={playlist.coverImgUrl}
-                    className="rounded-xl w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
-                  />
+                  <LazyLoad offset={100}>
+                    {" "}
+                    <img
+                      src={playlist.coverImgUrl}
+                      className="rounded-xl w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
+                    />
+                  </LazyLoad>
+
                   <div className="flex flex-col space-y-1 mt-1">
                     <span className="font-medium text-left w-full flex-nowrap flex overflow-hidden">
                       {playlist.name}

@@ -4,6 +4,7 @@ import axios from "axios";
 import { useRouter } from "next/router";
 import { Icon } from "@iconify/react";
 import { SongIdsContext } from "@/components/SongIdsContext";
+import LazyLoad from 'react-lazy-load';
 
 export default function Home() {
   const router = useRouter();
@@ -105,7 +106,10 @@ export default function Home() {
               onClick={() => router.push(`/playlist?id=${playlist.id}`)}
               className="flex flex-col w-full -mb-32 md:-mb-0 sm:-mb-0 h-[35.5rem] overflow-hidden"
             >
-              <img src={playlist.coverImgUrl} className="rounded-xl w-full" />
+              <LazyLoad offset={100}>
+                <img src={playlist.coverImgUrl} className="rounded-xl w-full" />
+              </LazyLoad>
+
               <div className="px-2 py-2 md:py-4 sm:py-4">
                 <h1 className="font-medium text-base md:text-xl sm:text-xl text-left">
                   {playlist.name}
@@ -148,10 +152,12 @@ export default function Home() {
               }`}
               onClick={() => handleAddToPlaylist(track.id)}
             >
-              <img
-                src={track.al.picUrl}
-                className="rounded-xl w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
-              />
+              <LazyLoad offset={100}>
+                <img
+                  src={track.al.picUrl}
+                  className="rounded-xl w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
+                />
+              </LazyLoad>
               <div className="flex flex-col space-y-1 mt-1">
                 <span className="font-medium text-left w-full flex-wrap md:flex-nowrap sm:flex-nowrap flex overflow-hidden">
                   {track.name}

@@ -734,7 +734,7 @@ export default function Player({ ids, full }) {
                           : { scale: 1 }
                       }
                       className={cn(
-                        "mx-auto w-5/6 object-cover item-center rounded-xl",
+                        "mx-auto w-auto md:w-96 sm:w-[27.5rem] object-contain item-center rounded-xl",
                         display ? "hidden md:block sm:block" : "hidden"
                       )}
                     />
@@ -744,7 +744,7 @@ export default function Player({ ids, full }) {
                       initial={{ scale: 1 }}
                       animate={{ scale: isPlaying ? 1 : 0.85 }}
                       className={cn(
-                        "mx-auto w-5/6 item-center rounded-xl",
+                        "mx-auto w-5/6 object-cover item-center rounded-xl",
                         !display ? "block" : "hidden"
                       )}
                     />
@@ -1123,7 +1123,7 @@ export default function Player({ ids, full }) {
                           "text-left h-auto max-h-min w-full max-w-3xl flex flex-col space-y-1 tracking-tighter transition-all duration-500 cursor-pointer text-neutral-700 dark:text-neutral-300 rounded-3xl px-6 md:px-0 sm:px-0 py-4 md:py-7 sm:py-10 leading-normal flex-1 font-semibold",
                           line.text === highlightedLine
                             ? "font-semibold text-4xl md:text-5xl sm:text-6xl text-neutral-600 dark:text-neutral-300"
-                            : "text-3xl md:text-4xl sm:text-5xl blur-[2px] text-neutral-600 dark:text-neutral-300 font-semibold"
+                            : "text-3xl md:text-4xl sm:text-5xl opacity-50 blur-[1.5px] text-neutral-600 dark:text-neutral-300 font-semibold"
                         )}
                         onClick={() => audioRef.current.seekTo(line.timestamp)}
                         data-text={line.text}
