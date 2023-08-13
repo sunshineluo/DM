@@ -104,31 +104,29 @@ export default function Player({ ids, full }) {
       try {
         const currentSongId = songIds[currentSongIndex];
 
-        const songResponse = await axios.get(
-          `https://cf233.eu.org/song/detail?ids=${currentSongId}`
-        );
+        const [songResponse, lyricsResponse, translatedLyricsResponse] =
+          await Promise.all([
+            axios.get(`https://cf233.eu.org/song/detail?ids=${currentSongId}`),
+            axios.get(`https://cf233.eu.org/lyric?id=${currentSongId}`),
+            axios.get(
+              `https://cf233.eu.org/lyric/translate?id=${currentSongId}`
+            ),
+          ]);
+
         const songData = songResponse.data;
         const songDetail = songData.songs;
         setSongInfo(songDetail);
 
-        const lyricsResponse = await axios.get(
-          `https://cf233.eu.org/lyric?id=${currentSongId}`
-        );
         const lyricsData = lyricsResponse.data;
         const lyricsText = lyricsData.lrc.lyric;
         const parsedLyrics = parseLyrics(lyricsText);
         setLyrics(parsedLyrics);
 
-        const translatedLyricsResponse = await axios.get(
-          `https://cf233.eu.org/lyric/translate?id=${currentSongId}`
-        );
         const translatedLyricsData = translatedLyricsResponse.data;
         const translatedLyricsText = translatedLyricsData.tlyric.lyric;
         const parsedTranslatedLyrics = parseLyrics(translatedLyricsText);
         setTranslatedLyrics(parsedTranslatedLyrics);
 
-        // 在获取歌曲数据后，将播放状态设置为 true
-        setIsPlaying(true);
       } catch (error) {
         console.log(error);
       }
@@ -145,7 +143,6 @@ export default function Player({ ids, full }) {
       const line = lines[i].trim();
 
       if (line.length > 0) {
-        // 过滤空行
         const regex = /\[(\d+):(\d+)\.\d+\]/;
         const match = line.match(regex);
 
@@ -186,8 +183,8 @@ export default function Player({ ids, full }) {
   };
 
   useEffect(() => {
-    if (highlightedLine) {
-      const targetElement = lyricsContainerRef.current?.querySelector(
+    if (highlightedLine && lyricsContainerRef.current) {
+      const targetElement = lyricsContainerRef.current.querySelector(
         `p[data-text="${highlightedLine
           .replace(/"/g, '\\"')
           .replace(/'/g, "\\'")}"]`
@@ -251,34 +248,6 @@ export default function Player({ ids, full }) {
     setVolume(newVolume);
   };
 
-  const shouldHideTranslation = (text) => {
-    const commonWords = [
-      "作曲 :",
-      "作词 :",
-      "演唱",
-      "编曲",
-      "制作",
-      "配乐",
-      "混音",
-      "发行",
-      "录音",
-      "导演",
-      "制片",
-      "出品",
-      "编剧",
-      "监制",
-      "设计",
-      "和声",
-      "贝斯",
-      "吉他",
-      "母带后期",
-      "发行公司",
-      "出品方",
-    ]; // 添加需要隐藏翻译的常用词
-
-    return commonWords.some((word) => text.includes(word));
-  };
-
   const handlePlayMode = () => {
     // 切换播放模式
     if (playMode === "default") {
@@ -289,9 +258,6 @@ export default function Player({ ids, full }) {
       setPlayMode("default");
     }
   };
-
-  let originalIndex = 0;
-  let translatedIndex = -1;
 
   function shuffleArray(array) {
     const newArray = [...array]; // 创建一个新数组，并复制原始数组的元素
@@ -327,30 +293,6 @@ export default function Player({ ids, full }) {
         shuffledIndexes[(currentIndex + 1) % shuffledIndexes.length]
       );
       setIsPlaying(true);
-    }
-  };
-
-  const elementRef = useRef(null);
-
-  const toggleFullscreen = () => {
-    if (document.fullscreenElement) {
-      document.exitFullscreen();
-    } else {
-      elementRef.current.requestFullscreen();
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener("keydown", handleKeydown);
-    return () => {
-      document.removeEventListener("keydown", handleKeydown);
-    };
-  }, []);
-
-  const handleKeydown = (event) => {
-    if (event.key === "F11") {
-      event.preventDefault();
-      toggleFullscreen();
     }
   };
 
@@ -444,7 +386,7 @@ export default function Player({ ids, full }) {
   };
 
   return (
-    <div ref={elementRef} className="fixed w-full max-h-screen h-screen">
+    <div className="fixed w-full max-h-screen h-screen z-[10000]">
       <div></div>
       <ReactPlayer
         ref={audioRef}
@@ -462,7 +404,7 @@ export default function Player({ ids, full }) {
       />
       {isFull === "false" && (
         <div className="fixed bottom-0 w-full overflow-x-auto bg-neutral-200/75 dark:bg-neutral-800/75 backdrop-blur-lg border-t-[1.5px] border-t-neutral-200/50 dark:border-t-neutral-800/50">
-          <div className="max-w-4xl mx-auto px-0 md:px-8 sm:px-8">
+          <div className="max-w-6xl mx-auto px-0 md:px-8 sm:px-8">
             {songInfo &&
               songInfo.length > 0 &&
               songInfo.map((song) => (
@@ -477,10 +419,10 @@ export default function Player({ ids, full }) {
                         className="rounded-xl w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16 cursor-pointer"
                       />
                       <div className="flex flex-col space-y-1 mt-1 ">
-                        <span className="text-base font-medium text-center w-18 md:w-36 sm:w-36 flex-nowrap flex truncate">
+                        <span className="text-base font-medium text-center w-32 md:w-72 sm:w-96 flex-nowrap flex truncate">
                           {song.name}
                         </span>
-                        <span className="text-base opacity-75 text-left w-16 md:w-54 sm:w-54 truncate flex-nowrap flex">
+                        <span className="text-base opacity-75 text-left w-32 md:w-72 sm:w-96 truncate flex-nowrap flex">
                           {song.ar.map((artist) => artist.name).join(" / ")}
                         </span>
                       </div>
@@ -655,32 +597,7 @@ export default function Player({ ids, full }) {
                           </Dialog.Portal>
                         </Dialog.Root>
                       </div>
-                      <div>
-                        <Slider.Root
-                          className="SliderRoot mx-auto hidden md:inline sm:inline"
-                          min={0}
-                          max={1}
-                          step={0.01}
-                          value={[played]}
-                          onValueChange={(newValue) =>
-                            handleSeekChange(newValue)
-                          }
-                          onPointerUp={handleSeek}
-                        >
-                          <Slider.Track className="SliderTrack backdrop-blur-lg bg-opacity-75 cursor-pointer">
-                            <Slider.Range
-                              className={cn(
-                                "SliderRange cursor-pointer",
-                                played === 1 ? "rounded-full" : "rounded-l-full"
-                              )}
-                            />
-                            <Slider.Thumb
-                              className="SliderThumb focus:outline-none -mt-1"
-                              aria-label="Progress"
-                            />
-                          </Slider.Track>
-                        </Slider.Root>
-                      </div>
+                      <div></div>
                     </div>
                   </div>
                 </div>
@@ -794,19 +711,19 @@ export default function Player({ ids, full }) {
                         {playMode === "default" && (
                           <Icon
                             icon="bi:repeat"
-                            className="w-4 md:w-6 sm:w-8 h-8 opacity-75"
+                            className="w-4 md:w-6 sm:w-7 h-7 opacity-75"
                           />
                         )}
                         {playMode === "loop" && (
                           <Icon
                             icon="bi:repeat-1"
-                            className="w-4 md:w-6 sm:w-8 h-8 opacity-75"
+                            className="w-4 md:w-6 sm:w-7 h-7 opacity-75"
                           />
                         )}
                         {playMode === "shuffle" && (
                           <Icon
                             icon="bi:shuffle"
-                            className="w-4 md:w-6 sm:w-8 h-8 opacity-75"
+                            className="w-4 md:w-6 sm:w-7 h-7 opacity-75"
                           />
                         )}
                       </button>
@@ -814,12 +731,12 @@ export default function Player({ ids, full }) {
                         {isLiked ? (
                           <Icon
                             icon="bi:heart-fill"
-                            className="w-4 md:w-6 sm:w-8 h-8 opacity-75"
+                            className="w-4 md:w-6 sm:w-7 h-7 opacity-75"
                           />
                         ) : (
                           <Icon
                             icon="bi:heart"
-                            className="w-4 md:w-6 sm:w-8 h-8 opacity-75"
+                            className="w-4 md:w-6 sm:w-7 h-7 opacity-75"
                           />
                         )}
                       </button>
@@ -889,7 +806,7 @@ export default function Player({ ids, full }) {
                           <button>
                             <Icon
                               icon="bi:card-list"
-                              className="w-0 md:w-6 sm:w-8 h-8 opacity-75 hidden md:block sm:block"
+                              className="w-0 md:w-6 sm:w-7 h-7 opacity-75 hidden md:block sm:block"
                             />
                           </button>
                         </Dialog.Trigger>
@@ -1103,27 +1020,60 @@ export default function Player({ ids, full }) {
               >
                 <div ref={lyricsContainerRef} style={{ maxHeight: "100%" }}>
                   {lyrics.map((line, index) => {
-                    if (line.text) {
-                      originalIndex++;
-                      if (!shouldHideTranslation(line.text)) {
-                        translatedIndex++;
-                      }
-                    }
-
-                    const shouldMoveTranslation =
-                      line.text &&
-                      (shouldHideTranslation(line.text) || !line.text);
-                    const isHidden =
-                      !line.text && !shouldHideTranslation(line.text); // 是否隐藏空行
-
+                    const translationLine = translatedLyrics.find(
+                      (translatedLine) =>
+                        translatedLine.timestamp === line.timestamp
+                    );
+                    const highlightedIndex = lyrics.findIndex(
+                      (lyric) => lyric.text === highlightedLine
+                    );
+                    const isHighlightedRow = index === highlightedIndex;
+                    const isPreviousRowHighlighted =
+                      index === highlightedIndex - 1;
+                    const isNextRowHighlighted = index === highlightedIndex + 1;
+                    const isTwoRowsBeforeHighlighted =
+                      index === highlightedIndex - 2;
+                    const isTwoRowsAfterHighlighted =
+                      index === highlightedIndex + 2;
+                    const isThreeRowsBeforeHighlighted =
+                      index === highlightedIndex - 3;
+                    const isThreeRowsAfterHighlighted =
+                      index === highlightedIndex + 3;
+                    const isFourRowsBeforeHighlighted =
+                      index === highlightedIndex - 4;
+                    const isFourRowsAfterHighlighted =
+                      index === highlightedIndex + 4;
                     return (
                       <motion.p
                         key={index}
                         className={cn(
-                          "text-left h-auto max-h-min w-full max-w-3xl flex flex-col space-y-1 tracking-tighter transition-all duration-500 cursor-pointer text-neutral-700 dark:text-neutral-300 rounded-3xl px-6 md:px-0 sm:px-0 py-4 md:py-7 sm:py-10 leading-normal flex-1 font-semibold",
-                          line.text === highlightedLine
-                            ? "font-semibold text-4xl md:text-5xl sm:text-6xl text-neutral-600 dark:text-neutral-300"
-                            : "text-3xl md:text-4xl sm:text-5xl opacity-50 blur-[1.5px] text-neutral-600 dark:text-neutral-300 font-semibold"
+                          "text-neutral-700 dark:text-neutral-300 text-left h-auto max-h-min w-full text-3xl md:text-4xl sm:text-5xl font-semibold max-w-3xl flex flex-col space-y-1 tracking-tighter transition-all duration-500 cursor-pointer rounded-3xl px-6 md:px-0 sm:px-0 py-4 md:py-7 sm:py-10 leading-normal flex-1",
+                          isHighlightedRow &&
+                            "text-[2rem] md:text-[2.4rem] sm:text-[3.2rem] blur-0",
+                          isPreviousRowHighlighted && "opacity-50 blur-[1px]",
+                          isNextRowHighlighted && "opacity-50 blur-[1px]",
+                          isTwoRowsBeforeHighlighted &&
+                            "opacity-25 blur-[1.5px]",
+                          isTwoRowsAfterHighlighted &&
+                            "opacity-25 blur-[1.5px]",
+                          isThreeRowsBeforeHighlighted &&
+                            "opacity-25 blur-[2px]",
+                          isThreeRowsAfterHighlighted &&
+                            "opacity-25 blur-[2px]",
+                          isFourRowsBeforeHighlighted &&
+                            "opacity-25 blur-[2.5px]",
+                          isFourRowsAfterHighlighted &&
+                            "opacity-25 blur-[2.5px]",
+                          !isHighlightedRow &&
+                            !isPreviousRowHighlighted &&
+                            !isNextRowHighlighted &&
+                            !isTwoRowsBeforeHighlighted &&
+                            !isTwoRowsAfterHighlighted &&
+                            !isThreeRowsBeforeHighlighted &&
+                            !isThreeRowsAfterHighlighted &&
+                            !isFourRowsBeforeHighlighted &&
+                            !isFourRowsAfterHighlighted &&
+                            "opacity-25 blur-[3px]"
                         )}
                         onClick={() => audioRef.current.seekTo(line.timestamp)}
                         data-text={line.text}
@@ -1131,6 +1081,11 @@ export default function Player({ ids, full }) {
                         <span className="mb-1 md:mb-2 sm:mb-4 leading-normal">
                           {line.text}
                         </span>
+                        {translationLine?.text && (
+                          <span className="text-2xl md:text-3xl sm:text-4xl text-neutral-600 dark:text-neutral-400 font-medium leading-normal">
+                            {translationLine.text}
+                          </span>
+                        )}
                       </motion.p>
                     );
                   })}

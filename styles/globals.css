@@ -31,11 +31,10 @@ body {
 }
 
 .SliderTrack {
-  @apply bg-neutral-500;
+  @apply bg-neutral-500 dark:bg-neutral-400;
   position: relative;
   flex-grow: 1;
-  height: 5px;
-  @apply rounded-full;
+  @apply rounded-full h-[10px] hover:h-[20px] transition-all duration-300;
 }
 
 .SliderRange {
@@ -67,6 +66,7 @@ body {
   position: fixed;
   inset: 0;
   animation: overlayShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 99999;
 }
 
 .DialogContent {
@@ -79,7 +79,7 @@ body {
   max-width: 900px;
   max-height: 80vh;
   animation: contentShow 300ms cubic-bezier(0.16, 1, 0.3, 1);
-  @apply rounded-xl border-2 dark:border-neutral-800 px-6 md:px-12 sm:px-16 py-12;
+  @apply rounded-xl border-2 dark:border-neutral-800 px-6 md:px-12 sm:px-16 py-12 z-[999999999];
 }
 .DialogContent:focus {
   outline: none;
@@ -127,7 +127,7 @@ body {
   line-height: 1;
   color: var(--mauve-11);
   user-select: none;
-  @apply text-base md:text-lg sm:text-lg px-6 py-1.5 md:py-2 sm:py-2 rounded-full;
+  @apply text-base min-w-[81px] md:text-lg sm:text-lg px-4 md:px-6 sm:px-6 py-1.5 md:py-2 sm:py-2 rounded-full;
 }
 
 .TabsTrigger[data-state="active"] {

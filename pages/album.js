@@ -7,57 +7,60 @@ import Head from "next/head";
 import { SongIdsContext } from "@/components/SongIdsContext";
 import LazyLoad from "react-lazy-load";
 
-const Playlist = () => {
+const Album = () => {
   const router = useRouter();
   const id = router.query.id || null;
-  const [playlistDetail, setPlaylistDetail] = useState(null);
-  const [playlistTrack, setPlaylistTrack] = useState(null);
+  const [albumDetail, setAlbumDetail] = useState(null);
+  const [albumTrack, setAlbumTrack] = useState(null);
   const [searchTerm, setSearchTerm] = useState(""); // 搜索关键词状态
 
-  const filteredTracks = playlistTrack
-    ? playlistTrack.filter((track) =>
+  const filteredTracks = albumTrack
+    ? albumTrack.filter((track) =>
         track.name.toLowerCase().includes(searchTerm.toLowerCase())
       )
     : [];
 
-  const getPlaylistDetail = async () => {
+  const getAlbumDetail = async () => {
     try {
-      const response = await axios.get("https://cf233.eu.org/playlist/detail", {
+      const response = await axios.get("https://cf233.eu.org/album", {
         params: {
           id: id,
         },
       });
 
-      setPlaylistDetail([response.data.playlist]);
+      setAlbumDetail(response.data.songs);
+      console.log(albumDetail);
     } catch (error) {
       // 处理错误
       console.error(error);
     }
   };
 
-  const getPlaylistTracks = async () => {
+  const getAlbumTracks = async () => {
+    if (!Array.isArray(albumDetail)) {
+      console.error("Invalid albumDetail. Expected an array.");
+      return;
+    }
+  
+    const songIds = albumDetail.map((song) => song.id);
+  
     try {
-      const response = await axios.get(
-        "https://cf233.eu.org/playlist/track/all",
-        {
-          params: {
-            id: id,
-            limit: 1000,
-          },
-        }
+      const response = await fetch(
+        `https://cf233.eu.org/song/detail?ids=${songIds.join(",")}`
       );
-
-      setPlaylistTrack(response.data.songs);
+      const data = await response.json();
+      if (data && data.code === 200) {
+        setAlbumTrack(data.songs);
+      }
     } catch (error) {
-      // 处理错误
-      console.error(error);
+      console.log("An error occurred while fetching song details:", error);
     }
   };
 
   useEffect(() => {
     if (id !== null) {
-      getPlaylistDetail();
-      getPlaylistTracks();
+      getAlbumDetail();
+      getAlbumTracks();
     }
   }, [id]);
 
@@ -69,55 +72,54 @@ const Playlist = () => {
   };
 
   const handlePlayAll = () => {
-    const trackIds = playlistTrack.map((track) => track.id);
+    const trackIds = albumTrack.map((track) => track.id);
     addAllToPlaylist(trackIds); // 将所有歌曲ID传递给 addAllToPlaylist 函数
   };
 
   return (
     <div>
       <Head>
-        {playlistDetail !== null &&
-          playlistDetail.map(
+        {albumDetail !== null &&
+          albumDetail.map(
             (detail, index) =>
-              detail && <title key={index}>{detail.name}</title>
+              detail && <title key={index}>{detail.al.name}</title>
           )}
       </Head>
-      {playlistDetail !== null &&
-        playlistDetail.map(
+      {albumDetail !== null &&
+        albumDetail.map(
           (detail) =>
             detail &&
-            detail.coverImgUrl && (
+            detail.picUrl && (
               <img
                 key={detail.id}
-                src={detail.coverImgUrl}
+                src={detail.picUrl}
                 className="fixed w-full h-screen z-[-1] blur-lg hidden"
               />
             )
         )}
       <div className="bg-neutral-100/75 dark:bg-neutral-900/75 backdrop-blur-3xl min-h-screen overflow-y-auto">
         <div className="max-w-6xl mx-auto py-8 px-0 md:px-6 sm:px-6">
-          {playlistDetail !== null &&
-            playlistDetail.map(
+          {albumDetail !== null &&
+            albumDetail.slice(0,1).map(
               (detail, index) =>
                 detail && (
                   <div key={index}>
                     <div className="">
                       <div className="flex flex-row space-x-4 md:space-x-6 sm:space-x-8 ml-4 md:ml-0 sm:ml-0">
-                        {detail.coverImgUrl && (
+                        {detail.al.picUrl && (
                           <LazyLoad offset={100}>
                             <img
-                              src={detail.coverImgUrl}
+                              src={detail.al.picUrl}
                               className="rounded-xl w-24 h-24 md:h-32  md:w-32 sm:w-32 sm:h-32"
                             />
                           </LazyLoad>
                         )}
                         <div className="flex flex-col space-y-2 mt-3 md:mt-6 sm:mt-6">
                           <h1 className="font-medium text-xl md:text-3xl sm:text-3xl">
-                            {detail.name}
+                            {detail.al.name}
                           </h1>
                           <p className="text-base md:text-lg sm:text-lg opacity-75">
-                            更新于
-                            {moment(detail.updateTime).format("YYYY年MM月DD日")}
+                            {detail.ar.map((artist) => artist.name).join(" / ")}
                           </p>
                         </div>
                       </div>
@@ -144,7 +146,7 @@ const Playlist = () => {
               <input
                 type="search"
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="搜索歌单..."
+                placeholder="搜索专辑..."
                 className="w-full px-10  py-1.5 focus:outline-none bg-neutral-50 dark:bg-neutral-950 dark:border-neutral-800 text-lg focus:ring-2 focus:ring-red-600 border-2 rounded-xl"
               />
             </div>
@@ -189,4 +191,4 @@ const Playlist = () => {
   );
 };
 
-export default Playlist;
+export default Album;

@@ -57,7 +57,7 @@ export default function Home() {
       try {
         setIsPlaylistLoading(true);
         const response = await fetch(
-          `https://cf233.eu.org/top/playlist/highquality?cat=全部&limit=4`
+          `https://cf233.eu.org/top/playlist/highquality?cat=全部&limit=6`
         );
         const data = await response.json();
         if (data && data.code === 200) {
@@ -81,7 +81,7 @@ export default function Home() {
     addToPlaylist(trackId);
   };
   return (
-    <div className="max-w-4xl mx-auto px-0 py-8 overflow-hidden">
+    <div className="max-w-6xl mx-auto px-0 py-8 overflow-hidden">
       <Head>
         <title>现在就听</title>
       </Head>
@@ -98,7 +98,7 @@ export default function Home() {
         </button>
       </div>
 
-      <div className="mt-6 px-6 md:px-6 sm:px-6 columns-1 md:columns-2 sm:columns-2 w-full">
+      <div className="mt-6 px-6 md:px-6 sm:px-6 columns-1 md:columns-2 sm:columns-3 w-full">
         {playlists.length > 0 &&
           playlists.map((playlist, index) => (
             <button
@@ -159,12 +159,11 @@ export default function Home() {
                 />
               </LazyLoad>
               <div className="flex flex-col space-y-1 mt-1">
-                <span className="font-medium text-left w-full flex-wrap md:flex-nowrap sm:flex-nowrap flex overflow-hidden">
+                <span className="font-medium text-left w-full">
                   {track.name}
                 </span>
-                <span className="text-base opacity-75 text-left flex flex-row flex-wrap md:flex-nowrap sm:flex-nowrap overflow-hidden truncate w-1/2 md:w-2/3 sm:w-2/3">
-                  {track.ar.map((artist) => artist.name).join(" / ")} -{" "}
-                  {track.al.name}
+                <span className="text-base opacity-75 text-left truncate w-48 md:w-96 sm:w-96">
+                  {track.ar.map((artist) => artist.name).join(" / ")}
                 </span>
               </div>
             </button>

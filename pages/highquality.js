@@ -32,16 +32,14 @@ export default function Highquality() {
   }, []);
   const router = useRouter();
   return (
-    <div className="max-w-4xl mx-auto px-0 py-8">
+    <div className="max-w-6xl mx-auto px-0 py-8">
       <Head>
         <title>精品歌单</title>
       </Head>
-
       <h2 className="px-6 text-neutral-700 dark:text-neutral-300 font-medium text-lg md:text-3xl sm:text-4xl">
         精品歌单
       </h2>
-
-      <div className="columns-1 md:columns-2 sm:columns-2 mt-6 px-6 md:px-0 sm:px-0">
+      <div className="columns-1 md:columns-2 sm:columns-3 mt-6 px-6 md:px-0 sm:px-0">
         {playlists.length > 0 &&
           playlists.map((playlist, index) => (
             <button
@@ -67,13 +65,12 @@ export default function Highquality() {
               </div>
             </button>
           ))}
-
-        {isLoading && (
-          <p className="flex flex-row px-6 md:px-6 sm:px-6 justify-start mt-6">
-            <Icon icon="eos-icons:loading" className="w-8 h-8" />
-          </p>
-        )}
-      </div>
+      </div>{" "}
+      {isLoading && (
+        <p className="flex flex-row px-6 md:px-6 sm:px-6 justify-start mt-6">
+          <Icon icon="eos-icons:loading" className="w-8 h-8" />
+        </p>
+      )}
     </div>
   );
 }

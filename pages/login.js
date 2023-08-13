@@ -63,7 +63,7 @@ export default function QrLogin() {
   }, []);
 
   return (
-    <div className="max-w-4xl px-6 py-8 mx-auto">
+    <div className="max-w-6xl px-6 py-8 mx-auto">
       <Head>
         <title>扫描二维码登录</title>
       </Head>

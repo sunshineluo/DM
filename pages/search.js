@@ -15,6 +15,9 @@ const MusicSearch = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [hotSearchList, setHotSearchList] = useState([]);
+  const [albumDetail, setAlbumDetail] = useState([]);
+  const [videoDetail, setVideoDetail] = useState([]);
+  const [mvDetail, setMvDetail] = useState([]);
 
   useEffect(() => {
     const fetchHotSearchList = async () => {
@@ -48,28 +51,50 @@ const MusicSearch = () => {
     setIsLoading(true);
 
     try {
-      const [songResponse, artistResponse, playlistResponse] =
-        await Promise.all([
-          fetch(
-            `https://cf233.eu.org/search?keywords=${encodeURIComponent(
-              keywords
-            )}`
-          ),
-          fetch(
-            `https://cf233.eu.org/search?type=100&keywords=${encodeURIComponent(
-              keywords
-            )}`
-          ),
-          fetch(
-            `https://cf233.eu.org/search?type=1000&keywords=${encodeURIComponent(
-              keywords
-            )}`
-          ),
-        ]);
+      const [
+        songResponse,
+        artistResponse,
+        playlistResponse,
+        albumResponse,
+        mvResponse,
+        videoResponse,
+      ] = await Promise.all([
+        fetch(
+          `https://cf233.eu.org/search?keywords=${encodeURIComponent(keywords)}`
+        ),
+        fetch(
+          `https://cf233.eu.org/search?type=100&keywords=${encodeURIComponent(
+            keywords
+          )}`
+        ),
+        fetch(
+          `https://cf233.eu.org/search?type=1000&keywords=${encodeURIComponent(
+            keywords
+          )}`
+        ),
+        fetch(
+          `https://cf233.eu.org/search?type=10&keywords=${encodeURIComponent(
+            keywords
+          )}`
+        ),
+        fetch(
+          `https://cf233.eu.org/search?type=1004&keywords=${encodeURIComponent(
+            keywords
+          )}`
+        ),
+        fetch(
+          `https://cf233.eu.org/search?type=1014&keywords=${encodeURIComponent(
+            keywords
+          )}`
+        ),
+      ]);
 
       const songData = await songResponse.json();
       const artistData = await artistResponse.json();
       const playlistData = await playlistResponse.json();
+      const albumData = await albumResponse.json();
+      const mvData = await mvResponse.json();
+      const videoData = await videoResponse.json();
 
       if (songData && songData.code === 200) {
         const songIds = songData.result.songs.map((song) => song.id);
@@ -82,6 +107,18 @@ const MusicSearch = () => {
 
       if (playlistData && playlistData.code === 200) {
         setPlaylistDetail(playlistData.result.playlists);
+      }
+
+      if (albumData && albumData.code === 200) {
+        setAlbumDetail(albumData.result.albums);
+      }
+
+      if (mvData && mvData.code === 200) {
+        setMvDetail(mvData.result.mvs);
+      }
+
+      if (videoData && videoData.code === 200) {
+        setVideoDetail(videoData.result.videos);
       }
 
       localStorage.setItem("searchKeywords", keywords); // 将搜索关键词保存在本地存储中
@@ -119,7 +156,7 @@ const MusicSearch = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-0 py-8">
+    <div className="max-w-6xl mx-auto px-0 py-8">
       <Head>
         <title>智能搜索</title>
       </Head>
@@ -135,7 +172,7 @@ const MusicSearch = () => {
             value={keywords}
             onChange={(e) => setKeywords(e.target.value)}
             placeholder="好音乐一搜即得"
-            className="text-neutral-700 dark:text-neutral-300 bg-white dark:bg-black dark:border-neutral-800 border-neutral-200 w-full md:w-[32rem] sm:w-[36rem] px-10 py-1.5 md:py-2 sm:py-2 focus:outline-none text-lg md:text-xl sm:text-xl focus:ring-2 focus:ring-red-600 border-2 rounded-xl"
+            className="text-neutral-700 dark:text-neutral-300 bg-neutral-50 dark:bg-neutral-950 dark:border-neutral-800 border-neutral-200 w-full md:w-[32rem] sm:w-[36rem] px-10 py-1.5 md:py-2 sm:py-2 focus:outline-none text-lg md:text-xl sm:text-xl focus:ring-2 focus:ring-red-600 border-2 rounded-xl"
           />
           <button type="submit" className="hidden">
             Search
@@ -149,17 +186,17 @@ const MusicSearch = () => {
           <h1>热搜列表</h1>
 
           <div className="flex justify-center">
-            <div className="px-6 md:px-0 sm:px-0 text-left mt-6 gap-4 md:gap-12 sm:gap-12 columns-2 md:columns-3 sm:columns-3 mx-auto">
+            <div className="px-6 md:px-0 sm:px-0 text-left mt-6 gap-4 md:gap-12 sm:gap-12 columns-2 md:columns-3 sm:columns-4 mx-auto">
               {hotSearchList.map((item, index) => (
                 <p
                   onClick={() => setKeywords(item.searchWord)}
                   key={index}
-                  className="cursor-pointer mb-4 text-base md:text-xl sm:text-xl font-medium py-2 px-6 rounded-xl bg-neutral-200 dark:bg-neutral-800"
+                  className="cursor-pointer mb-4 text-base md:text-lg sm:text-xl font-medium py-2 px-4 md:px-6 sm:px-6 rounded-xl bg-neutral-200 dark:bg-neutral-800"
                 >
                   <div className="flex flex-row">
                     <div>
                       <span className="opacity-50"> {index + 1}</span>{" "}
-                      <span>{item.searchWord}</span>
+                      <span className="truncate">{item.searchWord}</span>
                     </div>
                     <div>
                       {item.iconUrl && (
@@ -179,54 +216,67 @@ const MusicSearch = () => {
 
       <Tabs.Root className="TabsRoot" defaultValue="tab1">
         <ul className="mb-16 px-0 md:px-6 sm:px-6">
-          <Tabs.List
-            className="TabsList mt-6 px-6 max-w-xl mx-auto flex flex-row space-x-4 overflow-x-auto"
-            aria-label="类别"
-          >
+          <div className="sticky top-2 px-6 md:px-0 sm:px-0 z-[9999] ">
+            {" "}
             {songDetail.length > 0 && (
-              <>
-                <Tabs.Trigger className="TabsTrigger" value="tab1">
-                  单曲
-                </Tabs.Trigger>
-                <Tabs.Trigger className="TabsTrigger" value="tab2">
-                  歌手
-                </Tabs.Trigger>
-                <Tabs.Trigger className="TabsTrigger" value="tab3">
-                  歌单
-                </Tabs.Trigger>
-              </>
+              <Tabs.List
+                className="bg-neutral-200/75 dark:bg-neutral-800/75 backdrop-blur-lg rounded-full TabsList py-1.5 mt-6 px-2 max-w-3xl mx-auto flex flex-row space-x-2 md:space-x-4 sm:space-x-4 overflow-x-auto"
+                aria-label="类别"
+              >
+                <>
+                  <Tabs.Trigger className="TabsTrigger" value="tab1">
+                    单曲
+                  </Tabs.Trigger>
+                  <Tabs.Trigger className="TabsTrigger" value="tab2">
+                    艺术家
+                  </Tabs.Trigger>
+                  <Tabs.Trigger className="TabsTrigger" value="tab3">
+                    歌单
+                  </Tabs.Trigger>
+                  <Tabs.Trigger className="TabsTrigger" value="tab4">
+                    专辑
+                  </Tabs.Trigger>
+                  <Tabs.Trigger className="TabsTrigger" value="tab5">
+                    MV
+                  </Tabs.Trigger>
+                  <Tabs.Trigger className="TabsTrigger" value="tab6">
+                    视频
+                  </Tabs.Trigger>
+                </>
+              </Tabs.List>
             )}
-          </Tabs.List>
+          </div>
           <Tabs.Content className="mt-8 w-auto" value="tab1">
-            {songDetail &&
-              !isLoading &&
-              songDetail.map((track, index) => (
-                <button
-                  key={track.id}
-                  className={`flex flex-row space-x-4 w-full rounded-none md:rounded-xl sm:rounded-xl px-6 py-4 ${
-                    index % 2 === 0
-                      ? "bg-neutral-200 dark:bg-neutral-800"
-                      : "odd"
-                  }`}
-                  onClick={() => handleAddToPlaylist(track.id)}
-                >
-                  <LazyLoad offset={100}>
-                    <img
-                      src={track.al.picUrl}
-                      className="rounded-xl w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
-                    />
-                  </LazyLoad>
-                  <div className="flex flex-col space-y-1 mt-1">
-                    <span className="font-medium text-left w-full flex-nowrap flex overflow-hidden">
-                      {track.name}
-                    </span>
-                    <span className="text-base opacity-75 text-left">
-                      {track.ar.map((artist) => artist.name).join(" / ")} -{" "}
-                      {track.al.name}
-                    </span>
-                  </div>
-                </button>
-              ))}
+            <div className="columns-1 md:columns-1 sm:columns-2">
+              {songDetail &&
+                !isLoading &&
+                songDetail.map((track, index) => (
+                  <button
+                    key={track.id}
+                    className={`flex flex-row space-x-4 w-full rounded-none md:rounded-xl sm:rounded-xl px-6 py-4 ${
+                      index % 2 === 0
+                        ? "bg-neutral-200 dark:bg-neutral-800"
+                        : "odd"
+                    }`}
+                    onClick={() => handleAddToPlaylist(track.id)}
+                  >
+                    <LazyLoad offset={100}>
+                      <img
+                        src={track.al.picUrl}
+                        className="rounded-xl w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
+                      />
+                    </LazyLoad>
+                    <div className="flex flex-col space-y-1 mt-1">
+                      <span className="font-medium text-left truncate w-48 md:w-96 sm:w-96 flex overflow-hidden">
+                        {track.name}
+                      </span>
+                      <span className="text-base opacity-75 text-left truncate w-48 md:w-96 sm:w-96">
+                        {track.ar.map((artist) => artist.name).join(" / ")}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+            </div>
 
             {isLoading && (
               <p className="flex flex-row px-6 md:px-0 sm:px-0 justify-center mt-6">
@@ -235,32 +285,34 @@ const MusicSearch = () => {
             )}
           </Tabs.Content>
           <Tabs.Content className="TabsContent mt-8" value="tab2">
-            {artistDetail &&
-              !isLoading &&
-              artistDetail.map((artist, index) => (
-                <button
-                  key={artist.id}
-                  className={`flex flex-row space-x-4 w-full rounded-none md:rounded-xl sm:rounded-xl px-6 py-4 ${
-                    index % 2 === 0
-                      ? "bg-neutral-200 dark:bg-neutral-800"
-                      : "odd"
-                  }`}
-                >
-                  <LazyLoad offset={100}>
-                    {" "}
-                    <img
-                      src={artist.picUrl}
-                      className="rounded-full w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
-                    />
-                  </LazyLoad>
+            <div className="columns-1 md:columns-1 sm:columns-2">
+              {artistDetail &&
+                !isLoading &&
+                artistDetail.map((artist, index) => (
+                  <button
+                    key={artist.id}
+                    className={`flex flex-row space-x-4 w-full rounded-none md:rounded-xl sm:rounded-xl px-6 py-4 ${
+                      index % 2 === 0
+                        ? "bg-neutral-200 dark:bg-neutral-800"
+                        : "odd"
+                    }`}
+                  >
+                    <LazyLoad offset={100}>
+                      <img
+                        src={artist.picUrl}
+                        className="rounded-full w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
+                      />
+                    </LazyLoad>
 
-                  <div className="flex flex-col space-y-1 mt-1">
-                    <span className="font-medium text-left w-full text-xl  mt-3 flex-nowrap flex overflow-hidden">
-                      {artist.name}
-                    </span>
-                  </div>
-                </button>
-              ))}
+                    <div className="flex flex-col space-y-1 mt-1">
+                      <span className="font-medium text-left text-xl  mt-3 flex-nowrap flex truncate w-48 md:w-96 sm:w-96">
+                        {artist.name}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+            </div>
+
             {isLoading && (
               <p className="flex flex-row px-6 md:px-0 sm:px-0 justify-center mt-6">
                 <Icon icon="eos-icons:loading" className="w-8 h-8" />
@@ -268,36 +320,77 @@ const MusicSearch = () => {
             )}
           </Tabs.Content>
           <Tabs.Content className="TabsContent mt-8" value="tab3">
-            {playlistDetail &&
-              !isLoading &&
-              playlistDetail.map((playlist, index) => (
-                <button
-                  key={playlist.id}
-                  onClick={() => router.push(`/playlist?id=${playlist.id}`)}
-                  className={`flex flex-row space-x-4 w-full rounded-none md:rounded-xl sm:rounded-xl px-6 py-4 ${
-                    index % 2 === 0
-                      ? "bg-neutral-200 dark:bg-neutral-800"
-                      : "odd"
-                  }`}
-                >
-                  <LazyLoad offset={100}>
-                    {" "}
-                    <img
-                      src={playlist.coverImgUrl}
-                      className="rounded-xl w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
-                    />
-                  </LazyLoad>
+            <div className="columns-1 md:columns-1 sm:columns-2">
+              {playlistDetail &&
+                !isLoading &&
+                playlistDetail.map((playlist, index) => (
+                  <button
+                    key={playlist.id}
+                    onClick={() => router.push(`/playlist?id=${playlist.id}`)}
+                    className={`flex flex-row space-x-4 w-full rounded-none md:rounded-xl sm:rounded-xl px-6 py-4 ${
+                      index % 2 === 0
+                        ? "bg-neutral-200 dark:bg-neutral-800"
+                        : "odd"
+                    }`}
+                  >
+                    <LazyLoad offset={100}>
+                      <img
+                        src={playlist.coverImgUrl}
+                        className="rounded-xl w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
+                      />
+                    </LazyLoad>
 
-                  <div className="flex flex-col space-y-1 mt-1">
-                    <span className="font-medium text-left w-full flex-nowrap flex overflow-hidden">
-                      {playlist.name}
-                    </span>
-                    <span className="opacity-75 text-left">
-                      {playlist.description}
-                    </span>
-                  </div>
-                </button>
-              ))}
+                    <div className="flex flex-col space-y-1 mt-1">
+                      <span className="font-medium text-left w-full flex-nowrap flex overflow-hidden">
+                        {playlist.name}
+                      </span>
+                      <span className="opacity-75 text-left truncate w-48 md:w-96 sm:w-96">
+                        {playlist.description}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+            </div>
+
+            {isLoading && (
+              <p className="flex flex-row px-6 md:px-0 sm:px-0 justify-center mt-6">
+                <Icon icon="eos-icons:loading" className="w-8 h-8" />
+              </p>
+            )}
+          </Tabs.Content>
+          <Tabs.Content className="TabsContent mt-8" value="tab4">
+            <div className="columns-1 md:columns-1 sm:columns-2">
+              {albumDetail &&
+                !isLoading &&
+                albumDetail.map((al, index) => (
+                  <button
+                    key={al.id}
+                    onClick={() => router.push(`/album?id=${al.id}`)}
+                    className={`flex flex-row space-x-4 w-full rounded-none md:rounded-xl sm:rounded-xl px-6 py-4 ${
+                      index % 2 === 0
+                        ? "bg-neutral-200 dark:bg-neutral-800"
+                        : "odd"
+                    }`}
+                  >
+                    <LazyLoad offset={100}>
+                      <img
+                        src={al.picUrl}
+                        className="rounded-xl w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
+                      />
+                    </LazyLoad>
+
+                    <div className="flex flex-col space-y-1 mt-1">
+                      <span className="font-medium text-left truncate w-48 md:w-96 sm:w-96">
+                        {al.name}
+                      </span>
+                      <span className="opacity-75 text-left truncate w-48 md:w-96 sm:w-96">
+                        {al.company}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+            </div>
+
             {isLoading && (
               <p className="flex flex-row px-6 md:px-0 sm:px-0 justify-center mt-6">
                 <Icon icon="eos-icons:loading" className="w-8 h-8" />

@@ -54,7 +54,7 @@ export default function Newsongs() {
     addToPlaylist(trackId);
   };
   return (
-    <div className="max-w-4xl mx-auto px-0 py-8 overflow-hidden">
+    <div className="max-w-6xl mx-auto px-0 py-8 overflow-hidden">
       <Head>
         <title>新歌速递</title>
       </Head>
@@ -81,9 +81,8 @@ export default function Newsongs() {
                 <span className="font-medium text-left w-full flex-wrap md:flex-nowrap sm:flex-nowrap flex overflow-hidden">
                   {track.name}
                 </span>
-                <span className="text-base opacity-75 text-left flex flex-row flex-wrap md:flex-nowrap sm:flex-nowrap overflow-hidden truncate w-1/2 md:w-2/3 sm:w-2/3">
-                  {track.ar.map((artist) => artist.name).join(" / ")} -{" "}
-                  {track.al.name}
+                <span className="text-base opacity-75 text-left truncate w-48 md:w-96 sm:w-96">
+                  {track.ar.map((artist) => artist.name).join(" / ")} 
                 </span>
               </div>
             </button>
