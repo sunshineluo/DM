@@ -1,0 +1,22 @@
+{
+    "headers": [
+      {
+        "source": "/likelist",
+        "headers": [
+          {
+            "key": "Access-Control-Allow-Origin",
+            "value": "https://music.gengyue.eu.org"
+          }
+        ]
+      },
+      {
+        "source": "/like",
+        "headers": [
+          {
+            "key": "Access-Control-Allow-Origin",
+            "value": "https://music.gengyue.eu.org"
+          }
+        ]
+      }
+    ]
+  }
