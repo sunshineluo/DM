@@ -350,7 +350,7 @@ export default function Player({ ids, full }) {
           withCredentials: true,
         }
       );
-
+  
       if (response.data.code === 200) {
         const likedMusicIds = response.data.ids;
         const isLiked = likedMusicIds.includes(songId);
@@ -363,11 +363,11 @@ export default function Player({ ids, full }) {
       // 处理错误情况
     }
   };
-
+  
   const toggleLikeMusic = async () => {
     try {
       setIsLiked(!isLiked); // 直接更新喜欢状态，不等待服务器响应
-
+  
       const response = await axios.get(`https://cf233.eu.org/like`, {
         params: {
           id: songId,
@@ -375,10 +375,13 @@ export default function Player({ ids, full }) {
         },
         withCredentials: true,
       });
-
+  
       if (response.data.code !== 200) {
         console.log("喜欢失败");
       }
+  
+      // 切换喜欢状态之后，执行检查是否喜欢的操作
+      await checkLikedMusic(userId, songId);
     } catch (error) {
       console.error(error);
       // 处理错误情况

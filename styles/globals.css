@@ -34,7 +34,7 @@ body {
   @apply bg-neutral-500 dark:bg-neutral-400;
   position: relative;
   flex-grow: 1;
-  @apply rounded-full h-[10px] hover:h-[20px] transition-all duration-300;
+  @apply rounded-full h-[10px] hover:h-[20px] transition-all duration-150 ease-linear;
 }
 
 .SliderRange {
