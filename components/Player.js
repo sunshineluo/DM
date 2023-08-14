@@ -15,6 +15,7 @@ export default function Player({ ids, full }) {
   const [lyrics, setLyrics] = useState([]);
   const [isFull, setIsFull] = useState(full);
   const [highlightedLine, setHighlightedLine] = useState("");
+  const [highlightedLineTimestamp, setHighlightedLineTimestamp] = useState("");
   const { songIds, currentSongIndex, setCurrentSongIndex } =
     useContext(SongIdsContext);
   const [playMode, setPlayMode] = useState("default"); // 默认为顺序播放模式
@@ -165,31 +166,37 @@ export default function Player({ ids, full }) {
     if (!lyrics.length || !audioRef.current || !lyricsContainerRef.current) {
       return;
     }
-  
-    let currentHighlightedLine = null;
-    let minDiff = 114514; // 初始设置一个非常大的值作为差值
-  
+
+    const matchingLines = [];
+
     for (let i = 0; i < lyrics.length; i++) {
       const { timestamp, text } = lyrics[i];
       const diff = Math.abs(playedSeconds - timestamp);
-  
-      if (diff <= minDiff && playedSeconds >= timestamp) {
-        minDiff = diff;
-        currentHighlightedLine = text;
+
+      if (playedSeconds >= timestamp) {
+        matchingLines.push({
+          text,
+          diff,
+          timestamp,
+        });
       }
     }
-  
+
+    // 根据差值排序，选择最小差值对应的歌词行
+    matchingLines.sort((a, b) => a.diff - b.diff);
+    const currentHighlightedLine = matchingLines[0]?.text || null;
+    const currentHighlightedLineTimestamp = matchingLines[0]?.timestamp || null;
+
     setHighlightedLine(currentHighlightedLine);
+    setHighlightedLineTimestamp(currentHighlightedLineTimestamp);
   };
 
   useEffect(() => {
-    if (highlightedLine && lyricsContainerRef.current) {
+    if (typeof highlightedLineTimestamp === 'number' && lyricsContainerRef.current) {
       const targetElement = lyricsContainerRef.current.querySelector(
-        `p[data-text="${highlightedLine
-          .replace(/"/g, '\\"')
-          .replace(/'/g, "\\'")}"]`
+        `p[data-text="${String(highlightedLineTimestamp)}"]`
       );
-
+  
       if (targetElement) {
         targetElement.scrollIntoView({
           behavior: "smooth",
@@ -197,7 +204,7 @@ export default function Player({ ids, full }) {
         });
       }
     }
-  }, [highlightedLine]);
+  }, [highlightedLineTimestamp]);
 
   useEffect(() => {
     // 从 localStorage 中获取已播放的时间
@@ -340,7 +347,7 @@ export default function Player({ ids, full }) {
     if (userData) {
       checkLikedMusic(userData.data.account.id, songId);
     }
-  }, [songId]); 
+  }, [songId]);
 
   useEffect(() => {
     localStorage.setItem("isLiked", isLiked); // 每次 isLiked 更新后保存到本地存储
@@ -1012,21 +1019,22 @@ export default function Player({ ids, full }) {
             <AnimatePresence>
               <motion.div
                 className={cn(
-                  "text-left flex right-0 py-12 overflow-y-auto z-20 select-none",
+                  "py-12 overflow-y-auto z-20 select-none",
                   !display
                     ? "hidden"
-                    : "fixed md:relative sm:relative block h-[50vh] md:h-screen sm:h-screen mx-auto md:mx-auto sm:mr-auto max-w-sm md:max-w-3xl sm:max-w-none px-4 right-0 w-full md:w-1/2 sm:w-1/2",
-                  "justify-center md:justify-center sm:justify-start"
+                    : "fixed md:static sm:static block h-[50vh] md:h-screen sm:h-screen px-4 right-0 w-full md:w-1/2 sm:w-1/2"
                 )}
               >
                 <div ref={lyricsContainerRef} style={{ maxHeight: "100%" }}>
                   {lyrics.map((line, index) => {
                     const translationLine = translatedLyrics.find(
                       (translatedLine) =>
-                        translatedLine.timestamp === line.timestamp
+                        translatedLine.timestamp === line.timestamp && line.text !== ''
                     );
                     const highlightedIndex = lyrics.findIndex(
-                      (lyric) => lyric.text === highlightedLine
+                      (lyric) =>
+                        lyric.text === highlightedLine &&
+                        lyric.timestamp === highlightedLineTimestamp
                     );
                     const isHighlightedRow = index === highlightedIndex;
                     const isPreviousRowHighlighted =
@@ -1048,23 +1056,20 @@ export default function Player({ ids, full }) {
                       <motion.p
                         key={index}
                         className={cn(
-                          "text-neutral-700 dark:text-neutral-300 text-left h-auto max-h-min w-full text-3xl md:text-4xl sm:text-5xl font-semibold max-w-4xl flex flex-col space-y-1 tracking-tighter transition-all duration-500 cursor-pointer rounded-3xl px-6 md:px-0 sm:px-0 py-4 md:py-7 sm:py-10 leading-normal flex-1",
+                          "text-neutral-700 dark:text-neutral-300 text-3xl md:text-4xl sm:text-5xl font-semibold flex flex-col space-y-1 tracking-tighter transition-all duration-500 cursor-pointer px-4 md:px-0 sm:px-0 py-4 md:py-7 sm:py-10 leading-normal",
                           isHighlightedRow &&
                             "text-[2rem] md:text-[2.4rem] sm:text-[3.2rem] blur-0",
-                          isPreviousRowHighlighted && "opacity-50 blur-[1px]",
-                          isNextRowHighlighted && "opacity-50 blur-[1px]",
-                          isTwoRowsBeforeHighlighted &&
-                            "opacity-25 blur-[1.5px]",
-                          isTwoRowsAfterHighlighted &&
-                            "opacity-25 blur-[1.5px]",
+                          isPreviousRowHighlighted && "opacity-40 blur-[0.5px]",
+                          isNextRowHighlighted && "opacity-40 blur-[0.5px]",
+                          isTwoRowsBeforeHighlighted && "opacity-25 blur-[1px]",
+                          isTwoRowsAfterHighlighted && "opacity-25 blur-[1px]",
                           isThreeRowsBeforeHighlighted &&
-                            "opacity-25 blur-[2px]",
+                            "opacity-25 blur-[1.5px]",
                           isThreeRowsAfterHighlighted &&
-                            "opacity-25 blur-[2px]",
+                            "opacity-25 blur-[1.5px]",
                           isFourRowsBeforeHighlighted &&
-                            "opacity-25 blur-[2.5px]",
-                          isFourRowsAfterHighlighted &&
-                            "opacity-25 blur-[2.5px]",
+                            "opacity-25 blur-[2px]",
+                          isFourRowsAfterHighlighted && "opacity-25 blur-[2px]",
                           !isHighlightedRow &&
                             !isPreviousRowHighlighted &&
                             !isNextRowHighlighted &&
@@ -1074,16 +1079,16 @@ export default function Player({ ids, full }) {
                             !isThreeRowsAfterHighlighted &&
                             !isFourRowsBeforeHighlighted &&
                             !isFourRowsAfterHighlighted &&
-                            "opacity-25 blur-[3px]"
+                            "opacity-25 blur-[2.5px]"
                         )}
                         onClick={() => audioRef.current.seekTo(line.timestamp)}
-                        data-text={line.text}
+                        data-text={String(line.timestamp)}
                       >
-                        <span className="mb-1 md:mb-2 sm:mb-4 leading-normal">
+                        <span className="mb-1 md:mb-2 sm:mb-2 leading-normal break-words hyphens-auto">
                           {line.text}
                         </span>
                         {translationLine?.text && (
-                          <span className="text-2xl md:text-3xl sm:text-4xl text-neutral-600 dark:text-neutral-400 font-medium leading-normal">
+                          <span className="text-[1.325rem] md:text-[1.675rem] sm:text-[2.1rem] text-neutral-600 dark:text-neutral-400 font-medium leading-normal">
                             {translationLine.text}
                           </span>
                         )}
