@@ -28,8 +28,7 @@ const Album = () => {
         },
       });
 
-      setAlbumDetail(response.data.songs);
-      console.log(albumDetail);
+      setAlbumDetail([response.data]);
     } catch (error) {
       // 处理错误
       console.error(error);
@@ -37,12 +36,11 @@ const Album = () => {
   };
 
   const getAlbumTracks = async () => {
-    if (!Array.isArray(albumDetail)) {
-      console.error("Invalid albumDetail. Expected an array.");
-      return;
+    if (albumDetail === null || !Array.isArray(albumDetail[0].songs)) {
+      alert("An error occurred while fetching song details");
     }
   
-    const songIds = albumDetail.map((song) => song.id);
+    const songIds = albumDetail.songs.map((song) => song.id);
   
     try {
       const response = await fetch(
@@ -56,7 +54,7 @@ const Album = () => {
       console.log("An error occurred while fetching song details:", error);
     }
   };
-
+  
   useEffect(() => {
     if (id !== null) {
       getAlbumDetail();
@@ -82,7 +80,7 @@ const Album = () => {
         {albumDetail !== null &&
           albumDetail.map(
             (detail, index) =>
-              detail && <title key={index}>{detail.al.name}</title>
+              detail && <title key={index}>{detail.album.name}</title>
           )}
       </Head>
       {albumDetail !== null &&
@@ -100,26 +98,26 @@ const Album = () => {
       <div className="bg-neutral-100/75 dark:bg-neutral-900/75 backdrop-blur-3xl min-h-screen overflow-y-auto">
         <div className="max-w-6xl mx-auto py-8 px-0 md:px-6 sm:px-6">
           {albumDetail !== null &&
-            albumDetail.slice(0,1).map(
+            albumDetail.slice(0, 1).map(
               (detail, index) =>
                 detail && (
                   <div key={index}>
                     <div className="">
                       <div className="flex flex-row space-x-4 md:space-x-6 sm:space-x-8 ml-4 md:ml-0 sm:ml-0">
-                        {detail.al.picUrl && (
+                        {detail.album.picUrl && (
                           <LazyLoad offset={100}>
                             <img
-                              src={detail.al.picUrl}
+                              src={detail.album.picUrl}
                               className="rounded-xl w-24 h-24 md:h-32  md:w-32 sm:w-32 sm:h-32"
                             />
                           </LazyLoad>
                         )}
                         <div className="flex flex-col space-y-2 mt-3 md:mt-6 sm:mt-6">
                           <h1 className="font-medium text-xl md:text-3xl sm:text-3xl">
-                            {detail.al.name}
+                            {detail.album.name}
                           </h1>
                           <p className="text-base md:text-lg sm:text-lg opacity-75">
-                            {detail.ar.map((artist) => artist.name).join(" / ")}
+                            {detail.album.artists.map((artist) => artist.name).join(" / ")}
                           </p>
                         </div>
                       </div>

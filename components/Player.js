@@ -126,7 +126,6 @@ export default function Player({ ids, full }) {
         const translatedLyricsText = translatedLyricsData.tlyric.lyric;
         const parsedTranslatedLyrics = parseLyrics(translatedLyricsText);
         setTranslatedLyrics(parsedTranslatedLyrics);
-
       } catch (error) {
         console.log(error);
       }
@@ -166,19 +165,20 @@ export default function Player({ ids, full }) {
     if (!lyrics.length || !audioRef.current || !lyricsContainerRef.current) {
       return;
     }
-
+  
     let currentHighlightedLine = null;
-
+    let minDiff = 114514; // 初始设置一个非常大的值作为差值
+  
     for (let i = 0; i < lyrics.length; i++) {
       const { timestamp, text } = lyrics[i];
-
-      if (playedSeconds >= timestamp) {
+      const diff = Math.abs(playedSeconds - timestamp);
+  
+      if (diff <= minDiff && playedSeconds >= timestamp) {
+        minDiff = diff;
         currentHighlightedLine = text;
-      } else {
-        break;
       }
     }
-
+  
     setHighlightedLine(currentHighlightedLine);
   };
 
@@ -340,7 +340,11 @@ export default function Player({ ids, full }) {
     if (userData) {
       checkLikedMusic(userData.data.account.id, songId);
     }
-  }, [userData, songId]);
+  }, [songId]); 
+
+  useEffect(() => {
+    localStorage.setItem("isLiked", isLiked); // 每次 isLiked 更新后保存到本地存储
+  }, [isLiked]);
 
   const checkLikedMusic = async (userId, songId) => {
     try {
@@ -350,7 +354,7 @@ export default function Player({ ids, full }) {
           withCredentials: true,
         }
       );
-  
+
       if (response.data.code === 200) {
         const likedMusicIds = response.data.ids;
         const isLiked = likedMusicIds.includes(songId);
@@ -363,11 +367,11 @@ export default function Player({ ids, full }) {
       // 处理错误情况
     }
   };
-  
+
   const toggleLikeMusic = async () => {
     try {
       setIsLiked(!isLiked); // 直接更新喜欢状态，不等待服务器响应
-  
+
       const response = await axios.get(`https://cf233.eu.org/like`, {
         params: {
           id: songId,
@@ -375,13 +379,10 @@ export default function Player({ ids, full }) {
         },
         withCredentials: true,
       });
-  
+
       if (response.data.code !== 200) {
         console.log("喜欢失败");
       }
-  
-      // 切换喜欢状态之后，执行检查是否喜欢的操作
-      await checkLikedMusic(userId, songId);
     } catch (error) {
       console.error(error);
       // 处理错误情况
@@ -575,11 +576,10 @@ export default function Player({ ids, full }) {
                                               <span className="font-medium text-left w-full flex-nowrap flex overflow-hidden">
                                                 {track.name}
                                               </span>
-                                              <span className="text-base opacity-75 text-left">
+                                              <span className="text-base opacity-75 text-left truncate w-48 md:w-96 sm:w-96">
                                                 {track.ar
                                                   .map((artist) => artist.name)
-                                                  .join(" / ")}{" "}
-                                                -{track.al.name}
+                                                  .join(" / ")}
                                               </span>
                                             </div>
                                           </div>
@@ -857,11 +857,10 @@ export default function Player({ ids, full }) {
                                           <span className="font-medium text-left w-full flex-nowrap flex overflow-hidden">
                                             {track.name}
                                           </span>
-                                          <span className="text-base opacity-75 text-left">
+                                          <span className="text-base opacity-75 text-left truncate w-48 md:w-96 sm:w-96">
                                             {track.ar
                                               .map((artist) => artist.name)
-                                              .join(" / ")}{" "}
-                                            -{track.al.name}
+                                              .join(" / ")}
                                           </span>
                                         </div>
                                       </div>
@@ -981,11 +980,10 @@ export default function Player({ ids, full }) {
                                             <span className="font-medium text-left w-full flex-nowrap flex overflow-hidden">
                                               {track.name}
                                             </span>
-                                            <span className="text-base opacity-75 text-left">
+                                            <span className="text-base opacity-75 text-left truncate w-48 md:w-96 sm:w-96">
                                               {track.ar
                                                 .map((artist) => artist.name)
-                                                .join(" / ")}{" "}
-                                              -{track.al.name}
+                                                .join(" / ")}
                                             </span>
                                           </div>
                                         </div>
@@ -1050,7 +1048,7 @@ export default function Player({ ids, full }) {
                       <motion.p
                         key={index}
                         className={cn(
-                          "text-neutral-700 dark:text-neutral-300 text-left h-auto max-h-min w-full text-3xl md:text-4xl sm:text-5xl font-semibold max-w-3xl flex flex-col space-y-1 tracking-tighter transition-all duration-500 cursor-pointer rounded-3xl px-6 md:px-0 sm:px-0 py-4 md:py-7 sm:py-10 leading-normal flex-1",
+                          "text-neutral-700 dark:text-neutral-300 text-left h-auto max-h-min w-full text-3xl md:text-4xl sm:text-5xl font-semibold max-w-4xl flex flex-col space-y-1 tracking-tighter transition-all duration-500 cursor-pointer rounded-3xl px-6 md:px-0 sm:px-0 py-4 md:py-7 sm:py-10 leading-normal flex-1",
                           isHighlightedRow &&
                             "text-[2rem] md:text-[2.4rem] sm:text-[3.2rem] blur-0",
                           isPreviousRowHighlighted && "opacity-50 blur-[1px]",

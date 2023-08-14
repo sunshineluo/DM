@@ -22,7 +22,7 @@ export const SongIdsProvider = ({ children }) => {
     } else {
       // 添加新的歌曲ID
       setSongIds([...songIds, trackId]);
-      setCurrentSongIndex(currentSongIndex + 1); // 将当前索引切换到新添加的歌曲索引
+      setCurrentSongIndex(songIds.length); // 将当前索引切换到新添加的歌曲索引
     }
   };
 

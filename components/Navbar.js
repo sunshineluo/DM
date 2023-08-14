@@ -3,14 +3,12 @@ import Link from "next/link";
 import { Icon } from "@iconify/react";
 import { useRouter } from "next/router";
 import { useTheme } from "next-themes";
-import { useState } from "react";
 
 function cn(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
 export default function Navbar() {
-  const [url, setUrl] = useState("");
   const router = useRouter();
   if (router.asPath.includes("/playlist")) {
     router.asPath = "/";
@@ -30,17 +28,19 @@ export default function Navbar() {
   if (router.asPath.includes("/album")) {
     router.asPath = "/";
   }
+  if (router.asPath.includes("/mv")) {
+    router.asPath = "/";
+  }
   const userDataStr = localStorage.getItem("userData");
   const userData = JSON.parse(userDataStr);
   const { theme, setTheme } = useTheme();
 
   const goBack = () => {
-    setUrl(router.asPath);
     router.back();
   };
 
-  const goForward = () => {
-    router.push(url); // 前进到指定 URL
+  const goRefresh = () => {
+    router.reload(); // 前进到指定 URL
   };
   return (
     <div className="">
@@ -49,24 +49,16 @@ export default function Navbar() {
           <button onClick={goBack}>
             <Icon
               icon="heroicons:arrow-uturn-left-20-solid"
-              className="w-4 h-4 md:w-5 md:h-5 sm:w-5 sm:h-5 opacity-75"
+              className="w-4 h-4 md:w-6 md:h-6 sm:w-6 sm:h-6 opacity-75"
             />
           </button>
-          {url !== "" ? (
-            <button onClick={goForward}>
-              <Icon
-                icon="heroicons:arrow-uturn-right-20-solid"
-                className="w-4 h-4 md:w-5 md:h-5 sm:w-5 sm:h-5 opacity-75"
-              />
-            </button>
-          ) : (
-            <button>
-              <Icon
-                icon="heroicons:arrow-uturn-right-20-solid"
-                className="w-4 h-4 md:w-5 md:h-5 sm:w-5 sm:h-5 opacity-50 cursor-not-allowed"
-              />
-            </button>
-          )}
+
+          <button onClick={goRefresh}>
+            <Icon
+              icon="heroicons:arrow-path-20-solid"
+              className="w-4 h-4 md:w-6 md:h-6 sm:w-6 sm:h-6 opacity-75"
+            />
+          </button>
         </div>
         <div className="max-w-5xl w-full mx-auto flex flex-row justify-between py-6">
           <div className="flex flex-row space-x-2 md:space-x-6 sm:space-x-6">

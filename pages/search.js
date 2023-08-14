@@ -22,10 +22,12 @@ const MusicSearch = () => {
   useEffect(() => {
     const fetchHotSearchList = async () => {
       try {
+        setIsLoading(true);
         const response = await fetch("https://cf233.eu.org/search/hot/detail");
         const data = await response.json();
         if (data && data.code === 200) {
           setHotSearchList(data.data);
+          setIsLoading(false);
         }
       } catch (error) {
         console.error(
@@ -172,7 +174,7 @@ const MusicSearch = () => {
             value={keywords}
             onChange={(e) => setKeywords(e.target.value)}
             placeholder="好音乐一搜即得"
-            className="text-neutral-700 dark:text-neutral-300 bg-neutral-50 dark:bg-neutral-950 dark:border-neutral-800 border-neutral-200 w-full md:w-[32rem] sm:w-[36rem] px-10 py-1.5 md:py-2 sm:py-2 focus:outline-none text-lg md:text-xl sm:text-xl focus:ring-2 focus:ring-red-600 border-2 rounded-xl"
+            className="text-neutral-700 dark:text-neutral-300 bg-neutral-50 dark:bg-neutral-950 dark:border-neutral-800 border-neutral-200 w-full md:w-[32rem] sm:w-[36rem] px-10 py-1.5 md:py-2 sm:py-2 focus:outline-none text-lg md:text-xl sm:text-xl focus:ring-2 focus:ring-red-600 border-[1.5px] rounded-xl"
           />
           <button type="submit" className="hidden">
             Search
@@ -193,10 +195,10 @@ const MusicSearch = () => {
                   key={index}
                   className="cursor-pointer mb-4 text-base md:text-lg sm:text-xl font-medium py-2 px-4 md:px-6 sm:px-6 rounded-xl bg-neutral-200 dark:bg-neutral-800"
                 >
-                  <div className="flex flex-row">
+                  <div className="flex flex-row truncate w-32 md:w-36 sm:w-[12rem]">
                     <div>
                       <span className="opacity-50"> {index + 1}</span>{" "}
-                      <span className="truncate">{item.searchWord}</span>
+                      <span className="">{item.searchWord}</span>
                     </div>
                     <div>
                       {item.iconUrl && (
@@ -220,7 +222,7 @@ const MusicSearch = () => {
             {" "}
             {songDetail.length > 0 && (
               <Tabs.List
-                className="bg-neutral-200/75 dark:bg-neutral-800/75 backdrop-blur-lg rounded-full TabsList py-1.5 mt-6 px-2 max-w-3xl mx-auto flex flex-row space-x-2 md:space-x-4 sm:space-x-4 overflow-x-auto"
+                className="dark:border-neutral-800 border-neutral-200 border-[1.5px] bg-neutral-200/75 dark:bg-neutral-800/75 backdrop-blur-lg rounded-full TabsList py-1.5 mt-6 px-2 max-w-3xl mx-auto flex flex-row space-x-2 md:space-x-4 sm:space-x-4 overflow-x-auto"
                 aria-label="类别"
               >
                 <>
@@ -238,9 +240,6 @@ const MusicSearch = () => {
                   </Tabs.Trigger>
                   <Tabs.Trigger className="TabsTrigger" value="tab5">
                     MV
-                  </Tabs.Trigger>
-                  <Tabs.Trigger className="TabsTrigger" value="tab6">
-                    视频
                   </Tabs.Trigger>
                 </>
               </Tabs.List>
@@ -389,6 +388,43 @@ const MusicSearch = () => {
                     </div>
                   </button>
                 ))}
+            </div>
+
+            {isLoading && (
+              <p className="flex flex-row px-6 md:px-0 sm:px-0 justify-center mt-6">
+                <Icon icon="eos-icons:loading" className="w-8 h-8" />
+              </p>
+            )}
+          </Tabs.Content>
+          <Tabs.Content className="TabsContent mt-8" value="tab5">
+            <div className="columns-1 md:columns-2 sm:columns-2">
+              {mvDetail &&  !isLoading &&  mvDetail.map((mv, index) => (
+                <button
+                  key={mv.id}
+                  onClick={() => router.push(`/mv?id=${mv.id}`)}
+                  className={`flex flex-col space-y-4 w-full rounded-none md:rounded-xl sm:rounded-xl px-6 py-4 ${
+                    index % 2 === 0
+                      ? "bg-neutral-200 dark:bg-neutral-800"
+                      : "odd"
+                  }`}
+                >
+                  <LazyLoad offset={100}>
+                    <img
+                      src={mv.cover}
+                      className="rounded-xl w-full h-48 md:h-64 sm:h-72"
+                    />
+                  </LazyLoad>
+
+                  <div className="flex flex-col space-y-1 mt-1">
+                    <span className="font-medium text-left w-full flex-nowrap flex overflow-hidden">
+                      {mv.name}
+                    </span>
+                    <span className="opacity-75 text-left truncate w-48 md:w-96 sm:w-96">
+                      {mv.artists.map((artist) => artist.name).join(" / ")}
+                    </span>
+                  </div>
+                </button>
+              ))}
             </div>
 
             {isLoading && (
