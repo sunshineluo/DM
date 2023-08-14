@@ -110,9 +110,9 @@ export default function Navbar() {
               ) : (
                 <button
                   onClick={() => router.push("/login")}
-                  className="bg-red-600 rounded-xl text-sm md:text-base sm:text-base text-white px-2 md:px-4 sm:px-6 py-1.5 flex flex-row space-x-2.5"
+                  className="bg-red-600 rounded-xl text-sm md:text-base sm:text-base text-white px-2 md:px-4 sm:px-6 py-1.5 flex flex-row space-x-1 md:space-x-2 sm:space-x-2.5"
                 >
-                  <Icon icon="bi:person-circle" className="w-4 h-4 mt-0.5 md:mt-[0.925rem] sm:mt-0 md:w-5 md:h-5 sm:w-6 sm:h-6" />
+                  <Icon icon="bi:person-circle" className="w-4 h-4 mt-0.5 md:mt-[0.0925rem] sm:mt-0 md:w-5 md:h-5 sm:w-6 sm:h-6" />
                   <span>登录</span>
                 </button>
               )}
