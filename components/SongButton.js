@@ -28,7 +28,7 @@ export default function SongButton({ key, id, picUrl, index, name, ar }) {
   };
   return (
     <button
-      key={key}
+      key={index}
       className={`flex flex-row space-x-4 w-full rounded-none md:rounded-xl sm:rounded-xl px-6 py-4 ${
         index % 2 === 0 ? "bg-neutral-200 dark:bg-neutral-800" : "odd"
       }`}
@@ -56,10 +56,10 @@ export default function SongButton({ key, id, picUrl, index, name, ar }) {
         </div>
       )}
       <div className="flex flex-col space-y-1 mt-1">
-        <span className="font-medium text-left truncate w-48 md:w-96 sm:w-96 flex overflow-hidden">
+        <span className="font-medium text-left truncate w-48 md:w-56 sm:w-96 flex overflow-hidden">
           {name}
         </span>
-        <span className="text-base opacity-75 text-left truncate w-48 md:w-96 sm:w-96">
+        <span className="text-base opacity-75 text-left truncate w-48 md:w-56 sm:w-96">
           {ar}
         </span>
       </div>

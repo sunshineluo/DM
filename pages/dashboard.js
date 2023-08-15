@@ -51,6 +51,7 @@ export default function Dashboard() {
       <Head>
         <title>{userData.data.profile.nickname}, 您今天看上去很聪明！</title>
       </Head>
+
       <img
         src={userData.data.profile.backgroundUrl}
         className="fixed z-[-1] w-full blur-lg h-screen hidden"
@@ -130,7 +131,7 @@ export default function Dashboard() {
             </p>
           </div>
           <div className="mt-16">
-            <h2 className="px-6 text-neutral-700 dark:text-neutral-300 font-medium text-lg md:text-3xl sm:text-4xl">
+            <h2 className="px-6 text-neutral-700 dark:text-neutral-300 font-medium text-lg md:text-xl sm:text-2xl">
               用户歌单
             </h2>
 

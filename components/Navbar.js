@@ -31,6 +31,9 @@ export default function Navbar() {
   if (router.asPath.includes("/mv")) {
     router.asPath = "/";
   }
+  if (router.asPath.includes("/search")) {
+    router.asPath = "/";
+  }
   const userDataStr = localStorage.getItem("userData");
   const userData = JSON.parse(userDataStr);
   const { theme, setTheme } = useTheme();
@@ -44,8 +47,8 @@ export default function Navbar() {
   };
   return (
     <div className="">
-      <div className="flex flex-row max-w-7xl mx-auto px-4 space-x-4 md:space-x-12 sm:space-x-16">
-        <div className="flex-row py-6 space-x-3 md:space-x-6 sm:space-x-7 flex">
+      <div className="flex flex-row max-w-7xl mx-auto px-2 md:px-4 sm:px-4 space-x-4 md:space-x-12 sm:space-x-16">
+        <div className="flex-row py-6 space-x-3 md:space-x-6 sm:space-x-7 hidden md:flex sm:flex">
           <button onClick={goBack}>
             <Icon
               icon="heroicons:arrow-uturn-left-20-solid"
@@ -79,7 +82,13 @@ export default function Navbar() {
               </Link>
             ))}
           </div>
-          <div className="flex flex-row space-x-2 md:space-x-4 sm:space-x-4">
+          <div className="flex flex-row space-x-2 md:space-x-6 sm:space-x-8">
+            <button onClick={() => router.push("/search")}>
+              <Icon
+                icon="bi:search"
+                className="w-4 h-4 md:w-5 md:h-5 sm:w-5 sm:h-5 opacity-75"
+              />
+            </button>
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               className=""
@@ -112,7 +121,10 @@ export default function Navbar() {
                   onClick={() => router.push("/login")}
                   className="bg-red-600 rounded-xl text-sm md:text-base sm:text-base text-white px-2 md:px-4 sm:px-6 py-1.5 flex flex-row space-x-1 md:space-x-2 sm:space-x-2.5"
                 >
-                  <Icon icon="bi:person-circle" className="w-4 h-4 mt-0.5 md:mt-[0.0925rem] sm:mt-0 md:w-5 md:h-5 sm:w-6 sm:h-6" />
+                  <Icon
+                    icon="bi:person-circle"
+                    className="w-4 h-4 mt-0.5 md:mt-[0.0925rem] sm:mt-0 md:w-5 md:h-5 sm:w-6 sm:h-6"
+                  />
                   <span>登录</span>
                 </button>
               )}
