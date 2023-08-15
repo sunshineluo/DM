@@ -46,20 +46,23 @@ const Mv = () => {
   }, [id]);
 
   return (
-    <div className="max-w-6xl mx-auto py-8 overflow-hidden px-6 mb-16">
+    <div className="max-w-7xl mx-auto py-8 overflow-hidden px-0 md:px-6 sm:px-6 mb-20">
       <Head>{mvData && <title>{mvData.name}</title>}</Head>
+      {mvUrl && (
+        <div>
+          <video controls src={mvUrl} className="rounded-none md:rounded-xl sm:rounded-xl w-full"></video>
+        </div>
+      )}
+
       {mvData && (
-        <div className="text-xs md:text-base sm:text-base flex flex-row mb-4 justify-between">
-          <h2 className="font-medium">{mvData.name}</h2>
-          <div className="flex flex-row space-x-6 opacity-75">
+        <div className="px-6 md:px-8 sm:px-8 py-4 md:py-8 sm:py-8 mt-6 rounded-none md:rounded-xl sm:rounded-xl bg-neutral-200 dark:bg-neutral-800">
+          <h2 className="text-neutral-700 dark:text-neutral-300 font-medium text-lg md:text-xl sm:text-2xl">
+            {mvData.name}
+          </h2>
+          <div className="flex flex-row space-x-6 opacity-75 mt-2">
             <p>{mvData.artistName}</p>
             <p>{moment(mvData.publishTime).format("YYYY年MM月DD日")}</p>
           </div>
-        </div>
-      )}
-      {mvUrl && (
-        <div>
-          <video controls src={mvUrl} className="rounded-xl w-full"></video>
         </div>
       )}
 

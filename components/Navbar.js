@@ -44,7 +44,7 @@ export default function Navbar() {
   };
   return (
     <div className="">
-      <div className="flex flex-row max-w-6xl mx-auto px-4 space-x-4 md:space-x-12 sm:space-x-16">
+      <div className="flex flex-row max-w-7xl mx-auto px-4 space-x-4 md:space-x-12 sm:space-x-16">
         <div className="flex-row py-6 space-x-3 md:space-x-6 sm:space-x-7 flex">
           <button onClick={goBack}>
             <Icon
@@ -60,7 +60,7 @@ export default function Navbar() {
             />
           </button>
         </div>
-        <div className="max-w-5xl w-full mx-auto flex flex-row justify-between py-6">
+        <div className="max-w-6xl w-full mx-auto flex flex-row justify-between py-6">
           <div className="flex flex-row space-x-2 md:space-x-6 sm:space-x-6">
             {nav.map((item, index) => (
               <Link

@@ -6,6 +6,7 @@ import { Icon } from "@iconify/react";
 import Head from "next/head";
 import { SongIdsContext } from "@/components/SongIdsContext";
 import LazyLoad from "react-lazy-load";
+import SongButton from "@/components/SongButton";
 
 const Playlist = () => {
   const router = useRouter();
@@ -95,7 +96,7 @@ const Playlist = () => {
             )
         )}
       <div className="bg-neutral-100/75 dark:bg-neutral-900/75 backdrop-blur-3xl min-h-screen overflow-y-auto">
-        <div className="max-w-6xl mx-auto py-8 px-0 md:px-6 sm:px-6">
+        <div className="max-w-7xl mx-auto py-8 px-0 md:px-6 sm:px-6">
           {playlistDetail !== null &&
             playlistDetail.map(
               (detail, index) =>
@@ -107,14 +108,17 @@ const Playlist = () => {
                           <LazyLoad offset={100}>
                             <img
                               src={detail.coverImgUrl}
-                              className="rounded-xl w-24 h-24 md:h-32  md:w-32 sm:w-32 sm:h-32"
+                              className="rounded-xl w-24 h-24 md:h-36 md:w-36 sm:w-48 sm:h-48"
                             />
                           </LazyLoad>
                         )}
-                        <div className="flex flex-col space-y-2 mt-3 md:mt-6 sm:mt-6">
-                          <h1 className="font-medium text-xl md:text-3xl sm:text-3xl">
+                        <div className="flex flex-col space-y-4 mt-3 md:mt-6 sm:mt-6">
+                          <h1 className="font-medium text-xl md:text-3xl sm:text-3xl w-48 md:w-full sm:w-full truncate">
                             {detail.name}
                           </h1>
+                          <p className="text-base md:text-lg sm:text-lg opacity-75 w-48 md:w-[36rem] sm:w-[54rem] truncate md:text-ellipsis sm:text-ellipsis">
+                            {detail.description}
+                          </p>
                           <p className="text-base md:text-lg sm:text-lg opacity-75">
                             更新于
                             {moment(detail.updateTime).format("YYYY年MM月DD日")}
@@ -152,30 +156,14 @@ const Playlist = () => {
           <div className="columns-1 md:columns-1 sm:columns-2 mt-6 mb-16">
             {filteredTracks.length > 0 || searchTerm !== "" ? (
               filteredTracks.map((track, index) => (
-                <button
+                <SongButton
                   key={track.id}
-                  className={`flex flex-row space-x-4 w-full rounded-none md:rounded-xl sm:rounded-xl px-6 py-4 ${
-                    index % 2 === 0
-                      ? "bg-neutral-200 dark:bg-neutral-800"
-                      : "odd"
-                  }`}
-                  onClick={() => handleAddToPlaylist(track.id)}
-                >
-                  <LazyLoad offset={100}>
-                    <img
-                      src={track.al.picUrl}
-                      className="rounded-xl w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
-                    />
-                  </LazyLoad>
-                  <div className="flex flex-col space-y-1 mt-1">
-                    <span className="font-medium text-left w-full flex-nowrap flex overflow-hidden">
-                      {track.name}
-                    </span>
-                    <span className="text-base opacity-75 text-left truncate w-48 md:w-96 sm:w-96">
-                      {track.ar.map((artist) => artist.name).join(" / ")}
-                    </span>
-                  </div>
-                </button>
+                  picUrl={track.al.picUrl}
+                  index={index}
+                  id={track.id}
+                  ar={track.ar.map((artist) => artist.name).join(" / ")}
+                  name={track.name}
+                />
               ))
             ) : (
               <p className="flex flex-row px-6 md:px-0 sm:px-0">

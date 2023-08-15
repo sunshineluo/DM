@@ -4,6 +4,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { Icon } from "@iconify/react";
 import { SongIdsContext } from "@/components/SongIdsContext";
 import LazyLoad from 'react-lazy-load';
+import SongButton from "@/components/SongButton";
 
 export default function Newsongs() {
   const router = useRouter();
@@ -54,38 +55,26 @@ export default function Newsongs() {
     addToPlaylist(trackId);
   };
   return (
-    <div className="max-w-6xl mx-auto px-0 py-8 overflow-hidden">
+    <div className="max-w-7xl mx-auto px-0 py-8 overflow-hidden">
       <Head>
         <title>新歌速递</title>
       </Head>
 
-      <h2 className="px-6 text-neutral-700 dark:text-neutral-300 font-medium text-lg md:text-3xl sm:text-4xl">
+      <h2 className="px-6 text-neutral-700 dark:text-neutral-300 font-medium text-lg md:text-xl sm:text-2xl">
         新歌速递
       </h2>
 
       <div className="px-0 md:px-6 sm:px-6 mt-6 mb-16 columns-1 md:columns-2 sm:columns-2 w-full">
         {songDetails &&
           songDetails.map((track, index) => (
-            <button
-              key={track.id}
-              className={`flex flex-row space-x-4 w-full rounded-none md:rounded-xl sm:rounded-xl px-6 py-4 ${
-                index % 2 === 0 ? "bg-neutral-200 dark:bg-neutral-800" : "odd"
-              }`}
-              onClick={() => handleAddToPlaylist(track.id)}
-            >
-              <img
-                src={track.al.picUrl}
-                className="rounded-xl w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
-              />
-              <div className="flex flex-col space-y-1 mt-1">
-                <span className="font-medium text-left w-full flex-wrap md:flex-nowrap sm:flex-nowrap flex overflow-hidden">
-                  {track.name}
-                </span>
-                <span className="text-base opacity-75 text-left truncate w-48 md:w-96 sm:w-96">
-                  {track.ar.map((artist) => artist.name).join(" / ")} 
-                </span>
-              </div>
-            </button>
+            <SongButton
+            key={track.id}
+            index={index}
+            id={track.id}
+            name={track.name}
+            ar={track.ar.map((artist) => artist.name).join(" / ")}
+            picUrl={track.al.picUrl}
+          />
           ))}
       </div>
       {isLoading && (

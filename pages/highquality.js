@@ -32,11 +32,11 @@ export default function Highquality() {
   }, []);
   const router = useRouter();
   return (
-    <div className="max-w-6xl mx-auto px-0 py-8">
+    <div className="max-w-7xl mx-auto px-0 py-8">
       <Head>
         <title>精品歌单</title>
       </Head>
-      <h2 className="px-6 text-neutral-700 dark:text-neutral-300 font-medium text-lg md:text-3xl sm:text-4xl">
+      <h2 className="px-6 text-neutral-700 dark:text-neutral-300 font-medium text-lg md:text-xl sm:text-2xl">
         精品歌单
       </h2>
       <div className="columns-1 md:columns-2 sm:columns-3 mt-6 px-6 md:px-0 sm:px-0">

@@ -6,6 +6,7 @@ import { Icon } from "@iconify/react";
 import * as Slider from "@radix-ui/react-slider";
 import { SongIdsContext } from "./SongIdsContext";
 import * as Dialog from "@radix-ui/react-dialog";
+import { useAnimation } from "framer-motion";
 
 function cn(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -26,7 +27,10 @@ export default function Player({ ids, full }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [played, setPlayed] = useState(0);
   const [seekValue, setSeekValue] = useState(0);
-  const [currentTime, setCurrentTime] = useState(0);
+  const [currentTime, setCurrentTime] = useState(() => {
+    const storedCurrentTime = localStorage.getItem("playedTime");
+    return storedCurrentTime !== 0 ? parseFloat(storedCurrentTime) : 0;
+  });
   const [remainingTime, setRemainingTime] = useState(0);
   const [volume, setVolume] = useState(1.0);
   const [display, setDisplay] = useState(() => {
@@ -43,35 +47,43 @@ export default function Player({ ids, full }) {
   const [isLiked, setIsLiked] = useState(false);
 
   useEffect(() => {
-    // 页面加载时，从本地存储中获取之前存储的播放状态和进度
     const storedIsPlaying = localStorage.getItem("isPlaying");
-    const storedCurrentTime = localStorage.getItem("currentTime");
+    const storedCurrentTime = localStorage.getItem("playedTime");
 
-    if (storedIsPlaying !== null) {
-      setIsPlaying(JSON.parse(storedIsPlaying));
-    }
-    if (storedCurrentTime !== null) {
-      setCurrentTime(parseFloat(storedCurrentTime));
-    }
+    console.log(storedCurrentTime);
 
-    // 每当 currentSongIndex 变化时，将其存储到 localStorage 中
+    setIsPlaying(JSON.parse(storedIsPlaying));
+
+    setCurrentTime(parseFloat(storedCurrentTime));
+    console.log(currentTime);
+
     localStorage.setItem("currentSongIndex", JSON.stringify(currentSongIndex));
+
+    return () => {
+      // 在组件卸载时保存当前的播放时间到本地存储
+      localStorage.setItem("playedTime", currentTime.toString());
+    };
   }, []);
 
   useEffect(() => {
-    // 每当 isPlaying 变化时，将其存储到本地存储中
     localStorage.setItem("isPlaying", JSON.stringify(isPlaying));
   }, [isPlaying]);
 
   useEffect(() => {
-    // 每当 currentTime 变化时，将其存储到本地存储中
-    localStorage.setItem("currentTime", currentTime.toString());
+    localStorage.setItem("playedTime", currentTime.toString());
   }, [currentTime]);
 
   useEffect(() => {
-    const storedCurrentTime = localStorage.getItem("currentTime");
-    if (storedCurrentTime) {
-      setCurrentTime(parseFloat(storedCurrentTime));
+    audioRef.current.seekTo(currentTime);
+  }, []);
+
+  useEffect(() => {
+    const savedPlayedTime = localStorage.getItem("playedTime");
+    if (savedPlayedTime) {
+      const parsedTime = parseFloat(savedPlayedTime);
+      setPlayed(parsedTime);
+      setCurrentTime(parsedTime);
+      audioRef.current.seekTo(parsedTime);
     }
   }, []);
 
@@ -80,6 +92,10 @@ export default function Player({ ids, full }) {
       setCurrentSongIndex(0); // 如果 currentSongIndex 不再有效，则将其设置为默认索引 0
     }
   }, [songIds]);
+
+  useEffect(() => {
+    localStorage.setItem("playedTime", currentTime.toString());
+  }, [currentTime]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -192,11 +208,14 @@ export default function Player({ ids, full }) {
   };
 
   useEffect(() => {
-    if (typeof highlightedLineTimestamp === 'number' && lyricsContainerRef.current) {
+    if (
+      typeof highlightedLineTimestamp === "number" &&
+      lyricsContainerRef.current
+    ) {
       const targetElement = lyricsContainerRef.current.querySelector(
         `p[data-text="${String(highlightedLineTimestamp)}"]`
       );
-  
+
       if (targetElement) {
         targetElement.scrollIntoView({
           behavior: "smooth",
@@ -206,24 +225,11 @@ export default function Player({ ids, full }) {
     }
   }, [highlightedLineTimestamp]);
 
-  useEffect(() => {
-    // 从 localStorage 中获取已播放的时间
-    const savedPlayedTime = localStorage.getItem("playedTime");
-    if (savedPlayedTime) {
-      const parsedTime = parseFloat(savedPlayedTime);
-      setPlayed(parsedTime);
-      setCurrentTime(parsedTime);
-      audioRef.current.seekTo(parsedTime);
-    }
-  }, []);
-
   const handleProgress = (progress) => {
     const playedTime = progress.playedSeconds;
     setPlayed(progress.played);
     setCurrentTime(playedTime);
     setRemainingTime(audioRef.current.getDuration() - playedTime);
-
-    // 保存已播放的时间到 localStorage
     localStorage.setItem("playedTime", playedTime.toString());
   };
 
@@ -415,7 +421,7 @@ export default function Player({ ids, full }) {
       />
       {isFull === "false" && (
         <div className="fixed bottom-0 w-full overflow-x-auto bg-neutral-200/75 dark:bg-neutral-800/75 backdrop-blur-lg border-t-[1.5px] border-t-neutral-200/50 dark:border-t-neutral-800/50">
-          <div className="max-w-6xl mx-auto px-0 md:px-8 sm:px-8">
+          <div className="max-w-7xl mx-auto px-0 md:px-8 sm:px-8">
             {songInfo &&
               songInfo.length > 0 &&
               songInfo.map((song) => (
@@ -616,16 +622,11 @@ export default function Player({ ids, full }) {
         </div>
       )}
       {isFull === "true" && (
-        <motion.div className="fixed top-0 w-full h-screen">
-          <button
-            className="fixed top-2 md:top-4 sm:top-8 inset-x-0 left-0 md:left-4 sm:left-8 right-0 z-[99999] hidden md:block sm:block"
-            onClick={() => setIsFull("false")}
-          >
-            <Icon
-              icon="bi:x"
-              className="w-8 md:w-12 h-8 md:h-12 sm:w-16 sm:h-16 opacity-75 text-neutral-700 dark:text-neutral-300"
-            />
-          </button>
+        <motion.div
+          initial={{ y: 0 }}
+          animate={{ y: isFull === "true" ? 0 : 200 }}
+          className="fixed top-0 w-full h-screen"
+        >
           <div>
             {songInfo.map((song) => (
               <img
@@ -648,20 +649,25 @@ export default function Player({ ids, full }) {
               {songInfo.map((song) => (
                 <div
                   key={song.id}
-                  className="flex flex-col mx-auto h-screen px-0 md:px-0 sm:px-32 py-4 md:py-12 sm:py-12"
+                  className="flex flex-col mx-auto h-screen px-0 md:px-0 sm:px-32"
                 >
                   <div key={song.id} className="mx-auto">
+                    <button
+                      className="z-[99999] flex text-center mx-auto"
+                      onClick={() => setIsFull("false")}
+                    >
+                      <Icon
+                        icon="pepicons-pop:line-x"
+                        className="items-center w-10 md:w-12 h-10 md:h-12 sm:w-16 sm:h-16 opacity-75 text-neutral-700 dark:text-neutral-300"
+                      />
+                    </button>
                     <motion.img
                       src={song.al.picUrl}
                       alt="Album Cover"
                       initial={{ scale: 1 }}
-                      animate={
-                        !display
-                          ? { scale: isPlaying ? 1 : 0.85 }
-                          : { scale: 1 }
-                      }
+                      animate={{ scale: isPlaying ? 1 : 0.9 }}
                       className={cn(
-                        "mx-auto w-auto md:w-96 sm:w-[27.5rem] object-contain item-center rounded-xl",
+                        "mx-auto w-auto md:w-96 sm:w-[28rem] object-contain item-center rounded-xl",
                         display ? "hidden md:block sm:block" : "hidden"
                       )}
                     />
@@ -669,7 +675,7 @@ export default function Player({ ids, full }) {
                       src={song.al.picUrl}
                       alt="Album Cover"
                       initial={{ scale: 1 }}
-                      animate={{ scale: isPlaying ? 1 : 0.85 }}
+                      animate={{ scale: isPlaying ? 1 : 0.9 }}
                       className={cn(
                         "mx-auto w-5/6 object-cover item-center rounded-xl",
                         !display ? "block" : "hidden"
@@ -678,7 +684,7 @@ export default function Player({ ids, full }) {
                     <h1 className="text-center font-medium text-base md:text-lg sm:text-lg mt-4">
                       {song.name}
                     </h1>
-                    <h2 className="text-center font-medium text-base md:text-lg sm:text-lg opacity-75 truncate">
+                    <h2 className="text-center font-medium text-base md:text-lg sm:text-lg opacity-75 w-full truncate">
                       {song.ar.map((artist) => artist.name).join(" / ")}
                     </h2>
                   </div>
@@ -696,6 +702,7 @@ export default function Player({ ids, full }) {
                       <Slider.Range
                         className={cn(
                           "SliderRange cursor-pointer",
+                          played === 0 ? "rounded-l-full" : "rounded-none",
                           played === 1 ? "rounded-full" : "rounded-l-full"
                         )}
                       />
@@ -716,24 +723,24 @@ export default function Player({ ids, full }) {
                   </div>
 
                   <div className="flex flex-row justify-between text-neutral-700 dark:text-neutral-300 px-6 md:px-8 sm:px-10">
-                    <div className="flex flex-row space-x-6">
+                    <div className="flex flex-row space-x-3 md:space-x-6 sm:space-x-6">
                       <button onClick={handlePlayMode}>
                         {playMode === "default" && (
                           <Icon
                             icon="bi:repeat"
-                            className="w-4 md:w-6 sm:w-7 h-7 opacity-75"
+                            className="w-4 md:w-5 sm:w-6 h-6 opacity-75"
                           />
                         )}
                         {playMode === "loop" && (
                           <Icon
                             icon="bi:repeat-1"
-                            className="w-4 md:w-6 sm:w-7 h-7 opacity-75"
+                            className="w-4 md:w-5 sm:w-6 h-6 opacity-75"
                           />
                         )}
                         {playMode === "shuffle" && (
                           <Icon
                             icon="bi:shuffle"
-                            className="w-4 md:w-6 sm:w-7 h-7 opacity-75"
+                            className="w-4 md:w-5 sm:w-6 h-6 opacity-75"
                           />
                         )}
                       </button>
@@ -741,17 +748,17 @@ export default function Player({ ids, full }) {
                         {isLiked ? (
                           <Icon
                             icon="bi:heart-fill"
-                            className="w-4 md:w-6 sm:w-7 h-7 opacity-75"
+                            className="w-4 md:w-5 sm:w-6 h-6 opacity-75"
                           />
                         ) : (
                           <Icon
                             icon="bi:heart"
-                            className="w-4 md:w-6 sm:w-7 h-7 opacity-75"
+                            className="w-4 md:w-5 sm:w-6 h-6 opacity-75"
                           />
                         )}
                       </button>
                     </div>
-                    <div className="w-[50%] md:w-[40%] sm:w-[45%] mx-auto mt-5 mb-5">
+                    <div className="w-1/2 mx-auto mt-5 mb-5">
                       <div className="mx-auto flex flex-row justify-between z-30">
                         <button
                           onClick={() =>
@@ -762,19 +769,19 @@ export default function Player({ ids, full }) {
                           }
                         >
                           <Icon
-                            className="font-bold w-9 md:w-10 sm:w-12 h-12 opacity-80 hover:opacity-100"
+                            className="font-bold w-10 md:w-11 sm:w-12 h-12 opacity-80 hover:opacity-100"
                             icon="bi:rewind-fill"
                           />
                         </button>
                         <button onClick={() => setIsPlaying(!isPlaying)}>
                           {isPlaying === true ? (
                             <Icon
-                              className="font-bold w-9 md:w-10 sm:w-12 h-12"
+                              className="font-bold w-11 md:w-12 sm:w-14 h-14"
                               icon="clarity:pause-solid"
                             />
                           ) : (
                             <Icon
-                              className="font-bold w-9 md:w-10 sm:w-12 h-12"
+                              className="font-bold w-11 md:w-12 sm:w-14 h-14"
                               icon="clarity:play-solid"
                             />
                           )}
@@ -787,36 +794,30 @@ export default function Player({ ids, full }) {
                           }
                         >
                           <Icon
-                            className="font-bold w-9 md:w-10 sm:w-12 h-12 opacity-80 hover:opacity-100"
+                            className="font-bold w-10 md:w-11 sm:w-12 h-12 opacity-80 hover:opacity-100"
                             icon="bi:fast-forward-fill"
                           />
                         </button>
                       </div>
                     </div>
-                    <button
-                      onClick={() =>
-                        setDisplay(display === false ? true : false)
-                      }
-                    >
-                      <Icon
-                        icon="solar:password-minimalistic-bold"
-                        className="w-5 md:w-8 sm:w-8 h-8 opacity-75 block md:hidden sm:hidden"
-                      />
-                    </button>
+
                     <Dialog.Root>
-                      <div className="flex flex-row space-x-6">
-                        {" "}
-                        <button>
+                      <div className="flex flex-row space-x-3 md:space-x-6 sm:space-x-6 justify-end">
+                        <button
+                          onClick={() =>
+                            setDisplay(display === false ? true : false)
+                          }
+                        >
                           <Icon
                             icon="solar:password-minimalistic-bold"
-                            className="hidden w-6 md:w-8 sm:w-8 h-8 opacity-75"
+                            className="w-5 md:w-8 sm:w-8 h-8 opacity-75 block md:hidden sm:hidden"
                           />
                         </button>
                         <Dialog.Trigger asChild>
                           <button>
                             <Icon
                               icon="bi:card-list"
-                              className="w-0 md:w-6 sm:w-7 h-7 opacity-75 hidden md:block sm:block"
+                              className="w-5 md:w-6 sm:w-7 h-7 opacity-75"
                             />
                           </button>
                         </Dialog.Trigger>
@@ -926,92 +927,6 @@ export default function Player({ ids, full }) {
                       />
                     </button>
                   </div>
-
-                  <div className="flex flex-row justify-between mx-auto mt-6 px-4 md:hidden sm:hidden">
-                    <button onClick={() => setIsFull("false")}>
-                      <Icon
-                        icon="bi:arrows-fullscreen"
-                        className="font-bold w-5 md:w-5 mr-24 sm:w-6 h-6 text-neutral-700 dark:text-neutral-300 "
-                      />
-                    </button>
-                    <button>
-                      <Dialog.Root>
-                        <Dialog.Trigger asChild>
-                          <Icon
-                            icon="bi:card-list"
-                            className="font-bold w-7 h-7  text-neutral-700 dark:text-neutral-300"
-                          />
-                        </Dialog.Trigger>
-                        <Dialog.Portal>
-                          <Dialog.Overlay className="DialogOverlay bg-black/25 backdrop-blur-3xl" />
-                          <Dialog.Content className="DialogContent fixed max-w-4xl mx-auto w-full h-screen bg-neutral-100 dark:bg-neutral-900 overflow-y-auto backdrop-blur-lg z-[999]">
-                            <Dialog.Title className="DialogTitle font-medium text-3xl">
-                              播放列表({playlistDetails.length})
-                            </Dialog.Title>
-
-                            <div className="flex flex-row justify-between text-red-600 dark:text-red-400 mt-6 px-3">
-                              <button onClick={handlePlayAll}>播放全部</button>
-                              <button onClick={handleRemoveAll}>
-                                删除全部
-                              </button>
-                            </div>
-
-                            <div className="flex flex-col justify-start mt-4 overflow-y-auto">
-                              {playlistDetails.length > 0 &&
-                                playlistDetails.map((track, index) => {
-                                  const handleDeleteSong = (id) => {
-                                    // 在这里处理删除操作，使用传入的id参数
-                                    removeFromPlaylist(id);
-                                  };
-                                  return (
-                                    <div key={track.id}>
-                                      <div
-                                        key={track.id}
-                                        className={`cursor-pointer flex flex-row justify-between w-full rounded-xl px-6 py-4 ${
-                                          index % 2 === 0
-                                            ? "bg-neutral-200 dark:bg-neutral-800"
-                                            : "odd"
-                                        }`}
-                                      >
-                                        <div
-                                          onClick={() =>
-                                            handleAddToPlaylist(track.id)
-                                          }
-                                          className="flex flex-row space-x-4"
-                                        >
-                                          <img
-                                            src={track.al.picUrl}
-                                            className="rounded-xl w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
-                                          />
-                                          <div className="flex flex-col space-y-1 mt-1">
-                                            <span className="font-medium text-left w-full flex-nowrap flex overflow-hidden">
-                                              {track.name}
-                                            </span>
-                                            <span className="text-base opacity-75 text-left truncate w-48 md:w-96 sm:w-96">
-                                              {track.ar
-                                                .map((artist) => artist.name)
-                                                .join(" / ")}
-                                            </span>
-                                          </div>
-                                        </div>
-                                        <button
-                                          onClick={() =>
-                                            handleDeleteSong(track.id)
-                                          }
-                                          className="text-red-600 dark:text-red-400 w-24 md:w-16 sm:w-8 text-right"
-                                        >
-                                          删除
-                                        </button>
-                                      </div>
-                                    </div>
-                                  );
-                                })}
-                            </div>
-                          </Dialog.Content>
-                        </Dialog.Portal>
-                      </Dialog.Root>
-                    </button>
-                  </div>
                 </div>
               ))}
             </div>
@@ -1029,7 +944,8 @@ export default function Player({ ids, full }) {
                   {lyrics.map((line, index) => {
                     const translationLine = translatedLyrics.find(
                       (translatedLine) =>
-                        translatedLine.timestamp === line.timestamp && line.text !== ''
+                        translatedLine.timestamp === line.timestamp &&
+                        line.text !== ""
                     );
                     const highlightedIndex = lyrics.findIndex(
                       (lyric) =>
@@ -1058,18 +974,32 @@ export default function Player({ ids, full }) {
                         className={cn(
                           "text-neutral-700 dark:text-neutral-300 text-3xl md:text-4xl sm:text-5xl font-semibold flex flex-col space-y-1 tracking-tighter transition-all duration-500 cursor-pointer px-4 md:px-0 sm:px-0 py-4 md:py-7 sm:py-10 leading-normal",
                           isHighlightedRow &&
+                            highlightedIndex !== -1 &&
                             "text-[2rem] md:text-[2.4rem] sm:text-[3.2rem] blur-0",
-                          isPreviousRowHighlighted && "opacity-40 blur-[0.5px]",
-                          isNextRowHighlighted && "opacity-40 blur-[0.5px]",
-                          isTwoRowsBeforeHighlighted && "opacity-25 blur-[1px]",
-                          isTwoRowsAfterHighlighted && "opacity-25 blur-[1px]",
+                          isPreviousRowHighlighted &&
+                            highlightedIndex !== -1 &&
+                            "opacity-40 blur-[0.5px]",
+                          isNextRowHighlighted &&
+                            highlightedIndex !== -1 &&
+                            "opacity-40 blur-[0.5px]",
+                          isTwoRowsBeforeHighlighted &&
+                            highlightedIndex !== -1 &&
+                            "opacity-25 blur-[1px]",
+                          isTwoRowsAfterHighlighted &&
+                            highlightedIndex !== -1 &&
+                            "opacity-25 blur-[1px]",
                           isThreeRowsBeforeHighlighted &&
+                            highlightedIndex !== -1 &&
                             "opacity-25 blur-[1.5px]",
                           isThreeRowsAfterHighlighted &&
+                            highlightedIndex !== -1 &&
                             "opacity-25 blur-[1.5px]",
                           isFourRowsBeforeHighlighted &&
+                            highlightedIndex !== -1 &&
                             "opacity-25 blur-[2px]",
-                          isFourRowsAfterHighlighted && "opacity-25 blur-[2px]",
+                          isFourRowsAfterHighlighted &&
+                            highlightedIndex !== -1 &&
+                            "opacity-25 blur-[2px]",
                           !isHighlightedRow &&
                             !isPreviousRowHighlighted &&
                             !isNextRowHighlighted &&
@@ -1079,13 +1009,34 @@ export default function Player({ ids, full }) {
                             !isThreeRowsAfterHighlighted &&
                             !isFourRowsBeforeHighlighted &&
                             !isFourRowsAfterHighlighted &&
+                            highlightedIndex !== -1 &&
+                            "opacity-25 blur-[2.5px]",
+                          highlightedIndex === -1 &&
+                            line.text !== "" &&
                             "opacity-25 blur-[2.5px]"
                         )}
                         onClick={() => audioRef.current.seekTo(line.timestamp)}
                         data-text={String(line.timestamp)}
                       >
                         <span className="mb-1 md:mb-2 sm:mb-2 leading-normal break-words hyphens-auto">
-                          {line.text}
+                          {line.text ? (
+                            <>{line.text}</>
+                          ) : (
+                            <>
+                              <div
+                                className={cn(
+                                  "dots",
+                                  highlightedIndex === -1
+                                    ? "flex blur-0"
+                                    : "invisible"
+                                )}
+                              >
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                              </div>
+                            </>
+                          )}
                         </span>
                         {translationLine?.text && (
                           <span className="text-[1.325rem] md:text-[1.675rem] sm:text-[2.1rem] text-neutral-600 dark:text-neutral-400 font-medium leading-normal">

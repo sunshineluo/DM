@@ -5,6 +5,7 @@ import Head from "next/head";
 import * as Tabs from "@radix-ui/react-tabs";
 import { useRouter } from "next/router";
 import LazyLoad from "react-lazy-load";
+import SongButton from "@/components/SongButton";
 
 const MusicSearch = () => {
   const [keywords, setKeywords] = useState("");
@@ -145,8 +146,15 @@ const MusicSearch = () => {
     }
   };
 
-  const { songIds, addAllToPlaylist, addToPlaylist } =
-    useContext(SongIdsContext);
+  const {
+    songIds,
+    currentSongIndex,
+    setCurrentSongIndex,
+    addAllToPlaylist,
+    addToPlaylist,
+  } = useContext(SongIdsContext);
+
+  const playingSongId = songIds[currentSongIndex];
 
   const handleAddToPlaylist = (trackId) => {
     addToPlaylist(trackId);
@@ -158,7 +166,7 @@ const MusicSearch = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-0 py-8">
+    <div className="max-w-7xl mx-auto px-0 py-8">
       <Head>
         <title>智能搜索</title>
       </Head>
@@ -250,30 +258,14 @@ const MusicSearch = () => {
               {songDetail &&
                 !isLoading &&
                 songDetail.map((track, index) => (
-                  <button
+                  <SongButton
                     key={track.id}
-                    className={`flex flex-row space-x-4 w-full rounded-none md:rounded-xl sm:rounded-xl px-6 py-4 ${
-                      index % 2 === 0
-                        ? "bg-neutral-200 dark:bg-neutral-800"
-                        : "odd"
-                    }`}
-                    onClick={() => handleAddToPlaylist(track.id)}
-                  >
-                    <LazyLoad offset={100}>
-                      <img
-                        src={track.al.picUrl}
-                        className="rounded-xl w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
-                      />
-                    </LazyLoad>
-                    <div className="flex flex-col space-y-1 mt-1">
-                      <span className="font-medium text-left truncate w-48 md:w-96 sm:w-96 flex overflow-hidden">
-                        {track.name}
-                      </span>
-                      <span className="text-base opacity-75 text-left truncate w-48 md:w-96 sm:w-96">
-                        {track.ar.map((artist) => artist.name).join(" / ")}
-                      </span>
-                    </div>
-                  </button>
+                    index={index}
+                    id={track.id}
+                    name={track.name}
+                    ar={track.ar.map((artist) => artist.name).join(" / ")}
+                    picUrl={track.al.picUrl}
+                  />
                 ))}
             </div>
 
@@ -398,33 +390,35 @@ const MusicSearch = () => {
           </Tabs.Content>
           <Tabs.Content className="TabsContent mt-8" value="tab5">
             <div className="columns-1 md:columns-2 sm:columns-2">
-              {mvDetail &&  !isLoading &&  mvDetail.map((mv, index) => (
-                <button
-                  key={mv.id}
-                  onClick={() => router.push(`/mv?id=${mv.id}`)}
-                  className={`flex flex-col space-y-4 w-full rounded-none md:rounded-xl sm:rounded-xl px-6 py-4 ${
-                    index % 2 === 0
-                      ? "bg-neutral-200 dark:bg-neutral-800"
-                      : "odd"
-                  }`}
-                >
-                  <LazyLoad offset={100}>
-                    <img
-                      src={mv.cover}
-                      className="rounded-xl w-full h-48 md:h-64 sm:h-72"
-                    />
-                  </LazyLoad>
+              {mvDetail &&
+                !isLoading &&
+                mvDetail.map((mv, index) => (
+                  <button
+                    key={mv.id}
+                    onClick={() => router.push(`/mv?id=${mv.id}`)}
+                    className={`flex flex-col space-y-4 w-full rounded-none md:rounded-xl sm:rounded-xl px-6 py-4 ${
+                      index % 2 === 0
+                        ? "bg-neutral-200 dark:bg-neutral-800"
+                        : "odd"
+                    }`}
+                  >
+                    <LazyLoad offset={100}>
+                      <img
+                        src={mv.cover}
+                        className="rounded-xl w-full h-48 md:h-64 sm:h-72"
+                      />
+                    </LazyLoad>
 
-                  <div className="flex flex-col space-y-1 mt-1">
-                    <span className="font-medium text-left w-full flex-nowrap flex overflow-hidden">
-                      {mv.name}
-                    </span>
-                    <span className="opacity-75 text-left truncate w-48 md:w-96 sm:w-96">
-                      {mv.artists.map((artist) => artist.name).join(" / ")}
-                    </span>
-                  </div>
-                </button>
-              ))}
+                    <div className="flex flex-col space-y-1 mt-1">
+                      <span className="font-medium text-left w-full flex-nowrap flex overflow-hidden">
+                        {mv.name}
+                      </span>
+                      <span className="opacity-75 text-left truncate w-48 md:w-96 sm:w-96">
+                        {mv.artists.map((artist) => artist.name).join(" / ")}
+                      </span>
+                    </div>
+                  </button>
+                ))}
             </div>
 
             {isLoading && (

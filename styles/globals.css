@@ -34,7 +34,7 @@ body {
   @apply bg-neutral-500 dark:bg-neutral-400;
   position: relative;
   flex-grow: 1;
-  @apply rounded-full h-[10px] hover:h-[20px] transition-all duration-150 ease-linear;
+  @apply rounded-full h-[12.5px] hover:h-[20px] transition-all duration-150 ease-linear;
 }
 
 .SliderRange {
@@ -132,4 +132,80 @@ body {
 
 .TabsTrigger[data-state="active"] {
   @apply bg-red-600 text-white rounded-full font-medium;
+}
+
+.dots {
+  width: 1.5em;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: space-between;
+  filter: blur(0px) !important;
+}
+
+.dots div {
+  width: 0.3em;
+  height: 0.3em;
+  border-radius: 50%;
+  animation: fade 0.8s ease-in-out alternate infinite;
+  @apply bg-neutral-500 dark:bg-neutral-400;
+  filter: blur(0px) !important;
+}
+
+.dots div:nth-of-type(1) {
+  animation-delay: -0.4s;
+}
+
+.dots div:nth-of-type(2) {
+  animation-delay: -0.2s;
+}
+
+@keyframes fade {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.playing{
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: space-between;
+  width: 1.5em;
+}
+
+.playing span {
+  width: 0.225em;
+  height: 0.75em;
+  @apply bg-red-600/80;
+}
+
+.playing span:nth-of-type(1) {
+  animation: grow 1s -0.45s ease-in-out infinite;
+}
+
+.playing span:nth-of-type(2) {
+  animation: grow 1s -0.3s ease-in-out infinite;
+}
+
+.playing span:nth-of-type(3) {
+  animation: grow 1s -0.15s ease-in-out infinite;
+}
+
+.playing span:nth-of-type(4) {
+  animation: grow 1s ease-in-out infinite;
+}
+
+@keyframes grow {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+
+  50% {
+    transform: scaleY(2);
+  }
 }

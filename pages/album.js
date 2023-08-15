@@ -6,6 +6,7 @@ import { Icon } from "@iconify/react";
 import Head from "next/head";
 import { SongIdsContext } from "@/components/SongIdsContext";
 import LazyLoad from "react-lazy-load";
+import SongButton from "@/components/SongButton";
 
 const Album = () => {
   const router = useRouter();
@@ -39,9 +40,9 @@ const Album = () => {
     if (albumDetail === null || !Array.isArray(albumDetail[0].songs)) {
       alert("An error occurred while fetching song details");
     }
-  
+
     const songIds = albumDetail.songs.map((song) => song.id);
-  
+
     try {
       const response = await fetch(
         `https://cf233.eu.org/song/detail?ids=${songIds.join(",")}`
@@ -54,7 +55,7 @@ const Album = () => {
       console.log("An error occurred while fetching song details:", error);
     }
   };
-  
+
   useEffect(() => {
     if (id !== null) {
       getAlbumDetail();
@@ -96,7 +97,7 @@ const Album = () => {
             )
         )}
       <div className="bg-neutral-100/75 dark:bg-neutral-900/75 backdrop-blur-3xl min-h-screen overflow-y-auto">
-        <div className="max-w-6xl mx-auto py-8 px-0 md:px-6 sm:px-6">
+        <div className="max-w-7xl mx-auto py-8 px-0 md:px-6 sm:px-6">
           {albumDetail !== null &&
             albumDetail.slice(0, 1).map(
               (detail, index) =>
@@ -117,7 +118,9 @@ const Album = () => {
                             {detail.album.name}
                           </h1>
                           <p className="text-base md:text-lg sm:text-lg opacity-75">
-                            {detail.album.artists.map((artist) => artist.name).join(" / ")}
+                            {detail.album.artists
+                              .map((artist) => artist.name)
+                              .join(" / ")}
                           </p>
                         </div>
                       </div>
@@ -152,30 +155,14 @@ const Album = () => {
           <div className="columns-1 md:columns-1 sm:columns-2 mt-6 mb-16">
             {filteredTracks.length > 0 || searchTerm !== "" ? (
               filteredTracks.map((track, index) => (
-                <button
+                <SongButton
                   key={track.id}
-                  className={`flex flex-row space-x-4 w-full rounded-none md:rounded-xl sm:rounded-xl px-6 py-4 ${
-                    index % 2 === 0
-                      ? "bg-neutral-200 dark:bg-neutral-800"
-                      : "odd"
-                  }`}
-                  onClick={() => handleAddToPlaylist(track.id)}
-                >
-                  <LazyLoad offset={100}>
-                    <img
-                      src={track.al.picUrl}
-                      className="rounded-xl w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
-                    />
-                  </LazyLoad>
-                  <div className="flex flex-col space-y-1 mt-1">
-                    <span className="font-medium text-left w-full flex-nowrap flex overflow-hidden">
-                      {track.name}
-                    </span>
-                    <span className="text-base opacity-75 text-left truncate w-48 md:w-96 sm:w-96">
-                      {track.ar.map((artist) => artist.name).join(" / ")}
-                    </span>
-                  </div>
-                </button>
+                  index={index}
+                  id={track.id}
+                  name={track.name}
+                  ar={track.ar.map((artist) => artist.name).join(" / ")}
+                  picUrl={track.al.picUrl}
+                />
               ))
             ) : (
               <p className="flex flex-row px-6 md:px-0 sm:px-0">
