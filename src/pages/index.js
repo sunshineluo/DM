@@ -105,7 +105,7 @@ export default function Home() {
             <button
               key={playlist.id}
               onClick={() => router.push(`/playlist?id=${playlist.id}`)}
-              className="flex flex-col w-full -mb-32 md:-mb-0 sm:-mb-0 h-[35.5rem] overflow-hidden"
+              className="flex flex-col w-full mb-4 overflow-hidden"
             >
               <LazyLoad offset={100}>
                 <img src={playlist.coverImgUrl} className="rounded-xl w-full" />
@@ -116,7 +116,7 @@ export default function Home() {
                   {playlist.name}
                 </h1>
 
-                <p className="mt-2 opacity-75 text-xs md:text-sm sm:text-sm truncate">
+                <p className="mt-2 opacity-75 text-xs md:text-sm sm:text-sm w-48 md:w-56 sm:w-96 truncate">
                   {playlist.description}
                 </p>
               </div>
@@ -130,7 +130,7 @@ export default function Home() {
         </p>
       )}
 
-      <div className="flex flex-row justify-between">
+      <div className="mt-8 flex flex-row justify-between">
         <h2 className="px-6 text-neutral-700 dark:text-neutral-300 font-medium text-lg md:text-xl sm:text-2xl">
           新歌速递
         </h2>

@@ -34,6 +34,9 @@ export default function Navbar() {
   if (router.asPath.includes("/search")) {
     router.asPath = "/";
   }
+  if (router.asPath.includes("/artist")) {
+    router.asPath = "/";
+  }
   const userDataStr = localStorage.getItem("userData");
   const userData = JSON.parse(userDataStr);
   const { theme, setTheme } = useTheme();
@@ -47,7 +50,7 @@ export default function Navbar() {
   };
   return (
     <div className="">
-      <div className="flex flex-row max-w-7xl mx-auto px-2 md:px-4 sm:px-4 space-x-4 md:space-x-12 sm:space-x-16">
+      <div className="flex flex-row max-w-7xl mx-auto px-1.5 md:px-4 sm:px-4 space-x-4 md:space-x-12 sm:space-x-16">
         <div className="flex-row py-6 space-x-3 md:space-x-6 sm:space-x-7 hidden md:flex sm:flex">
           <button onClick={goBack}>
             <Icon
@@ -82,7 +85,7 @@ export default function Navbar() {
               </Link>
             ))}
           </div>
-          <div className="flex flex-row space-x-2 md:space-x-6 sm:space-x-8">
+          <div className="flex flex-row space-x-4 md:space-x-6 sm:space-x-8">
             <button onClick={() => router.push("/search")}>
               <Icon
                 icon="bi:search"

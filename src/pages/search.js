@@ -226,11 +226,11 @@ const MusicSearch = () => {
 
       <Tabs.Root className="TabsRoot" defaultValue="tab1">
         <ul className="mb-16 px-0 md:px-6 sm:px-6">
-          <div className="sticky top-2 px-6 md:px-0 sm:px-0 z-[9999] ">
+          <div className="sticky top-0 md:top-2 sm:top-2 px-0 md:px-0 sm:px-0 z-[9999] ">
             {" "}
             {songDetail.length > 0 && (
               <Tabs.List
-                className="dark:border-neutral-800 border-neutral-200 border-[1.5px] bg-neutral-200/75 dark:bg-neutral-800/75 backdrop-blur-lg rounded-full TabsList py-1.5 mt-6 px-2 max-w-3xl mx-auto flex flex-row space-x-2 md:space-x-4 sm:space-x-4 overflow-x-auto"
+                className="dark:border-neutral-800 border-neutral-200 border-[1.5px] bg-neutral-200/75 dark:bg-neutral-800/75 backdrop-blur-lg rounded-none md:rounded-full sm:rounded-full TabsList py-1.5 mt-6 px-2 max-w-3xl mx-auto flex flex-row space-x-2 md:space-x-4 sm:space-x-4 overflow-x-auto"
                 aria-label="类别"
               >
                 <>
@@ -282,6 +282,7 @@ const MusicSearch = () => {
                 artistDetail.map((artist, index) => (
                   <button
                     key={artist.id}
+                    onClick={() => router.push(`/artist?id=${artist.id}`)}
                     className={`flex flex-row space-x-4 w-full rounded-none md:rounded-xl sm:rounded-xl px-6 py-4 ${
                       index % 2 === 0
                         ? "bg-neutral-200 dark:bg-neutral-800"
