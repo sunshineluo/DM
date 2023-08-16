@@ -97,9 +97,8 @@ const Mv = () => {
           评论({mvComments.length})
         </h2>
         {mvComments.map((comment, index) => (
-          <div>
+          <div key={index}>
             <div
-              key={index}
               className={`flex flex-row space-x-4 w-full rounded-none md:rounded-xl sm:rounded-xl px-6 py-4 ${
                 index % 2 === 0 ? "bg-neutral-200 dark:bg-neutral-800" : "odd"
               }`}
@@ -116,7 +115,8 @@ const Mv = () => {
                   {comment.content}
                 </span>
                 <span className="mt-2 text-xs md:text-sm sm:text-base opacity-75 truncate w-64 md:w-96 sm:w-96">
-                  {comment.user.nickname} 评论于 {moment(comment.time).format('YYYY年MM月DD日')}
+                  {comment.user.nickname} 评论于{" "}
+                  {moment(comment.time).format("YYYY年MM月DD日")}
                 </span>
               </div>
             </div>
