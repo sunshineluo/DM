@@ -1,6 +1,7 @@
 import { useContext, useState } from "react";
 import { SongIdsContext } from "./SongIdsContext";
 import LazyLoad from "react-lazy-load";
+import { Icon } from "@iconify/react";
 
 function cn(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -35,9 +36,11 @@ export default function SongButton({ id, picUrl, index, name, ar }) {
       <LazyLoad offset={100}>
         <img
           src={picUrl}
+          alt={name}
           className={cn(
             "rounded-xl w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16",
-            id === playingSongId && "opacity-75"
+            id === playingSongId && "opacity-75",
+            isHover ? 'opacity-75' : 'opacity-100'
           )}
         />
       </LazyLoad>
@@ -49,6 +52,14 @@ export default function SongButton({ id, picUrl, index, name, ar }) {
             <span></span>
             <span></span>
           </div>
+        </div>
+      )}
+      {id !== playingSongId && isHover && (
+        <div className="absolute flex justify-center">
+          <Icon
+            className="font-bold w-5 h-5 md:w-6 md:h-6 sm:w-7 sm:h-7 mt-4 text-red-600"
+            icon="ph:play-fill"
+          />
         </div>
       )}
       <div className="flex flex-col space-y-1 mt-1">

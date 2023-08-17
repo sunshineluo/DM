@@ -21,6 +21,7 @@ export default function Dashboard() {
         );
         const userDetails = response.data;
         setUserDetail([userDetails]);
+        console.log(userDetail);
 
         setIsPlaylistLoading(true);
 
@@ -40,6 +41,21 @@ export default function Dashboard() {
     fetchData(); // 调用 fetchData 函数来获取用户详情和歌单数据
   }, []); // 空数组作为依赖项，确保只在组件挂载后调用一次
 
+  const handleSignin = async () => {
+    try {
+      const response = await axios.get("https://cf233.eu.org/daily_signin", {
+        withCredentials: true,
+      });
+      console.log("签到成功", response.data);
+      alert("签到成功，经验 + 3.请勿重复签到！");
+      // 处理签到结果
+      // ...
+    } catch (error) {
+      console.error("签到失败", error);
+      alert("签到失败，需要登录.请勿重复签到！");
+    }
+  };
+
   const router = useRouter();
 
   const logout = () => {
@@ -53,6 +69,7 @@ export default function Dashboard() {
     // 将歌单id添加到URL中
     router.push(`/playlist?id=${playlistId}`);
   };
+
   return (
     <div>
       <Head>
@@ -63,30 +80,49 @@ export default function Dashboard() {
           <div>
             <div className="flex flex-col md:flex-row sm:flex-row space-y-4 md:space-y-0 sm:space-y-0 space-x-0 md:space-x-6 sm:space-x-6">
               <div className="w-full md:w-1/2 sm:w-1/2">
-                <LazyLoad>
-                  <img
-                    src={userData.data.profile.backgroundUrl}
-                    className="rounded-none md:rounded-xl sm:rounded-xl"
-                  />
-                </LazyLoad>
+                {userDetail.length > 0 &&
+                  userDetail.map((user, index) => (
+                    <img
+                      key={index}
+                      src={user.profile.backgroundUrl}
+                      className="rounded-none md:rounded-xl sm:rounded-xl"
+                    />
+                  ))}
               </div>
               <div className="w-full md:w-1/2 sm:w-1/2 flex flex-col space-y-4">
-                <div className="flex flex-row space-x-4 w-full rounded-none md:rounded-xl sm:rounded-xl px-6 py-4 bg-neutral-200 dark:bg-neutral-800">
-                  <img
-                    src={userData.data.profile.avatarUrl}
-                    className="rounded-full w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
-                  />
-                  <div className="space-y-2 flex flex-col">
-                    <h1 className="font-medium text-base md:text-lg sm:text-xl mt-4">
-                      {userData.data.profile.nickname}
-                    </h1>
+                <div className="flex flex-row justify-between w-full rounded-none md:rounded-xl sm:rounded-xl px-6 py-4 bg-neutral-200 dark:bg-neutral-800">
+                  <div className="flex flex-row space-x-4">
+                    {userDetail.length > 0 &&
+                      userDetail.map((user, index) => (
+                        <img
+                          key={index}
+                          src={user.profile.avatarUrl}
+                          className="rounded-full w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
+                        />
+                      ))}
+                    <div className="flex flex-row justify-between">
+                      <h1 className="font-medium text-base md:text-lg sm:text-xl mt-4">
+                        {userDetail.length > 0 &&
+                          userDetail.map((user, index) => (
+                            <span key={index}>{user.profile.nickname}</span>
+                          ))}
+                      </h1>
+                    </div>
+                  </div>
+                  <div className="flex flex-row space-x-4 md:space-x-5 sm:space-x-6">
+                    <button onClick={handleSignin}>
+                      <Icon icon="uim:calender" className="w-6 h-6 -mt-1" />
+                    </button>
                   </div>
                 </div>
                 <div className="columns-2 text-xs md:text-[0.8rem] sm:text-base leading-snug rounded-none md:rounded-xl sm:rounded-xl px-6 py-4 bg-neutral-200 dark:bg-neutral-800">
                   <p>
                     <span className="mr-3">简介</span>
                     <span className="opacity-75 w-36 md:w-56 sm:w-96 truncate">
-                      {userData.data.profile.signature}
+                      {userDetail.length > 0 &&
+                        userDetail.map((user, index) => (
+                          <span key={index}>{user.profile.signature}</span>
+                        ))}
                     </span>
                   </p>
                   <p className="mt-6">
@@ -142,7 +178,12 @@ export default function Dashboard() {
                 <div className="text-xs md:text-xs sm:text-base leading-snug rounded-none md:rounded-xl sm:rounded-xl px-6 py-4 bg-neutral-200 dark:bg-neutral-800">
                   <div className="flex flex-row justify-between">
                     <h2 className="font-medium mb-2">用户歌单</h2>
-                    <p className="text-red-600 cursor-pointer" onClick={()=>router.push('/dashboard/playlist')}>查看全部</p>
+                    <p
+                      className="text-red-600 cursor-pointer"
+                      onClick={() => router.push("/dashboard/playlist")}
+                    >
+                      查看全部
+                    </p>
                   </div>
                   <div className="columns-2">
                     {playlists.length > 0 &&

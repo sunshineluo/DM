@@ -1,0 +1,9 @@
+# electron-builder.yml
+
+appId: com.dm.corporation
+productName: DM
+directories:
+  output: dist
+win:
+  target: nsis
+  icon: /public/icon.png

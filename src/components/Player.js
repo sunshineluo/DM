@@ -45,6 +45,7 @@ export default function Player({ ids, full }) {
   } = useContext(SongIdsContext);
   const [playlistDetails, setPlaylistDetails] = useState([]);
   const [isLiked, setIsLiked] = useState(false);
+  const [more, setMore] = useState(false);
 
   useEffect(() => {
     const storedIsPlaying = localStorage.getItem("isPlaying");
@@ -625,7 +626,10 @@ export default function Player({ ids, full }) {
         <motion.div
           initial={{ y: 0 }}
           animate={{ y: isFull === "true" ? 0 : 200 }}
-          className="fixed top-0 w-full h-screen"
+          className={cn(
+            "top-0 w-full h-screen max-h-screen",
+            isFull === "true" && "fixed"
+          )}
         >
           <div>
             {songInfo.map((song) => (
@@ -637,19 +641,19 @@ export default function Player({ ids, full }) {
               />
             ))}
           </div>
-          <div className="flex flex-row w-full h-screen bg-neutral-100/75 dark:bg-neutral-900/75 backdrop-blur-3xl overflow-y-auto">
+          <div className="flex flex-row w-full h-screen bg-neutral-100/75 dark:bg-neutral-900/75 backdrop-blur-3xl overflow-y-hidden md:overflow-y-auto sm:overflow-y-auto">
             <div
               className={cn(
                 "transition-all duration-500 w-full md:w-1/2 sm:w-1/2  h-screen left-0 right-0 z-50 select-none bottom-0 overflow-y-auto ",
                 !display
                   ? "top-0 md:top-0 sm:top-0 w-screen"
-                  : "fixed md:relative sm:relative top-[50vh] md:top-0 sm:top-0 z-[99999] py-0 md:py-6 sm:py-0 "
+                  : "fixed left-0 right-0 inset-x-0 md:relative sm:relative top-[50vh] md:top-0 sm:top-0 z-[99999] py-0 md:py-6 sm:py-0 "
               )}
             >
               {songInfo.map((song) => (
                 <div
                   key={song.id}
-                  className="flex flex-col mx-auto h-screen px-0 md:px-0 sm:px-32"
+                  className="flex flex-col mx-auto h-screen px-4 md:px-8 sm:px-0"
                 >
                   <div key={song.id} className="mx-auto">
                     <button
@@ -666,8 +670,13 @@ export default function Player({ ids, full }) {
                       alt="Album Cover"
                       initial={{ scale: 1 }}
                       animate={{ scale: isPlaying ? 1 : 0.9 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 200,
+                        damping: 10,
+                      }}
                       className={cn(
-                        "mx-auto w-auto md:w-96 sm:w-[28rem] object-contain item-center rounded-xl",
+                        "shadow-md mx-auto w-auto md:w-96 sm:w-[28rem] object-contain item-center rounded-xl",
                         display ? "hidden md:block sm:block" : "hidden"
                       )}
                     />
@@ -676,256 +685,362 @@ export default function Player({ ids, full }) {
                       alt="Album Cover"
                       initial={{ scale: 1 }}
                       animate={{ scale: isPlaying ? 1 : 0.9 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 200,
+                        damping: 10,
+                      }}
                       className={cn(
-                        "mx-auto w-5/6 object-cover item-center rounded-xl",
+                        "mx-auto object-cover item-center rounded-xl",
                         !display ? "block" : "hidden"
                       )}
                     />
-                    <h1 className="text-center font-medium text-base md:text-lg sm:text-lg mt-4">
-                      {song.name}
-                    </h1>
-                    <h2 className="text-center font-medium text-base md:text-lg sm:text-lg opacity-75 w-full truncate">
-                      {song.ar.map((artist) => artist.name).join(" / ")}
-                    </h2>
-                  </div>
+                    <div className="flex flex-row justify-between w-full">
+                      <div>
+                        {" "}
+                        <h1 className="font-semibold text-lg md:text-xl sm:text-xl mt-6 w-36 md:w-72 sm:w-[90%] truncate">
+                          {song.name}
+                        </h1>
+                        <h2 className="font-semibold text-lg md:text-xl sm:text-xl opacity-75 w-full truncate">
+                          {song.ar.map((artist) => artist.name).join(" / ")}
+                        </h2>
+                      </div>
+                      <div className="flex flex-row space-x-3 justify-start">
+                        {more && (
+                          <button
+                            onClick={() =>
+                              setDisplay(display === false ? true : false)
+                            }
+                            className={cn(
+                              "mt-6 w-9 h-9 justify-center align-middle rounded-full bg-neutral-300/50 dark:bg-neutral-400/75 backdrop-blur-3xl",
+                              more ? "flex md:hidden sm:hidden " : "hidden"
+                            )}
+                          >
+                            <span className="w-5 h-5 mt-1.5">词</span>
+                          </button>
+                        )}
 
-                  <Slider.Root
-                    className="SliderRoot mx-auto"
-                    min={0}
-                    max={1}
-                    step={0.01}
-                    value={[played]}
-                    onValueChange={(newValue) => handleSeekChange(newValue)}
-                    onPointerUp={handleSeek}
-                  >
-                    <Slider.Track className="SliderTrack mt-6 backdrop-blur-lg bg-opacity-75 cursor-pointer">
-                      <Slider.Range
-                        className={cn(
-                          "SliderRange cursor-pointer",
-                          played === 0 ? "rounded-l-full" : "rounded-none",
-                          played === 1 ? "rounded-full" : "rounded-l-full"
-                        )}
-                      />
-                      <Slider.Thumb
-                        className="SliderThumb focus:outline-none -mt-1"
-                        aria-label="Progress"
-                      />
-                    </Slider.Track>
-                  </Slider.Root>
-
-                  <div className="w-[85%] mx-auto mt-3 flex flex-row justify-between font-medium">
-                    <div className="text-sm md:text-base sm:text-base opacity-75">
-                      {formatTime(currentTime)}
-                    </div>
-                    <div className="text-sm md:text-base sm:text-base opacity-75">
-                      -{formatTime(remainingTime)}
-                    </div>
-                  </div>
-
-                  <div className="flex flex-row justify-between text-neutral-700 dark:text-neutral-300 px-6 md:px-8 sm:px-10">
-                    <div className="flex flex-row space-x-3 md:space-x-6 sm:space-x-6">
-                      <button onClick={handlePlayMode}>
-                        {playMode === "default" && (
-                          <Icon
-                            icon="bi:repeat"
-                            className="w-4 md:w-5 sm:w-6 h-6 opacity-75"
-                          />
-                        )}
-                        {playMode === "loop" && (
-                          <Icon
-                            icon="bi:repeat-1"
-                            className="w-4 md:w-5 sm:w-6 h-6 opacity-75"
-                          />
-                        )}
-                        {playMode === "shuffle" && (
-                          <Icon
-                            icon="bi:shuffle"
-                            className="w-4 md:w-5 sm:w-6 h-6 opacity-75"
-                          />
-                        )}
-                      </button>
-                      <button onClick={toggleLikeMusic}>
-                        {isLiked ? (
-                          <Icon
-                            icon="bi:heart-fill"
-                            className="w-4 md:w-5 sm:w-6 h-6 opacity-75"
-                          />
-                        ) : (
-                          <Icon
-                            icon="bi:heart"
-                            className="w-4 md:w-5 sm:w-6 h-6 opacity-75"
-                          />
-                        )}
-                      </button>
-                    </div>
-                    <div className="w-1/2 mx-auto mt-5 mb-5">
-                      <div className="mx-auto flex flex-row justify-between z-30">
                         <button
-                          onClick={() =>
-                            setCurrentSongIndex(
-                              (currentSongIndex - 1 + songIds.length) %
-                                songIds.length
-                            )
-                          }
+                          onClick={toggleLikeMusic}
+                          className={cn(
+                            "mt-6 w-9 h-9 justify-center align-middle rounded-full bg-neutral-300/50 dark:bg-neutral-400/75 backdrop-blur-3xl",
+                            more ? "flex" : "hidden"
+                          )}
                         >
-                          <Icon
-                            className="font-bold w-10 md:w-11 sm:w-12 h-12 opacity-80 hover:opacity-100"
-                            icon="bi:rewind-fill"
-                          />
-                        </button>
-                        <button onClick={() => setIsPlaying(!isPlaying)}>
-                          {isPlaying === true ? (
+                          {isLiked ? (
                             <Icon
-                              className="font-bold w-11 md:w-12 sm:w-14 h-14"
-                              icon="clarity:pause-solid"
+                              icon="bi:heart-fill"
+                              className="w-5 h-5 mt-2.5 file:opacity-75"
                             />
                           ) : (
                             <Icon
-                              className="font-bold w-11 md:w-12 sm:w-14 h-14"
-                              icon="clarity:play-solid"
+                              icon="bi:heart"
+                              className="w-5 h-5 mt-2.5 opacity-75"
                             />
                           )}
                         </button>
+
+                        {more && (
+                          <Dialog.Root>
+                            <div className="flex flex-row space-x-3 md:space-x-6 sm:space-x-6 justify-end">
+                              <Dialog.Trigger asChild>
+                                <button
+                                  className={cn(
+                                    "mt-6 w-9 h-9 justify-center align-middle rounded-full bg-neutral-300/50 dark:bg-neutral-400/75 backdrop-blur-3xl",
+                                    more ? "flex" : "hidden"
+                                  )}
+                                >
+                                  <Icon
+                                    icon="bi:card-list"
+                                    className="w-5 h-5 mt-2 opacity-75"
+                                  />
+                                </button>
+                              </Dialog.Trigger>
+                            </div>
+                            <Dialog.Portal>
+                              <Dialog.Overlay className="DialogOverlay bg-black/25 backdrop-blur-3xl" />
+                              <Dialog.Content className="DialogContent fixed max-w-4xl mx-auto w-full h-screen bg-neutral-100 dark:bg-neutral-900 overflow-y-auto backdrop-blur-lg z-[999]">
+                                <Dialog.Title className="DialogTitle font-medium text-3xl">
+                                  播放列表({playlistDetails.length})
+                                </Dialog.Title>
+
+                                <div className="flex flex-row justify-between text-red-600 dark:text-red-400 mt-6 px-3">
+                                  <button onClick={handlePlayAll}>
+                                    播放全部
+                                  </button>
+                                  <button onClick={handleRemoveAll}>
+                                    删除全部
+                                  </button>
+                                </div>
+
+                                <div className="flex flex-col justify-start mt-4 overflow-y-auto">
+                                  {playlistDetails.length > 0 &&
+                                    playlistDetails.map((track, index) => {
+                                      const handleDeleteSong = (id) => {
+                                        // 在这里处理删除操作，使用传入的id参数
+                                        removeFromPlaylist(id);
+                                      };
+                                      return (
+                                        <div key={track.id}>
+                                          <div
+                                            key={track.id}
+                                            className={`cursor-pointer flex flex-row justify-between w-full rounded-xl px-6 py-4 ${
+                                              index % 2 === 0
+                                                ? "bg-neutral-200 dark:bg-neutral-800"
+                                                : "odd"
+                                            }`}
+                                          >
+                                            <div
+                                              onClick={() =>
+                                                handleAddToPlaylist(track.id)
+                                              }
+                                              className="flex flex-row space-x-4"
+                                            >
+                                              <img
+                                                src={track.al.picUrl}
+                                                className="rounded-xl w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
+                                              />
+                                              <div className="flex flex-col space-y-1 mt-1">
+                                                <span className="font-medium text-left w-full flex-nowrap flex overflow-hidden">
+                                                  {track.name}
+                                                </span>
+                                                <span className="text-base opacity-75 text-left truncate w-48 md:w-96 sm:w-96">
+                                                  {track.ar
+                                                    .map(
+                                                      (artist) => artist.name
+                                                    )
+                                                    .join(" / ")}
+                                                </span>
+                                              </div>
+                                            </div>
+                                            <button
+                                              onClick={() =>
+                                                handleDeleteSong(track.id)
+                                              }
+                                              className="text-red-600 dark:text-red-400 w-24 md:w-16 sm:w-8 text-right"
+                                            >
+                                              删除
+                                            </button>
+                                          </div>
+                                        </div>
+                                      );
+                                    })}
+                                </div>
+                              </Dialog.Content>
+                            </Dialog.Portal>
+                          </Dialog.Root>
+                        )}
                         <button
-                          onClick={() =>
-                            setCurrentSongIndex(
-                              (currentSongIndex + 1) % songIds.length
-                            )
-                          }
+                          onClick={() => setMore(!more)}
+                          className="mt-6 w-9 h-9 flex justify-center align-middle rounded-full bg-neutral-300/50 dark:bg-neutral-400/75 backdrop-blur-3xl"
                         >
-                          <Icon
-                            className="font-bold w-10 md:w-11 sm:w-12 h-12 opacity-80 hover:opacity-100"
-                            icon="bi:fast-forward-fill"
-                          />
+                          {!more ? (
+                            <Icon icon="tabler:dots" className="w-5 h-5 mt-2" />
+                          ) : (
+                            <Icon icon="bi:x" className="w-5 h-5 mt-2" />
+                          )}
                         </button>
                       </div>
                     </div>
-
-                    <Dialog.Root>
-                      <div className="flex flex-row space-x-3 md:space-x-6 sm:space-x-6 justify-end">
-                        <button
-                          onClick={() =>
-                            setDisplay(display === false ? true : false)
-                          }
-                        >
-                          <Icon
-                            icon="solar:password-minimalistic-bold"
-                            className="w-5 md:w-8 sm:w-8 h-8 opacity-75 block md:hidden sm:hidden"
-                          />
-                        </button>
-                        <Dialog.Trigger asChild>
-                          <button>
-                            <Icon
-                              icon="bi:card-list"
-                              className="w-5 md:w-6 sm:w-7 h-7 opacity-75"
-                            />
-                          </button>
-                        </Dialog.Trigger>
-                      </div>
-                      <Dialog.Portal>
-                        <Dialog.Overlay className="DialogOverlay bg-black/25 backdrop-blur-3xl" />
-                        <Dialog.Content className="DialogContent fixed max-w-4xl mx-auto w-full h-screen bg-neutral-100 dark:bg-neutral-900 overflow-y-auto backdrop-blur-lg z-[999]">
-                          <Dialog.Title className="DialogTitle font-medium text-3xl">
-                            播放列表({playlistDetails.length})
-                          </Dialog.Title>
-
-                          <div className="flex flex-row justify-between text-red-600 dark:text-red-400 mt-6 px-3">
-                            <button onClick={handlePlayAll}>播放全部</button>
-                            <button onClick={handleRemoveAll}>删除全部</button>
-                          </div>
-
-                          <div className="flex flex-col justify-start mt-4 overflow-y-auto">
-                            {playlistDetails.length > 0 &&
-                              playlistDetails.map((track, index) => {
-                                const handleDeleteSong = (id) => {
-                                  // 在这里处理删除操作，使用传入的id参数
-                                  removeFromPlaylist(id);
-                                };
-                                return (
-                                  <div key={track.id}>
-                                    <div
-                                      key={track.id}
-                                      className={`cursor-pointer flex flex-row justify-between w-full rounded-xl px-6 py-4 ${
-                                        index % 2 === 0
-                                          ? "bg-neutral-200 dark:bg-neutral-800"
-                                          : "odd"
-                                      }`}
-                                    >
-                                      <div
-                                        onClick={() =>
-                                          handleAddToPlaylist(track.id)
-                                        }
-                                        className="flex flex-row space-x-4"
-                                      >
-                                        <img
-                                          src={track.al.picUrl}
-                                          className="rounded-xl w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
-                                        />
-                                        <div className="flex flex-col space-y-1 mt-1">
-                                          <span className="font-medium text-left w-full flex-nowrap flex overflow-hidden">
-                                            {track.name}
-                                          </span>
-                                          <span className="text-base opacity-75 text-left truncate w-48 md:w-96 sm:w-96">
-                                            {track.ar
-                                              .map((artist) => artist.name)
-                                              .join(" / ")}
-                                          </span>
-                                        </div>
-                                      </div>
-                                      <button
-                                        onClick={() =>
-                                          handleDeleteSong(track.id)
-                                        }
-                                        className="text-red-600 dark:text-red-400 w-24 md:w-16 sm:w-8 text-right"
-                                      >
-                                        删除
-                                      </button>
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                          </div>
-                        </Dialog.Content>
-                      </Dialog.Portal>
-                    </Dialog.Root>
-                  </div>
-
-                  <div className="flex flex-row mx-auto w-[85%] space-x-3">
-                    <button onClick={() => setVolume(0)}>
-                      <Icon
-                        icon="ion:volume-off"
-                        className="font-bold w-5 md:w-5 sm:w-6 h-6 text-neutral-700 dark:text-neutral-300  mt-4 md:mt-[1.375rem] sm:mt-[1.375rem]"
-                      />
-                    </button>
-
                     <Slider.Root
-                      className="SliderRoot"
+                      className="SliderRoot mx-auto"
                       min={0}
                       max={1}
                       step={0.01}
-                      value={[volume]}
-                      onValueChange={(newValue) => handleVolumeChange(newValue)}
+                      value={[played]}
+                      onValueChange={(newValue) => handleSeekChange(newValue)}
+                      onPointerUp={handleSeek}
                     >
-                      <Slider.Track className="SliderTrack mt-9 md:mt-12 sm:mt-12 backdrop-blur-lg bg-opacity-75 cursor-pointer">
+                      <Slider.Track className="SliderTrack mt-6 backdrop-blur-lg bg-opacity-75 cursor-pointer">
                         <Slider.Range
                           className={cn(
                             "SliderRange cursor-pointer",
-                            volume === 1 ? "rounded-full" : "rounded-l-full"
+                            played === 0 ? "rounded-l-full" : "rounded-none",
+                            played === 1 ? "rounded-full" : "rounded-l-full"
                           )}
                         />
                         <Slider.Thumb
                           className="SliderThumb focus:outline-none -mt-1"
-                          aria-label="Volume"
+                          aria-label="Progress"
                         />
                       </Slider.Track>
                     </Slider.Root>
+                    <div className="mx-auto mt-3 flex flex-row justify-between font-medium">
+                      <div className="text-xs md:text-sm sm:text-sm opacity-75">
+                        {formatTime(currentTime)}
+                      </div>
+                      <div className="text-xs md:text-sm sm:text-sm opacity-75">
+                        -{formatTime(remainingTime)}
+                      </div>
+                    </div>
+                    <div className="flex flex-row justify-between text-neutral-700 dark:text-neutral-300">
+                      <div className="flex flex-row">
+                        <button
+                          onClick={() =>
+                            setPlayMode(
+                              playMode === "default" ? "loop" : "default"
+                            )
+                          }
+                        >
+                          {playMode === "default" && (
+                            <Icon
+                              icon="bi:repeat"
+                              className="w-4 md:w-5 sm:w-6 h-6 opacity-75"
+                            />
+                          )}
+                          {playMode === "loop" && (
+                            <Icon
+                              icon="bi:repeat-1"
+                              className="w-4 md:w-5 sm:w-6 h-6 opacity-75"
+                            />
+                          )}
+                        </button>
+                      </div>
+                      <div className="w-1/2 mx-auto mt-4 mb-4">
+                        <div className="mx-auto flex flex-row justify-between z-30">
+                          <button
+                            onClick={() =>
+                              setCurrentSongIndex(
+                                (currentSongIndex - 1 + songIds.length) %
+                                  songIds.length
+                              )
+                            }
+                          >
+                            <svg
+                              t="1692268477966"
+                              fill="currentColor"
+                              className="icon w-11 md:w-12 sm:w-14 h-14 opacity-80 hover:opacity-100"
+                              viewBox="0 0 1024 1024"
+                              version="1.1"
+                              xmlns="http://www.w3.org/2000/svg"
+                              p-id="4289"
+                            >
+                              <path
+                                d="M519.893333 569.984c-30.890667-19.2-46.336-28.842667-51.626666-41.130667a42.666667 42.666667 0 0 1 0-33.706666c5.290667-12.288 20.736-21.930667 51.626666-41.130667l218.453334-135.808c34.048-21.162667 51.114667-31.786667 65.152-30.634667a42.666667 42.666667 0 0 1 30.762666 17.109334c8.405333 11.349333 8.405333 31.402667 8.405334 71.509333v271.616c0 40.106667 0 60.16-8.405334 71.509333a42.666667 42.666667 0 0 1-30.762666 17.066667c-14.08 1.152-31.104-9.386667-65.152-30.592l-218.453334-135.808z"
+                                p-id="4290"
+                              ></path>
+                              <path
+                                d="M142.634667 569.984c-30.933333-19.2-46.378667-28.842667-51.626667-41.130667a42.666667 42.666667 0 0 1 0-33.706666c5.248-12.288 20.693333-21.930667 51.626667-41.130667l218.453333-135.808c34.048-21.162667 51.072-31.786667 65.109333-30.634667a42.666667 42.666667 0 0 1 30.762667 17.109334c8.405333 11.349333 8.405333 31.402667 8.405333 71.509333v271.616c0 40.106667 0 60.16-8.405333 71.509333a42.666667 42.666667 0 0 1-30.762667 17.066667c-14.08 1.152-31.061333-9.386667-65.152-30.592l-218.453333-135.808z"
+                                p-id="4291"
+                              ></path>
+                            </svg>
+                          </button>
+                          <button onClick={() => setIsPlaying(!isPlaying)}>
+                            {isPlaying === true ? (
+                              <svg
+                                t="1692268156116"
+                                fill="currentColor"
+                                className="icon w-12 md:w-14 sm:w-16 h-16"
+                                viewBox="0 0 1024 1024"
+                                version="1.1"
+                                xmlns="http://www.w3.org/2000/svg"
+                                p-id="4153"
+                              >
+                                <path
+                                  d="M298.666667 196.266667c0-23.893333 0-35.84 4.650666-44.970667a42.666667 42.666667 0 0 1 18.645334-18.645333C331.093333 128 343.04 128 366.933333 128h34.133334c23.893333 0 35.84 0 44.970666 4.650667a42.666667 42.666667 0 0 1 18.645334 18.645333C469.333333 160.426667 469.333333 172.373333 469.333333 196.266667v588.8c0 23.893333 0 35.84-4.650666 44.970666a42.666667 42.666667 0 0 1-18.645334 18.645334C436.906667 853.333333 424.96 853.333333 401.066667 853.333333h-34.133334c-23.893333 0-35.84 0-44.970666-4.650666a42.666667 42.666667 0 0 1-18.645334-18.645334C298.666667 820.906667 298.666667 808.96 298.666667 785.066667V196.266667zM554.666667 196.266667c0-23.893333 0-35.84 4.650666-44.970667a42.666667 42.666667 0 0 1 18.645334-18.645333C587.093333 128 599.04 128 622.933333 128h34.133334c23.893333 0 35.84 0 44.970666 4.650667a42.666667 42.666667 0 0 1 18.645334 18.645333C725.333333 160.426667 725.333333 172.373333 725.333333 196.266667v588.8c0 23.893333 0 35.84-4.650666 44.970666a42.666667 42.666667 0 0 1-18.645334 18.645334C692.906667 853.333333 680.96 853.333333 657.066667 853.333333h-34.133334c-23.893333 0-35.84 0-44.970666-4.650666a42.666667 42.666667 0 0 1-18.645334-18.645334C554.666667 820.906667 554.666667 808.96 554.666667 785.066667V196.266667z"
+                                  p-id="4154"
+                                ></path>
+                              </svg>
+                            ) : (
+                              <svg
+                                t="1692268110901"
+                                fill="currentColor"
+                                className="icon w-12 md:w-14 sm:w-16 h-16"
+                                viewBox="0 0 1024 1024"
+                                version="1.1"
+                                xmlns="http://www.w3.org/2000/svg"
+                                p-id="4017"
+                              >
+                                <path
+                                  d="M793.6 549.802667c33.621333-19.413333 50.389333-29.098667 56.021333-41.813334a42.666667 42.666667 0 0 0 0-34.688c-5.632-12.672-22.4-22.357333-56.021333-41.770666L326.4 161.792c-33.621333-19.370667-50.389333-29.098667-64.213333-27.648a42.666667 42.666667 0 0 0-30.037334 17.365333c-8.149333 11.221333-8.149333 30.634667-8.149333 69.418667v539.477333c0 38.826667 0 58.197333 8.149333 69.418667a42.666667 42.666667 0 0 0 30.037334 17.365333c13.824 1.450667 30.592-8.277333 64.213333-27.648l467.2-269.738666z"
+                                  p-id="4018"
+                                ></path>
+                              </svg>
+                            )}
+                          </button>
+                          <button
+                            onClick={() =>
+                              setCurrentSongIndex(
+                                (currentSongIndex + 1) % songIds.length
+                              )
+                            }
+                          >
+                            <svg
+                              t="1692268552716"
+                              fill="currentColor"
+                              className="icon w-11 md:w-12 sm:w-14 h-14 opacity-80 hover:opacity-100"
+                              viewBox="0 0 1024 1024"
+                              version="1.1"
+                              xmlns="http://www.w3.org/2000/svg"
+                              p-id="4426"
+                              width="200"
+                              height="200"
+                            >
+                              <path
+                                d="M504.106667 569.984c30.890667-19.2 46.336-28.842667 51.626666-41.130667a42.666667 42.666667 0 0 0 0-33.706666c-5.290667-12.288-20.736-21.930667-51.626666-41.130667l-218.453334-135.808c-34.048-21.162667-51.114667-31.786667-65.152-30.634667a42.666667 42.666667 0 0 0-30.762666 17.109334c-8.405333 11.349333-8.405333 31.402667-8.405334 71.509333v271.616c0 40.106667 0 60.16 8.405334 71.509333a42.666667 42.666667 0 0 0 30.762666 17.066667c14.08 1.152 31.104-9.386667 65.152-30.592l218.453334-135.808z"
+                                p-id="4427"
+                              ></path>
+                              <path
+                                d="M881.365333 569.984c30.933333-19.2 46.378667-28.842667 51.626667-41.130667a42.666667 42.666667 0 0 0 0-33.706666c-5.248-12.288-20.693333-21.930667-51.626667-41.130667l-218.453333-135.808c-34.048-21.162667-51.072-31.786667-65.109333-30.634667a42.666667 42.666667 0 0 0-30.762667 17.109334c-8.405333 11.349333-8.405333 31.402667-8.405333 71.509333v271.616c0 40.106667 0 60.16 8.405333 71.509333a42.666667 42.666667 0 0 0 30.762667 17.066667c14.08 1.152 31.061333-9.386667 65.152-30.592l218.453333-135.808z"
+                                p-id="4428"
+                              ></path>
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                      <div className="flex flex-row">
+                        <button onClick={() => setPlayMode("shuffle")}>
+                          <Icon
+                            icon="bi:shuffle"
+                            className={cn(
+                              "w-4 md:w-5 sm:w-6 h-6",
+                              playMode === "shuffle"
+                                ? "opacity-100"
+                                : "opacity-75"
+                            )}
+                          />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="flex flex-row mx-auto space-x-3">
+                      <button onClick={() => setVolume(0)}>
+                        <Icon
+                          icon="ion:volume-off"
+                          className="font-bold w-5 md:w-5 sm:w-6 h-6 text-neutral-700 dark:text-neutral-300 mt-4 md:mt-[1.375rem] sm:mt-[1.375rem]"
+                        />
+                      </button>
 
-                    <button onClick={() => setVolume(1)}>
-                      <Icon
-                        icon="fa-solid:volume-up"
-                        className="font-bold w-5 md:w-5 sm:w-6 h-6 text-neutral-700 dark:text-neutral-300 mt-4 md:mt-[1.375rem] sm:mt-[1.375rem]"
-                      />
-                    </button>
+                      <Slider.Root
+                        className="SliderRoot"
+                        min={0}
+                        max={1}
+                        step={0.01}
+                        value={[volume]}
+                        onValueChange={(newValue) =>
+                          handleVolumeChange(newValue)
+                        }
+                      >
+                        <Slider.Track className="SliderTrack mt-9 md:mt-12 sm:mt-12 backdrop-blur-lg bg-opacity-75 cursor-pointer">
+                          <Slider.Range
+                            className={cn(
+                              "SliderRange cursor-pointer",
+                              volume === 1 ? "rounded-full" : "rounded-l-full"
+                            )}
+                          />
+                          <Slider.Thumb
+                            className="SliderThumb focus:outline-none -mt-1"
+                            aria-label="Volume"
+                          />
+                        </Slider.Track>
+                      </Slider.Root>
+
+                      <button onClick={() => setVolume(1)}>
+                        <Icon
+                          icon="fa-solid:volume-up"
+                          className="font-bold w-5 md:w-5 sm:w-6 h-6 text-neutral-700 dark:text-neutral-300 mt-4 md:mt-[1.375rem] sm:mt-[1.375rem]"
+                        />
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -972,7 +1087,7 @@ export default function Player({ ids, full }) {
                       <motion.p
                         key={index}
                         className={cn(
-                          "text-neutral-700 dark:text-neutral-300 text-3xl md:text-4xl sm:text-5xl font-semibold flex flex-col space-y-1 tracking-tighter transition-all duration-500 cursor-pointer px-4 md:px-0 sm:px-0 py-4 md:py-7 sm:py-10 leading-normal",
+                          "text-neutral-700 dark:text-neutral-300 text-3xl md:text-4xl sm:text-5xl font-semibold flex flex-col space-y-1 tracking-tighter transition-all duration-500 cursor-pointer px-2.5 md:px-0 sm:px-0 py-4 md:py-7 sm:py-10 leading-normal",
                           isHighlightedRow &&
                             highlightedIndex !== -1 &&
                             "text-[2rem] md:text-[2.4rem] sm:text-[3.2rem] blur-0",

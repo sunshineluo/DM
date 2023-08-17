@@ -26,7 +26,7 @@ body {
   align-items: center;
   user-select: none;
   touch-action: none;
-  width: 85%;
+  width: 100%;
   height: 20px;
 }
 
@@ -34,7 +34,7 @@ body {
   @apply bg-neutral-500 dark:bg-neutral-400;
   position: relative;
   flex-grow: 1;
-  @apply rounded-full h-[12.5px] hover:h-[20px] transition-all duration-150 ease-linear;
+  @apply rounded-full h-[7px] transition-all duration-150 ease-linear;
 }
 
 .SliderRange {

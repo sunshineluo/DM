@@ -168,7 +168,7 @@ const MusicSearch = () => {
   return (
     <div className="max-w-7xl mx-auto px-0 py-8">
       <Head>
-        <title>智能搜索</title>
+        <title>搜索</title>
       </Head>
 
       <div className="mt-6 flex flex-row justify-center w-full px-6">
