@@ -254,7 +254,7 @@ const MusicSearch = () => {
             )}
           </div>
           <Tabs.Content className="mt-8 w-auto" value="tab1">
-            <div className="columns-1 md:columns-1 sm:columns-2">
+            <div className="">
               {songDetail &&
                 !isLoading &&
                 songDetail.map((track, index) => (
@@ -265,6 +265,7 @@ const MusicSearch = () => {
                     name={track.name}
                     ar={track.ar.map((artist) => artist.name).join(" / ")}
                     picUrl={track.al.picUrl}
+                    duration={track.dt}
                   />
                 ))}
             </div>

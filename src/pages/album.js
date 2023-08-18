@@ -152,7 +152,7 @@ const Album = () => {
               />
             </div>
           </div>
-          <div className="columns-1 md:columns-1 sm:columns-2 mt-6 mb-16">
+          <div className="mt-6 mb-16">
             {filteredTracks.length > 0 || searchTerm !== "" ? (
               filteredTracks.map((track, index) => (
                 <SongButton
@@ -160,6 +160,7 @@ const Album = () => {
                   index={index}
                   id={track.id}
                   name={track.name}
+                  duration={track.dt}
                   ar={track.ar.map((artist) => artist.name).join(" / ")}
                   picUrl={track.al.picUrl}
                 />

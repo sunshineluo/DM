@@ -72,7 +72,7 @@ export default function FM() {
         私人FM
       </h2>
 
-      <div className="px-0 md:px-6 sm:px-6 mt-6 mb-16 columns-1 md:columns-2 sm:columns-2 w-full">
+      <div className="px-0 md:px-6 sm:px-6 mt-6 mb-16 w-full">
         {songDetails &&
           songDetails.map((track, index) => (
             <SongButton
@@ -80,6 +80,7 @@ export default function FM() {
               index={index}
               id={track.id}
               name={track.name}
+              duration={track.dt}
               ar={track.ar.map((artist) => artist.name).join(" / ")}
               picUrl={track.al.picUrl}
             />

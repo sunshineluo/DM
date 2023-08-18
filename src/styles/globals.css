@@ -178,9 +178,9 @@ body {
 }
 
 .playing span {
-  width: 0.225em;
-  height: 0.75em;
-  @apply bg-red-600/80;
+  width: 0.16875em;
+  height: 0.5625em;
+  @apply bg-white mt-2;
 }
 
 .playing span:nth-of-type(1) {
@@ -208,4 +208,22 @@ body {
   50% {
     transform: scaleY(2);
   }
+}
+
+.SelectItem {
+  font-size: 13px;
+  line-height: 1;
+  color: var(--violet-11);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  height: 25px;
+  padding: 0 35px 0 25px;
+  position: relative;
+  user-select: none;
+}
+
+.invisible {
+  visibility: hidden;
+  opacity: 0;
 }

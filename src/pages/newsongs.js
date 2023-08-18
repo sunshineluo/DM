@@ -39,6 +39,7 @@ export default function Newsongs() {
       const data = await response.json();
       if (data && data.code === 200) {
         setSongDetails(data.songs);
+        console.log(songDetails)
       }
       setIsLoading(false);
     } catch (error) {
@@ -64,7 +65,7 @@ export default function Newsongs() {
         新歌速递
       </h2>
 
-      <div className="px-0 md:px-6 sm:px-6 mt-6 mb-16 columns-1 md:columns-2 sm:columns-2 w-full">
+      <div className="px-0 md:px-6 sm:px-6 mt-6 mb-16 w-full">
         {songDetails &&
           songDetails.map((track, index) => (
             <SongButton
@@ -72,6 +73,7 @@ export default function Newsongs() {
             index={index}
             id={track.id}
             name={track.name}
+            duration={track.dt}
             ar={track.ar.map((artist) => artist.name).join(" / ")}
             picUrl={track.al.picUrl}
           />

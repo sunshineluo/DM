@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import { Icon } from "@iconify/react";
 import { SongIdsContext } from "@/components/SongIdsContext";
 import LazyLoad from "react-lazy-load";
-import SongButton from "@/components/SongButton";
+import FullSongButton from "@/components/FullSongButton";
 
 export default function Home() {
   const router = useRouter();
@@ -148,11 +148,12 @@ export default function Home() {
           songDetails
             .slice(0, 12)
             .map((track, index) => (
-              <SongButton
+              <FullSongButton
                 key={track.id}
                 index={index}
                 id={track.id}
                 name={track.name}
+                duration={track.durationTime}
                 ar={track.ar.map((artist) => artist.name).join(" / ")}
                 picUrl={track.al.picUrl}
               />

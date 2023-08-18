@@ -133,11 +133,24 @@ const Playlist = () => {
           <div className="flex flex-row justify-between">
             <div>
               <button
-                className="text-lg md:text-xl sm:text-xl mt-12 text-red-600 flex flex-row space-x-2 ml-4 md:ml-0 sm:ml-0"
+                className="text-base md:text-lg sm:text-lg mt-12 bg-red-600 text-white px-4 py-1.5 rounded-xl flex flex-row space-x-2 ml-4 md:ml-0 sm:ml-0"
                 onClick={handlePlayAll}
               >
-                <Icon icon="bi:play-circle-fill" className="mt-1 mr-1.5" />
-                播放全部
+                <svg
+                  t="1692268110901"
+                  fill="currentColor"
+                  className="icon mt-0.5 md:mt-1 sm:mt-1 mr-1 w-5 h-5"
+                  viewBox="0 0 1024 1024"
+                  version="1.1"
+                  xmlns="http://www.w3.org/2000/svg"
+                  p-id="4017"
+                >
+                  <path
+                    d="M793.6 549.802667c33.621333-19.413333 50.389333-29.098667 56.021333-41.813334a42.666667 42.666667 0 0 0 0-34.688c-5.632-12.672-22.4-22.357333-56.021333-41.770666L326.4 161.792c-33.621333-19.370667-50.389333-29.098667-64.213333-27.648a42.666667 42.666667 0 0 0-30.037334 17.365333c-8.149333 11.221333-8.149333 30.634667-8.149333 69.418667v539.477333c0 38.826667 0 58.197333 8.149333 69.418667a42.666667 42.666667 0 0 0 30.037334 17.365333c13.824 1.450667 30.592-8.277333 64.213333-27.648l467.2-269.738666z"
+                    p-id="4018"
+                  ></path>
+                </svg>
+                播放
               </button>
             </div>
             <div className="mt-10 flex flex-row w-1/2 md:w-1/3 sm:w-1/3">
@@ -149,17 +162,18 @@ const Playlist = () => {
                 type="search"
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="搜索歌单..."
-                className="w-full px-10  py-1.5 focus:outline-none bg-neutral-50 dark:bg-neutral-950 dark:border-neutral-800 text-lg focus:ring-2 focus:ring-red-600 border-2 rounded-xl"
+                className="w-full px-10  py-1.5 focus:outline-none bg-neutral-50 dark:bg-neutral-950 dark:border-neutral-800 text-base md:text-lg sm:text-lg focus:ring-2 focus:ring-red-600 border-2 rounded-xl"
               />
             </div>
           </div>
-          <div className="columns-1 md:columns-1 sm:columns-2 mt-6 mb-16">
+          <div className="mt-6 mb-16">
             {filteredTracks.length > 0 || searchTerm !== "" ? (
               filteredTracks.map((track, index) => (
                 <SongButton
                   key={track.id}
                   picUrl={track.al.picUrl}
                   index={index}
+                  duration={track.dt}
                   id={track.id}
                   ar={track.ar.map((artist) => artist.name).join(" / ")}
                   name={track.name}

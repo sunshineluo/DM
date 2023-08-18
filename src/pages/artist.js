@@ -87,7 +87,7 @@ const Artist = () => {
         歌手50首热门单曲
       </h2>
 
-      <div className="px-0 mt-6 mb-16 columns-1 md:columns-2 sm:columns-2 w-full">
+      <div className="px-0 mt-6 mb-16 w-full">
         {arSongs &&
           arSongs.map((track, index) => (
             <SongButton
@@ -95,6 +95,7 @@ const Artist = () => {
               index={index}
               id={track.id}
               name={track.name}
+              duration={track.dt}
               ar={track.ar.map((artist) => artist.name).join(" / ")}
               picUrl={track.al.picUrl}
             />
