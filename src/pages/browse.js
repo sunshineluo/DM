@@ -23,7 +23,9 @@ export default function Browse() {
   const fetchNewSongs = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch("https://cf233.eu.org/personalized/newsong?limit=6");
+      const response = await fetch(
+        "https://cf233.eu.org/personalized/newsong?limit=6"
+      );
       const data = await response.json();
       if (data && data.code === 200) {
         setNewSongs(data.result);
@@ -115,6 +117,7 @@ export default function Browse() {
         {playlists.length > 0 &&
           playlists.map((pl, index) => (
             <PlaylistCard
+              key={pl.id}
               index={index}
               picUrl={pl.picUrl}
               name={pl.name}
@@ -150,6 +153,7 @@ export default function Browse() {
         {newMv &&
           newMv.map((track, index) => (
             <MvCard
+              key={track.key}
               index={index}
               id={track.id}
               name={track.name}
