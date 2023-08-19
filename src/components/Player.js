@@ -420,9 +420,12 @@ export default function Player({ ids, full }) {
       <motion.div
         initial={{ y: 0 }}
         animate={{
-          y: isFull === "true" ? [0, 1145] : [1145, 0],
+          y: isFull === "true" ? [0, 1500] : [1500, 0],
         }}
-        transition={{ duration: 1, delay: isFull === "true" ? 0.25 : 0 }}
+        transition={{
+          duration: 0.75,
+          delay: isFull === "true" ? 0.25 : 0,
+        }}
         className="fixed bottom-0 w-full overflow-x-auto bg-neutral-200/75 dark:bg-neutral-800/75 backdrop-blur-lg border-t-[1.5px] border-t-neutral-200/50 dark:border-t-neutral-800/50"
       >
         <div className="max-w-7xl mx-auto px-0 md:px-8 sm:px-8">
@@ -440,10 +443,10 @@ export default function Player({ ids, full }) {
                       className="rounded-xl w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16 cursor-pointer"
                     />
                     <div className="flex flex-col space-y-1 mt-1 ">
-                      <span className="text-base font-medium text-center w-32 md:w-72 sm:w-96 flex-nowrap flex truncate">
+                      <span className="text-base font-semibold text-center w-32 md:w-72 sm:w-96 flex-nowrap flex truncate">
                         {song.name}
                       </span>
-                      <span className="text-base opacity-75 text-left w-32 md:w-72 sm:w-96 truncate flex-nowrap flex">
+                      <span className="text-base  font-medium opacity-75 text-left w-32 md:w-72 sm:w-96 truncate flex-nowrap flex">
                         {song.ar.map((artist) => artist.name).join(" / ")}
                       </span>
                     </div>
@@ -626,11 +629,12 @@ export default function Player({ ids, full }) {
       <motion.div
         initial={{ y: 1145, borderRadius: 0 }}
         animate={{
-          y: isFull === "true" ? [1145, 0] : [0, 1145],
+          y: isFull === "true" ? [1500, 0] : [0, 1500],
           borderRadius: isFull === "true" ? [20, 0] : 0,
         }}
         transition={{
-          duration: 0.5,
+          type: "spring",
+          duration: 0.75,
         }}
         className={cn(
           "fixed top-0 w-full h-screen min-h-screen max-h-screen",
@@ -663,7 +667,7 @@ export default function Player({ ids, full }) {
               >
                 <div key={song.id} className="mx-auto">
                   <button
-                    className="z-[99999] flex text-center mx-auto"
+                    className="z-[10000000] flex text-center mx-auto" 
                     onClick={() => setIsFull("false")}
                   >
                     <Icon
@@ -673,7 +677,7 @@ export default function Player({ ids, full }) {
                   </button>
                   <motion.img
                     src={song.al.picUrl}
-                    alt="Album Cover"
+                    alt="Album Cover （PC）"
                     initial={{ scale: 1 }}
                     animate={{ scale: isPlaying ? 1 : 0.9 }}
                     transition={{
@@ -688,7 +692,7 @@ export default function Player({ ids, full }) {
                   />
                   <motion.img
                     src={song.al.picUrl}
-                    alt="Album Cover"
+                    alt="Album Cover （Mobile）"
                     initial={{ scale: 1 }}
                     animate={{ scale: isPlaying ? 1 : 0.9 }}
                     transition={{
@@ -705,10 +709,10 @@ export default function Player({ ids, full }) {
                   />
                   <div className="flex flex-row justify-between z-[99999]">
                     <div>
-                      <h1 className="font-semibold text-lg md:text-xl sm:text-xl mt-6 w-64 md:w-96 sm:w-[90%]] truncate">
+                      <h1 className="font-semibold text-lg md:text-xl sm:text-xl mt-6 w-64 md:w-96 sm:w-[25.5rem] truncate">
                         {song.name}
                       </h1>
-                      <h2 className="font-semibold text-lg md:text-xl sm:text-xl opacity-75 w-64 md:w-96 sm:w-[90%] truncate">
+                      <h2 className="font-semibold text-lg md:text-xl sm:text-xl opacity-75 w-64 md:w-96 sm:w-[25.5rem] truncate">
                         {song.ar.map((artist) => artist.name).join(" / ")}
                       </h2>
                     </div>
@@ -735,7 +739,7 @@ export default function Player({ ids, full }) {
                             leaveFrom="transform opacity-100 scale-100"
                             leaveTo="transform opacity-0 scale-95"
                           >
-                            <Menu.Items className="absolute border border-neutral-300 dark:border-neutral-700  right-0 mt-2 w-40 py-2 text-red-600 text-lg md:text-lg sm:text-xl origin-top-right bg-neutral-200 dark:bg-neutral-800 rounded-xl z-[99999]">
+                            <Menu.Items className="absolute border border-neutral-300 dark:border-neutral-700  right-0 mt-2 w-36 py-2 text-red-600 text-base md:text-base sm:text-lg origin-top-right bg-neutral-200 dark:bg-neutral-800 rounded-xl z-[99999]">
                               <div className="px-4 py-1 flex flex-col">
                                 <Menu.Item
                                   as="button"
@@ -1106,10 +1110,10 @@ export default function Player({ ids, full }) {
           <AnimatePresence>
             <motion.div
               className={cn(
-                "py-12 overflow-y-auto select-none",
+                "py-12 overflow-y-auto select-none z-[99999]",
                 !display
                   ? "hidden"
-                  : "z-[9999] block h-[50vh] md:h-screen sm:h-screen px-4 left-0 right-0 w-full md:w-1/2 sm:w-1/2"
+                  : "z-[99999] block h-[50vh] md:h-screen sm:h-screen px-4 left-0 right-0 w-full md:w-1/2 sm:w-1/2"
               )}
             >
               <div ref={lyricsContainerRef} style={{ maxHeight: "100%" }}>

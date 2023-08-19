@@ -4,7 +4,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { Icon } from "@iconify/react";
 import { SongIdsContext } from "@/components/SongIdsContext";
 import axios from "axios";
-import SongButton from "@/components/SongButton";
+import FullSongButton from "@/components/FullSongButton";
 
 export default function FM() {
   const router = useRouter();
@@ -63,19 +63,21 @@ export default function FM() {
     addToPlaylist(trackId);
   };
   return (
-    <div className="max-w-7xl mx-auto px-0 py-8 overflow-hidden">
+    <div className="max-w-7xl mx-auto px-0 md:px-6 sm:px-6 py-8 mb-20 overflow-hidden">
       <Head>
         <title>私人FM</title>
       </Head>
 
-      <h2 className="px-6 text-neutral-700 dark:text-neutral-300 font-medium text-lg md:text-xl sm:text-2xl">
+      <h1 className="px-6 md:px-0 sm:px-0 font-semibold text-3xl md:text-4xl sm:text-5xl">
         私人FM
-      </h2>
+      </h1>
 
-      <div className="px-0 md:px-6 sm:px-6 mt-6 mb-16 w-full">
+      <hr className="border-neutral-200 dark:border-neutral-800 my-3" />
+
+      <div className="my-4 px-6 md:px-0 sm:px-0 columns-2 md:columns-4 sm:columns-5">
         {songDetails &&
           songDetails.map((track, index) => (
-            <SongButton
+            <FullSongButton
               key={track.id}
               index={index}
               id={track.id}
@@ -86,12 +88,6 @@ export default function FM() {
             />
           ))}
       </div>
-
-      {isLoading && (
-        <p className="flex flex-row px-6 md:px-6 sm:px-6 justify-start -mt-12">
-          <Icon icon="eos-icons:loading" className="w-8 h-8" />
-        </p>
-      )}
     </div>
   );
 }

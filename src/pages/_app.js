@@ -2,10 +2,10 @@ import { useState, useEffect } from "react";
 import Player from "@/components/Player";
 import { SongIdsProvider } from "@/components/SongIdsContext";
 import nProgress from "nprogress";
-import Router from 'next/router';
+import Router from "next/router";
 import axios from "axios";
 
-import '@/styles/nprogress.css'
+import "@/styles/nprogress.css";
 import "@/styles/globals.css";
 import "inter-ui/inter.css";
 import "@fontsource/noto-sans-sc/400.css";
@@ -17,15 +17,15 @@ import { ThemeProvider } from "next-themes";
 nProgress.configure({ showSpinner: false });
 
 // 设置页面加载时的进度条
-Router.events.on('routeChangeStart', () => {
+Router.events.on("routeChangeStart", () => {
   nProgress.start();
 });
 
-Router.events.on('routeChangeComplete', () => {
+Router.events.on("routeChangeComplete", () => {
   nProgress.done();
 });
 
-Router.events.on('routeChangeError', () => {
+Router.events.on("routeChangeError", () => {
   nProgress.done();
 });
 
@@ -42,7 +42,9 @@ export default function App({ Component, pageProps }) {
     <ThemeProvider attribute="class">
       <SongIdsProvider>
         <Navbar />
-        <Component {...pageProps} />
+        <div className="py-12 md:py-0 sm:py-0">
+          <Component {...pageProps} />
+        </div>
         <Player full="false" />
       </SongIdsProvider>
     </ThemeProvider>

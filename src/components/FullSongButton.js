@@ -26,9 +26,7 @@ export default function FullSongButton({ id, picUrl, index, name, ar }) {
   return (
     <button
       key={id}
-      className={`flex flex-row space-x-4 w-full rounded-none md:rounded-xl sm:rounded-xl px-6 py-4 ${
-        index % 2 === 0 ? "bg-neutral-200 dark:bg-neutral-800" : "odd"
-      }`}
+      className="flex flex-col space-y-2 w-full rounded-none md:rounded-xl sm:rounded-xl mb-2"
       onMouseEnter={() => setIsHover(true)}
       onMouseLeave={() => setIsHover(false)}
       onClick={() => handleAddToPlaylist(id)}
@@ -38,35 +36,32 @@ export default function FullSongButton({ id, picUrl, index, name, ar }) {
           src={picUrl}
           alt={name}
           className={cn(
-            "rounded-xl w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16",
+            "rounded-xl w-40 h-40 md:w-48 md:h-48 sm:w-56 sm:h-56 shadow-md",
             id === playingSongId && "opacity-75",
-            isHover ? 'opacity-75' : 'opacity-100'
+            isHover ? "opacity-75" : "opacity-100"
           )}
         />
       </LazyLoad>
       {id === playingSongId && (
-        <div className="absolute">
-          <div className="playing mt-5 md:mt-6 sm:mt-6 ml-0.5">
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
+        <div className="absolute opacity-75 ml-2 mt-6 w-6 h-6">
+          <div className="playing index">
+            <span className="bg-red-600 index"></span>
+            <span className="bg-red-600 index"></span>
+            <span className="bg-red-600 index"></span>
+            <span className="bg-red-600 index"></span>
           </div>
         </div>
       )}
       {id !== playingSongId && isHover && (
-        <div className="absolute flex justify-center">
-          <Icon
-            className="font-bold w-5 h-5 md:w-6 md:h-6 sm:w-7 sm:h-7 mt-4 text-red-600"
-            icon="ph:play-fill"
-          />
-        </div>
+        <Icon
+          icon="bi:play-circle-fill"
+          className="absolute opacity-75 ml-2 mt-6 w-6 h-6"
+        />
       )}
-      <div className="flex flex-col space-y-1 mt-1">
-        <span className="font-medium text-left truncate w-48 md:w-56 sm:w-96 flex overflow-hidden">
+      <div className="flex flex-col hover:underline mt-1">
+        <span className="font-normal opacity-75 text-sm text-left truncate w-32 md:w-48 sm:w-56 flex overflow-hidden">
           {name}
-        </span>
-        <span className="text-base opacity-75 text-left truncate w-48 md:w-56 sm:w-96">
+          <br />
           {ar}
         </span>
       </div>

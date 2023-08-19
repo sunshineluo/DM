@@ -1,10 +1,8 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useState, useEffect, useContext } from "react";
-import { Icon } from "@iconify/react";
 import { SongIdsContext } from "@/components/SongIdsContext";
-import LazyLoad from 'react-lazy-load';
-import SongButton from "@/components/SongButton";
+import FullSongButton from "@/components/FullSongButton";
 
 export default function Newsongs() {
   const router = useRouter();
@@ -19,12 +17,12 @@ export default function Newsongs() {
   const fetchNewSongs = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch("https://cf233.eu.org/top/song?type=0");
+      const response = await fetch("https://cf233.eu.org/personalized/newsong");
       const data = await response.json();
       if (data && data.code === 200) {
-        setNewSongs(data.data);
-        setSongIds(data.data.map((song) => song.id));
-        fetchSongDetails(data.data.map((song) => song.id));
+        setNewSongs(data.result);
+        setSongIds(data.result.map((song) => song.id));
+        fetchSongDetails(data.result.map((song) => song.id));
       }
     } catch (error) {
       console.error("An error occurred while fetching new songs:", error);
@@ -39,7 +37,7 @@ export default function Newsongs() {
       const data = await response.json();
       if (data && data.code === 200) {
         setSongDetails(data.songs);
-        console.log(songDetails)
+        console.log(songDetails);
       }
       setIsLoading(false);
     } catch (error) {
@@ -56,34 +54,31 @@ export default function Newsongs() {
     addToPlaylist(trackId);
   };
   return (
-    <div className="max-w-7xl mx-auto px-0 py-8 overflow-hidden">
+    <div className="max-w-7xl mx-auto px-0 md:px-6 sm:px-6 py-8 mb-20 overflow-hidden">
       <Head>
         <title>新歌速递</title>
       </Head>
 
-      <h2 className="px-6 text-neutral-700 dark:text-neutral-300 font-medium text-lg md:text-xl sm:text-2xl">
+      <h1 className="px-6 md:px-0 sm:px-0 font-semibold text-2xl md:text-3xl sm:text-4xl">
         新歌速递
-      </h2>
-
-      <div className="px-0 md:px-6 sm:px-6 mt-6 mb-16 w-full">
+      </h1>
+      <hr className="border-neutral-200 dark:border-neutral-800 my-3" />
+      <div className="columns-2 md:columns-4 sm:columns-5 mt-6 px-6 md:px-0 sm:px-0">
         {songDetails &&
-          songDetails.map((track, index) => (
-            <SongButton
-            key={track.id}
-            index={index}
-            id={track.id}
-            name={track.name}
-            duration={track.dt}
-            ar={track.ar.map((artist) => artist.name).join(" / ")}
-            picUrl={track.al.picUrl}
-          />
-          ))}
+          songDetails
+            .slice(0, 12)
+            .map((track, index) => (
+              <FullSongButton
+                key={track.id}
+                index={index}
+                id={track.id}
+                name={track.name}
+                duration={track.durationTime}
+                ar={track.ar.map((artist) => artist.name).join(" / ")}
+                picUrl={track.al.picUrl}
+              />
+            ))}
       </div>
-      {isLoading && (
-        <p className="flex flex-row px-6 md:px-6 sm:px-6 justify-start -mt-6">
-          <Icon icon="eos-icons:loading" className="w-8 h-8" />
-        </p>
-      )}
     </div>
   );
 }

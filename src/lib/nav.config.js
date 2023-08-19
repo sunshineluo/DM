@@ -1,7 +1,11 @@
 const nav = [
   {
+    title: "浏览",
+    href: "/browse",
+  },
+  {
     title: "现在就听",
-    href: "/",
+    href: "/listen-now",
   },
   {
     title: "私人FM",
