@@ -11,9 +11,7 @@ export default function Highquality() {
     const fetchHighQualityPlaylists = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch(
-          `https://cf233.eu.org/personalized`
-        );
+        const response = await fetch(`https://cf233.eu.org/personalized`);
         const data = await response.json();
         if (data && data.code === 200) {
           setPlaylists(data.result);
@@ -43,6 +41,7 @@ export default function Highquality() {
         {playlists.length > 0 &&
           playlists.map((pl, index) => (
             <PlaylistCard
+              key={pl.id}
               index={index}
               picUrl={pl.picUrl}
               name={pl.name}

@@ -264,6 +264,7 @@ const MusicSearch = () => {
           !isLoading &&
           artistDetail.map((artist, index) => (
             <ArtistCard
+              key={artist.id}
               index={index}
               id={artist.id}
               picUrl={artist.picUrl}
@@ -277,6 +278,7 @@ const MusicSearch = () => {
         {playlistDetail.length > 0 &&
           playlistDetail.map((pl, index) => (
             <PlaylistCard
+              key={pl.id}
               index={index}
               picUrl={pl.coverImgUrl}
               name={pl.name}
@@ -291,6 +293,7 @@ const MusicSearch = () => {
           !isLoading &&
           albumDetail.map((al, index) => (
             <AlbumCard
+              key={al.id}
               index={index}
               picUrl={al.picUrl}
               name={al.name}
@@ -304,6 +307,7 @@ const MusicSearch = () => {
           !isLoading &&
           mvDetail.map((track, index) => (
             <MvCard
+              key={track.id}
               index={index}
               id={track.id}
               name={track.name}
