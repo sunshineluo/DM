@@ -259,7 +259,7 @@ const MusicSearch = () => {
 
       {songDetail && !isLoading && <Heading id="artist">艺术家</Heading>}
       <hr className="border-neutral-200 dark:border-neutral-800 my-3" />
-      <div className="my-4 columns-3 md:columns-4 sm:columns-5">
+      <div className="px-6 md:px-0 sm:px-0 my-4 flex flex-row space-x-[-64px] overflow-x-auto">
         {artistDetail &&
           !isLoading &&
           artistDetail.map((artist, index) => (
@@ -288,7 +288,7 @@ const MusicSearch = () => {
       </div>
       {songDetail && !isLoading && <Heading id="album">专辑</Heading>}
       <hr className="border-neutral-200 dark:border-neutral-800 my-3" />
-      <div className="my-4 columns-1 md:columns-2 sm:columns-3">
+      <div className="px-6 md:px-0 sm:px-0 my-4 columns-1 md:columns-2 sm:columns-3">
         {albumDetail &&
           !isLoading &&
           albumDetail.map((al, index) => (

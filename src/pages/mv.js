@@ -5,6 +5,8 @@ import moment from "moment";
 import { Icon } from "@iconify/react";
 import Head from "next/head";
 import LazyLoad from "react-lazy-load";
+import Heading from "@/components/Heading";
+import CommentCard from "@/components/CommentCard";
 
 const Mv = () => {
   const [mvData, setMvData] = useState(null);
@@ -76,58 +78,31 @@ const Mv = () => {
       )}
 
       {mvData && (
-        <div className="px-6 md:px-8 sm:px-8 py-4 md:py-8 sm:py-8 mt-6 rounded-none md:rounded-xl sm:rounded-xl bg-neutral-200 dark:bg-neutral-800">
-          <h2 className="text-neutral-700 dark:text-neutral-300 font-medium text-lg md:text-xl sm:text-2xl">
+        <div className="mt-8 px-6 md:px-0 sm:px-0">
+          <h2 className="font-semibold text-2xl md:text-3xl sm:text-4xl">
             {mvData.name}
           </h2>
-          <div className="flex flex-row space-x-6 opacity-75 mt-2">
+          <div className="flex flex-row space-x-6 opacity-75 mt-4">
             <p>{mvData.artistName}</p>
             <p>{moment(mvData.publishTime).format("YYYY年MM月DD日")}</p>
           </div>
         </div>
       )}
 
-      {isLoading && (
-        <p className="flex flex-row justify-start -mt-6">
-          <Icon icon="eos-icons:loading" className="w-8 h-8" />
-        </p>
-      )}
       <div className="mt-8">
-        <h2 className="mb-6 px-6 md:px-0 sm:px-0 text-neutral-700 dark:text-neutral-300 font-medium text-lg md:text-xl sm:text-2xl">
-          评论({mvComments.length})
-        </h2>
-        {mvComments.map((comment, index) => (
-          <div key={index}>
-            <div
-              className={`flex flex-row space-x-4 w-full rounded-none md:rounded-xl sm:rounded-xl px-6 py-4 ${
-                index % 2 === 0 ? "bg-neutral-200 dark:bg-neutral-800" : "odd"
-              }`}
-            >
-              <LazyLoad offset={100}>
-                <img
-                  src={comment.user.avatarUrl}
-                  className="rounded-full w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
-                />
-              </LazyLoad>
-
-              <div className="flex flex-col space-y-1 mt-1">
-                <span className="font-medium text-left text-base md:text-lg sm:text-xl truncate w-56 md:w-[27.5rem] sm:w-[36rem]">
-                  {comment.content}
-                </span>
-                <span className="mt-2 text-xs md:text-sm sm:text-base opacity-75 truncate w-64 md:w-96 sm:w-96">
-                  {comment.user.nickname} 评论于{" "}
-                  {moment(comment.time).format("YYYY年MM月DD日")}
-                </span>
-              </div>
-            </div>
-          </div>
-        ))}
-
-        {isCommentsLoading && (
-          <p className="flex flex-row justify-start mt-6">
-            <Icon icon="eos-icons:loading" className="w-8 h-8" />
-          </p>
-        )}
+        <Heading>评论({mvComments.length})</Heading>
+        <div className="mt-2">
+          {mvComments.map((comment, index) => (
+            <CommentCard
+              key={index}
+              content={comment.content}
+              index={index}
+              user={comment.user.nickname}
+              avatar={comment.user.avatarUrl}
+              time={comment.time}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

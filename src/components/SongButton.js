@@ -27,7 +27,7 @@ export default function SongButton({ id, picUrl, index, name, ar, duration }) {
   return (
     <button
       key={id}
-      className={`flex flex-row space-x-4 w-full rounded-none md:rounded-xl sm:rounded-xl focus:bg-red-600 px-6 py-4 ${
+      className={`flex flex-row space-x-4 w-full rounded-none md:rounded-xl sm:rounded-xl focus:bg-red-600 px-4 py-4 ${
         index % 2 === 0 && id !== playingSongId
           ? "focus:bg-red-600  bg-neutral-200/25 hover:bg-neutral-200 dark:bg-neutral-800/25 dark:hover:bg-neutral-800"
           : "hover:bg-neutral-200 dark:hover:bg-neutral-800 focus:bg-red-600 "

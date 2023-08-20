@@ -42,7 +42,7 @@ export default function App({ Component, pageProps }) {
     <ThemeProvider attribute="class">
       <SongIdsProvider>
         <Navbar />
-        <div className="py-12 md:py-0 sm:py-0">
+        <div className="py-12 md:py-4 sm:py-0">
           <Component {...pageProps} />
         </div>
         <Player full="false" />

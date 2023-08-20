@@ -15,7 +15,10 @@ export default function PlaylistCard({ index, id, picUrl, name }) {
       className="flex flex-col space-y-2 mb-2"
     >
       <LazyLoad offset={100}>
-        <img src={picUrl} className="rounded-xl hover:opacity-75 shadow-md" />
+        <img
+          src={picUrl}
+          className="rounded-xl hover:opacity-75 shadow-md w-72 md:w-80 sm:w-80  h-72 md:h-80 sm:h-80"
+        />
       </LazyLoad>
       <h1 className="w-72 md:w-80 sm:w-80 text-left text-sm opacity-75 font-normal hover:underline mb-4">
         {name}

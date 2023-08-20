@@ -13,9 +13,9 @@ function cn(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function Player({ ids, full }) {
+export default function Player() {
   const [lyrics, setLyrics] = useState([]);
-  const [isFull, setIsFull] = useState(full);
+  const [isFull, setIsFull] = useState("false");
   const [highlightedLine, setHighlightedLine] = useState("");
   const [highlightedLineTimestamp, setHighlightedLineTimestamp] = useState("");
   const { songIds, currentSongIndex, setCurrentSongIndex } =
@@ -417,228 +417,18 @@ export default function Player({ ids, full }) {
         onEnded={handleEnded}
         className="fixed top-0 hidden"
       />
-      <motion.div
-        initial={{ y: 0 }}
-        animate={{
-          y: isFull === "true" ? [0, 1500] : [1500, 0],
-        }}
-        transition={{
-          duration: 0.75,
-          delay: isFull === "true" ? 0.25 : 0,
-        }}
-        className="fixed bottom-0 w-full overflow-x-auto bg-neutral-200/75 dark:bg-neutral-800/75 backdrop-blur-lg border-t-[1.5px] border-t-neutral-200/50 dark:border-t-neutral-800/50"
-      >
-        <div className="max-w-7xl mx-auto px-0 md:px-8 sm:px-8">
-          {songInfo &&
-            songInfo.length > 0 &&
-            songInfo.map((song) => (
-              <div key={song.id} className="flex flex-row overflow-x-auto">
-                <div className="flex flex-row space-y-4 space-x-2 md:space-x-4 sm:space-x-4">
-                  <div className="py-2 md:py-4 sm:py-4 flex flex-row space-x-4 px-6 md:px-4 sm:px-4 w-56 md:w-72 sm:w-72">
-                    <img
-                      key={song.id}
-                      src={song.al.picUrl}
-                      alt="Album Cover"
-                      onClick={() => setIsFull("true")}
-                      className="rounded-xl w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16 cursor-pointer"
-                    />
-                    <div className="flex flex-col space-y-1 mt-1 ">
-                      <span className="text-base font-semibold text-center w-32 md:w-72 sm:w-96 flex-nowrap flex truncate">
-                        {song.name}
-                      </span>
-                      <span className="text-base  font-medium opacity-75 text-left w-32 md:w-72 sm:w-96 truncate flex-nowrap flex">
-                        {song.ar.map((artist) => artist.name).join(" / ")}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="py-0 md:py-4 sm:py-4 flex flex-col space-y-1 justify-center w-full">
-                    {" "}
-                    <div className="flex flex-row space-x-4 w-56 md:w-96 sm:w-96 justify-between text-neutral-700 dark:text-neutral-300 px-6 md:px-8 sm:px-10">
-                      {" "}
-                      <div className="flex flex-row space-x-4">
-                        <button onClick={handlePlayMode}>
-                          {playMode === "default" && (
-                            <Icon
-                              icon="bi:repeat"
-                              className="w-4 md:w-6 sm:w-6 h-6 opacity-75"
-                            />
-                          )}
-                          {playMode === "loop" && (
-                            <Icon
-                              icon="bi:repeat-1"
-                              className="w-4 md:w-6 sm:w-6 h-6 opacity-75"
-                            />
-                          )}
-                          {playMode === "shuffle" && (
-                            <Icon
-                              icon="bi:shuffle"
-                              className="w-4 md:w-6 sm:w-6 h-6 opacity-75"
-                            />
-                          )}
-                        </button>
-                        <button onClick={toggleLikeMusic}>
-                          {isLiked ? (
-                            <Icon
-                              icon="bi:heart-fill"
-                              className="w-4 md:w-6 sm:w-6 h-6 opacity-75"
-                            />
-                          ) : (
-                            <Icon
-                              icon="bi:heart"
-                              className="w-4 md:w-6 sm:w-6 h-6 opacity-75"
-                            />
-                          )}
-                        </button>
-                      </div>
-                      <div className="w-[57.5%] md:w-[45%] sm:w-[45%] mx-auto">
-                        <div className="mx-auto flex flex-row justify-between space-x-4 z-30">
-                          <button
-                            onClick={() =>
-                              setCurrentSongIndex(
-                                (currentSongIndex - 1 + songIds.length) %
-                                  songIds.length
-                              )
-                            }
-                          >
-                            <Icon
-                              className="font-bold w-7 md:w-9 sm:w-9 h-9  opacity-80 hover:opacity-100"
-                              icon="bi:rewind-fill"
-                            />
-                          </button>
-                          <button onClick={() => setIsPlaying(!isPlaying)}>
-                            {isPlaying === true ? (
-                              <Icon
-                                className="font-bold w-7 md:w-9 sm:w-9 h-9 "
-                                icon="clarity:pause-solid"
-                              />
-                            ) : (
-                              <Icon
-                                className="font-bold w-7 md:w-9 sm:w-9 h-9 "
-                                icon="clarity:play-solid"
-                              />
-                            )}
-                          </button>
-                          <button
-                            onClick={() =>
-                              setCurrentSongIndex(
-                                (currentSongIndex + 1) % songIds.length
-                              )
-                            }
-                          >
-                            <Icon
-                              className="font-bold w-7 md:w-9 sm:w-9 h-9 opacity-80 hover:opacity-100"
-                              icon="bi:fast-forward-fill"
-                            />
-                          </button>
-                        </div>
-                      </div>
-                      <Dialog.Root>
-                        <div className="flex flex-row space-x-4">
-                          <button>
-                            <Icon
-                              className="hidden font-bold w-7 md:w-9 sm:w-9 h-9 opacity-80 hover:opacity-100"
-                              icon="bi:fast-forward-fill"
-                            />
-                          </button>
-                          <Dialog.Trigger asChild>
-                            <button>
-                              <Icon
-                                icon="bi:card-list"
-                                className="w-4 md:w-6 sm:w-6 h-6 opacity-75"
-                              />
-                            </button>
-                          </Dialog.Trigger>
-                        </div>
-                        <Dialog.Portal>
-                          <Dialog.Overlay className="DialogOverlay bg-black/25 backdrop-blur-3xl" />
-                          <Dialog.Content className="DialogContent fixed max-w-4xl mx-auto w-full h-screen bg-neutral-100 dark:bg-neutral-900 overflow-y-auto backdrop-blur-lg z-[999]">
-                            <Dialog.Title className="DialogTitle font-medium text-3xl">
-                              播放列表({playlistDetails.length})
-                            </Dialog.Title>
-
-                            <div className="flex flex-row justify-between text-red-600 dark:text-red-400 mt-6 px-3">
-                              <button onClick={handlePlayAll}>播放全部</button>
-                              <button onClick={handleRemoveAll}>
-                                删除全部
-                              </button>
-                            </div>
-
-                            <div className="flex flex-col justify-start mt-4 overflow-y-auto">
-                              {playlistDetails.length > 0 &&
-                                playlistDetails.map((track, index) => {
-                                  const handleDeleteSong = (id) => {
-                                    // 在这里处理删除操作，使用传入的id参数
-                                    removeFromPlaylist(id);
-                                  };
-                                  return (
-                                    <div key={track.id}>
-                                      <div
-                                        key={track.id}
-                                        className={`cursor-pointer flex flex-row justify-between w-full rounded-xl px-6 py-4 ${
-                                          index % 2 === 0
-                                            ? "bg-neutral-200 dark:bg-neutral-800"
-                                            : "odd"
-                                        }`}
-                                      >
-                                        <div
-                                          onClick={() =>
-                                            handleAddToPlaylist(track.id)
-                                          }
-                                          className="flex flex-row space-x-4"
-                                        >
-                                          <img
-                                            src={track.al.picUrl}
-                                            className="rounded-xl w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
-                                          />
-                                          <div className="flex flex-col space-y-1 mt-1">
-                                            <span className="font-medium text-left w-full flex-nowrap flex overflow-hidden">
-                                              {track.name}
-                                            </span>
-                                            <span className="text-base opacity-75 text-left truncate w-48 md:w-96 sm:w-96">
-                                              {track.ar
-                                                .map((artist) => artist.name)
-                                                .join(" / ")}
-                                            </span>
-                                          </div>
-                                        </div>
-                                        <button
-                                          onClick={() =>
-                                            handleDeleteSong(track.id)
-                                          }
-                                          className="text-red-600 dark:text-red-400 w-24 md:w-16 sm:w-8 text-right"
-                                        >
-                                          删除
-                                        </button>
-                                      </div>
-                                    </div>
-                                  );
-                                })}
-                            </div>
-                          </Dialog.Content>
-                        </Dialog.Portal>
-                      </Dialog.Root>
-                    </div>
-                    <div></div>
-                  </div>
-                </div>
-              </div>
-            ))}
-        </div>
-      </motion.div>
 
       <motion.div
-        initial={{ y: 1145, borderRadius: 0 }}
-        animate={{
-          y: isFull === "true" ? [1500, 0] : [0, 1500],
-          borderRadius: isFull === "true" ? [20, 0] : 0,
-        }}
+        initial={{ y: 0, borderRadius: 0 }}
         transition={{
           type: "spring",
           duration: 0.75,
         }}
         className={cn(
-          "fixed top-0 w-full h-screen min-h-screen max-h-screen",
-          isFull === "true" && "z-[99999]"
+          "fixed transition-all duration-500 ",
+          isFull === "true"
+            ? "z-[99999] top-0 w-full h-screen"
+            : "bottom-0 w-full"
         )}
       >
         <div>
@@ -647,32 +437,68 @@ export default function Player({ ids, full }) {
               key={song.id}
               src={song.al.picUrl}
               alt="Album Cover"
-              className="bg-no-repeat absolute h-screen z-[-1] left-0 top-0 inset-x-0 right-0 w-full"
+              className={cn(
+                isFull === "true"
+                  ? "bg-no-repeat absolute h-screen z-[-1] left-0 top-0 inset-x-0 right-0 w-full"
+                  : "hidden"
+              )}
             />
           ))}
         </div>
-        <div className="flex flex-row w-full h-screen bg-neutral-100/75 dark:bg-neutral-900/75 backdrop-blur-3xl overflow-y-hidden md:overflow-y-auto sm:overflow-y-auto">
+        <div
+          className={cn(
+            "transition-all duration-500 flex flex-row overflow-y-hidden md:overflow-y-auto sm:overflow-y-auto",
+            isFull === "true"
+              ? "bg-neutral-100/75 dark:bg-neutral-900/75 backdrop-blur-3xl h-screen"
+              : "w-full overflow-x-auto bg-neutral-100/75 dark:bg-neutral-900/75 backdrop-blur-3xl border-t-[1.5px] border-t-neutral-200/50 dark:border-t-neutral-800/50"
+          )}
+        >
           <div
             className={cn(
-              "transition-all duration-500 w-full md:w-1/2 sm:w-1/2 min-h-screen left-0 right-0 z-[99999] select-none bottom-0 overflow-y-auto",
+              "transition-all duration-500 select-none bottom-0 ",
               !display
                 ? "top-0 md:top-0 sm:top-0 w-screen"
-                : "fixed md:relative sm:relative top-0 py-0 md:py-6 sm:py-0 "
+                : "fixed md:relative sm:relative top-0 py-0 md:py-6 sm:py-0",
+              isFull === "true"
+                ? "z-[99999] min-h-screen w-full md:w-1/2 sm:w-1/2 overflow-y-auto left-0 right-0 "
+                : "max-w-7xl w-full mx-auto z-50"
             )}
           >
             {songInfo.map((song) => (
               <div
                 key={song.id}
-                className="flex flex-col mx-auto h-screen px-6 md:px-8 sm:px-0"
+                className={cn(
+                  "transition-all duration-500",
+                  isFull === "true"
+                    ? "mx-auto flex flex-col h-screen px-6 md:px-8 sm:px-0"
+                    : "flex flex-row px-0 md:px-4 sm:px-4 py-2 md:py-0 sm:py-3"
+                )}
               >
-                <div key={song.id} className="mx-auto">
+                <div
+                  key={song.id}
+                  className={cn(
+                    "transition-all duration-500",
+                    isFull === "true" ? "mx-auto" : "flex flex-row space-x-4"
+                  )}
+                >
                   <button
-                    className="z-[10000000] flex text-center mx-auto" 
-                    onClick={() => setIsFull("false")}
+                    className={cn(
+                      "transition-all duration-500 z-[10000000] text-center mx-auto",
+                      isFull === "true" ? "flex" : "hidden"
+                    )}
+                    onClick={() =>
+                      setIsFull(isFull === "true" ? "false" : "true")
+                    }
                   >
                     <Icon
                       icon="pepicons-pop:line-x"
-                      className="items-center w-10 md:w-12 h-10 md:h-12 sm:w-16 sm:h-16 opacity-75 text-neutral-700 dark:text-neutral-300"
+                      className={cn(
+                        "items-center text-neutral-700 dark:text-neutral-300",
+                        display ? "opacity-0 md:opacity-75 sm:opacity-75" : "opacity-75 ",
+                        isFull === "true"
+                          ? "w-10 md:w-12 h-10 md:h-12 sm:w-16 sm:h-16"
+                          : "w-0 h-0"
+                      )}
                     />
                   </button>
                   <motion.img
@@ -680,14 +506,13 @@ export default function Player({ ids, full }) {
                     alt="Album Cover （PC）"
                     initial={{ scale: 1 }}
                     animate={{ scale: isPlaying ? 1 : 0.9 }}
-                    transition={{
-                      type: "spring",
-                      stiffness: 200,
-                      damping: 10,
-                    }}
+                    onClick={() => setIsFull("true")}
                     className={cn(
-                      "shadow-md mx-auto w-auto md:w-[26rem] sm:w-[28rem] object-contain item-center rounded-xl",
-                      display ? "hidden md:block sm:block" : "hidden"
+                      "shadow-md object-contain item-center rounded-xl transition-all duration-500",
+                      display ? "hidden md:block sm:block" : "hidden",
+                      isFull === "true"
+                        ? "mx-auto w-auto md:w-[26rem] sm:w-[28rem] "
+                        : "w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16 cursor-pointer"
                     )}
                   />
                   <motion.img
@@ -695,28 +520,45 @@ export default function Player({ ids, full }) {
                     alt="Album Cover （Mobile）"
                     initial={{ scale: 1 }}
                     animate={{ scale: isPlaying ? 1 : 0.9 }}
-                    transition={{
-                      type: "spring",
-                      stiffness: 200,
-                      damping: 10,
-                    }}
+                    onClick={() => setIsFull("true")}
                     className={cn(
-                      "shadow-md mx-auto w-auto md:w-[26rem] sm:w-[28rem] object-contain item-center rounded-xl",
+                      "shadow-md mx-auto w-auto md:w-[26rem] sm:w-[28rem] object-contain item-center rounded-xl transition-all duration-500",
                       !display
                         ? "opacity-100 z-0"
-                        : "block md:hidden sm:hidden pointer-events-none select-none opacity-0 z-0"
+                        : "block md:hidden sm:hidden pointer-events-none select-none opacity-0 z-0",
+                      isFull === "true"
+                        ? "mx-auto w-auto md:w-[26rem] sm:w-[28rem] "
+                        : "w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16 cursor-pointer"
                     )}
                   />
                   <div className="flex flex-row justify-between z-[99999]">
                     <div>
-                      <h1 className="font-semibold text-lg md:text-xl sm:text-xl mt-6 w-64 md:w-96 sm:w-[25.5rem] truncate">
+                      <h1
+                        className={cn(
+                          "font-semibold truncate",
+                          isFull === "true"
+                            ? "w-64 md:w-96 sm:w-[25.5rem] text-lg md:text-xl sm:text-xl mt-6 "
+                            : "w-36 md:w-56 sm:w-72 text-base md:text-lg sm:text-lg mt-1"
+                        )}
+                      >
                         {song.name}
                       </h1>
-                      <h2 className="font-semibold text-lg md:text-xl sm:text-xl opacity-75 w-64 md:w-96 sm:w-[25.5rem] truncate">
+                      <h2
+                        className={cn(
+                          "font-semibold opacity-75  truncate",
+                          isFull === "true"
+                            ? "w-64 md:w-96 sm:w-[25.5rem] text-lg md:text-xl sm:text-xl "
+                            : "w-36 md:w-56 sm:w-72 text-base md:text-lg sm:text-lg"
+                        )}
+                      >
                         {song.ar.map((artist) => artist.name).join(" / ")}
                       </h2>
                     </div>
-                    <div>
+                    <div
+                      className={cn(
+                        isFull === "true" ? "block" : "hidden w-0 z-0"
+                      )}
+                    >
                       <Dialog.Root>
                         <Menu
                           as="div"
@@ -842,8 +684,14 @@ export default function Player({ ids, full }) {
                       </Dialog.Root>
                     </div>
                   </div>
+
                   <Slider.Root
-                    className="SliderRoot mx-auto"
+                    className={cn(
+                      "transition-all duration-500 SliderRoot ",
+                      isFull === "true"
+                        ? "mx-auto"
+                        : "hidden w-0 pointer-events-none z-0"
+                    )}
                     min={0}
                     max={1}
                     step={0.01}
@@ -865,7 +713,13 @@ export default function Player({ ids, full }) {
                       />
                     </Slider.Track>
                   </Slider.Root>
-                  <div className="mx-auto mt-3 flex flex-row justify-between font-medium">
+
+                  <div
+                    className={cn(
+                      "transition-all duration-500 mx-auto mt-3 flex-row justify-between font-medium",
+                      isFull === "true" ? "flex" : "hidden z-0"
+                    )}
+                  >
                     <div className="text-xs md:text-sm sm:text-sm opacity-75">
                       {formatTime(currentTime)}
                     </div>
@@ -873,8 +727,14 @@ export default function Player({ ids, full }) {
                       -{formatTime(remainingTime)}
                     </div>
                   </div>
-                  <div className="flex flex-row justify-between text-neutral-700 dark:text-neutral-300">
-                    <div className="flex flex-row w-8">
+
+                  <div className="transition-all duration-500 flex flex-row justify-between text-neutral-700 dark:text-neutral-300">
+                    <div
+                      className={cn(
+                        "transition-all duration-500 flex flex-row ",
+                        isFull === "true" ? "w-8" : "w-0"
+                      )}
+                    >
                       <button
                         onClick={() =>
                           setPlayMode(
@@ -884,7 +744,8 @@ export default function Player({ ids, full }) {
                         className={cn(
                           "px-1",
                           playMode === "loop" &&
-                            "bg-neutral-200/50 dark:bg-neutral-600/50 my-8 rounded-md"
+                            "bg-neutral-200/50 dark:bg-neutral-600/50 rounded-md",
+                          isFull === "true" ? "my-8 " : "hidden"
                         )}
                       >
                         {playMode !== "loop" && (
@@ -921,8 +782,16 @@ export default function Player({ ids, full }) {
                         )}
                       </button>
                     </div>
-                    <div className="w-1/2 mx-auto mt-4 mb-4">
-                      <div className="mx-auto flex flex-row justify-between z-30">
+
+                    <div
+                      className={cn(
+                        "transition-all duration-500",
+                        isFull === "true"
+                          ? "mx-auto mt-4 mb-4 w-1/2 z-30"
+                          : "w-full"
+                      )}
+                    >
+                      <div className="mx-auto flex flex-row justify-between transition-all duration-500">
                         <button
                           onClick={() =>
                             setCurrentSongIndex(
@@ -934,7 +803,12 @@ export default function Player({ ids, full }) {
                           <svg
                             t="1692268477966"
                             fill="currentColor"
-                            className="icon w-10 md:w-11 sm:w-12 h-12 opacity-80 hover:opacity-100"
+                            className={
+                              ("icon z-50",
+                              isFull === "true"
+                                ? "w-10 md:w-11 sm:w-12 h-12 opacity-80 hover:opacity-100"
+                                : "w-10 md:w-11 sm:w-12 h-12 mt-2 md:mt-1 sm:mt-1 opacity-80 hover:opacity-100")
+                            }
                             viewBox="0 0 1024 1024"
                             version="1.1"
                             xmlns="http://www.w3.org/2000/svg"
@@ -966,7 +840,12 @@ export default function Player({ ids, full }) {
                             <svg
                               t="1692268156116"
                               fill="currentColor"
-                              className="icon w-12 md:w-14 sm:w-16 h-16"
+                              className={
+                                ("icon ",
+                                isFull === "true"
+                                  ? "w-12 md:w-14 sm:w-16 h-16"
+                                  : "w-10 md:w-12 sm:w-14 mt-2 md:mt-1 sm:mt-1")
+                              }
                               viewBox="0 0 1024 1024"
                               version="1.1"
                               xmlns="http://www.w3.org/2000/svg"
@@ -981,7 +860,12 @@ export default function Player({ ids, full }) {
                             <svg
                               t="1692268110901"
                               fill="currentColor"
-                              className="icon w-12 md:w-14 sm:w-16 h-16"
+                              className={
+                                ("icon ",
+                                isFull === "true"
+                                  ? "w-12 md:w-14 sm:w-16 h-16"
+                                  : "w-10 md:w-12 sm:w-14 mt-2 md:mt-1 sm:mt-1")
+                              }
                               viewBox="0 0 1024 1024"
                               version="1.1"
                               xmlns="http://www.w3.org/2000/svg"
@@ -1004,7 +888,12 @@ export default function Player({ ids, full }) {
                           <svg
                             t="1692268552716"
                             fill="currentColor"
-                            className="icon w-10 md:w-11 sm:w-12 h-12 opacity-80 hover:opacity-100"
+                            className={
+                              ("icon",
+                              isFull === "true"
+                                ? "w-10 md:w-11 sm:w-12 h-12 opacity-80 hover:opacity-100"
+                                : "w-10 md:w-11 sm:w-12 h-12 mt-2 md:mt-1 sm:mt-1 opacity-80 hover:opacity-100")
+                            }
                             viewBox="0 0 1024 1024"
                             version="1.1"
                             xmlns="http://www.w3.org/2000/svg"
@@ -1024,7 +913,13 @@ export default function Player({ ids, full }) {
                         </button>
                       </div>
                     </div>
-                    <div className="flex flex-row w-8">
+
+                    <div
+                      className={cn(
+                        "transition-all duration-500 flex flex-row ",
+                        isFull === "true" ? "w-8" : "w-0"
+                      )}
+                    >
                       <button
                         onClick={() =>
                           setPlayMode(
@@ -1034,7 +929,8 @@ export default function Player({ ids, full }) {
                         className={cn(
                           "px-1",
                           playMode === "shuffle" &&
-                            "bg-neutral-200/50 dark:bg-neutral-600/50 my-8 rounded-md"
+                            "bg-neutral-200/50 dark:bg-neutral-600/50 rounded-md",
+                          isFull === "true" ? "my-8 " : "hidden"
                         )}
                       >
                         <svg
@@ -1065,7 +961,13 @@ export default function Player({ ids, full }) {
                       </button>
                     </div>
                   </div>
-                  <div className="flex flex-row mx-auto space-x-3">
+
+                  <div
+                    className={cn(
+                      "transition-all duration-500 flex-row mx-auto space-x-3",
+                      isFull === "true" ? "flex" : "hidden"
+                    )}
+                  >
                     <button onClick={() => setVolume(0)}>
                       <Icon
                         icon="ion:volume-off"
@@ -1074,7 +976,7 @@ export default function Player({ ids, full }) {
                     </button>
 
                     <Slider.Root
-                      className="SliderRoot"
+                      className="SliderRoot transition-all duration-500"
                       min={0}
                       max={1}
                       step={0.01}
@@ -1110,10 +1012,13 @@ export default function Player({ ids, full }) {
           <AnimatePresence>
             <motion.div
               className={cn(
-                "py-12 overflow-y-auto select-none z-[99999]",
+                "py-12 overflow-y-auto select-none ",
                 !display
                   ? "hidden"
-                  : "z-[99999] block h-[50vh] md:h-screen sm:h-screen px-4 left-0 right-0 w-full md:w-1/2 sm:w-1/2"
+                  : "z-[99999] block h-[50vh] md:h-screen sm:h-screen px-4 left-0 right-0 w-full md:w-1/2 sm:w-1/2",
+                isFull === "true"
+                  ? "block z-[99999]"
+                  : "hidden z-0 pointer-events-none"
               )}
             >
               <div ref={lyricsContainerRef} style={{ maxHeight: "100%" }}>

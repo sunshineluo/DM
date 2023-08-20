@@ -59,7 +59,7 @@ export default function FullSongButton({ id, picUrl, index, name, ar }) {
         />
       )}
       <div className="flex flex-col hover:underline mt-1">
-        <span className="font-normal opacity-75 text-sm text-left truncate w-32 md:w-48 sm:w-56 flex overflow-hidden">
+        <span className="font-normal opacity-75 text-sm text-left truncate w-40 md:w-48 sm:w-56 flex overflow-hidden">
           {name}
           <br />
           {ar}

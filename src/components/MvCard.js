@@ -17,10 +17,10 @@ export default function MvCard({ index, id, picUrl, name, ar }) {
       <LazyLoad offset={100}>
         <img
           src={picUrl}
-          className="rounded-xl hover:opacity-75 w-80 md:w-96 sm:w-96 h-48 md:h-56 sm:h-56 shadow-md"
+          className="rounded-xl hover:opacity-75 w-80 md:w-96 sm:w-96 h-56 md:h-64 sm:h-64 shadow-md"
         />
       </LazyLoad>
-      <h1 className="w-72 md:w-80 sm:w-80 text-left text-sm opacity-75 font-normal hover:underline">
+      <h1 className="w-80 md:w-96 sm:w-96 text-left text-sm opacity-75 font-normal hover:underline">
         {name}
         <br />
         {ar}

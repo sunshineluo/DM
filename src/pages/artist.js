@@ -1,53 +1,112 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useRouter } from "next/router";
-import moment from "moment";
 import { Icon } from "@iconify/react";
 import Head from "next/head";
-import SongButton from "@/components/SongButton";
 import LazyLoad from "react-lazy-load";
-import ReadMore from "@/components/ReadMore";
 import Heading from "@/components/Heading";
+import SongButton from "@/components/SongButton";
+import ArtistCard from "@/components/ArCard";
+import MvCard from "@/components/MvCard";
+import AlbumCard from "@/components/AlbumCard";
 
 const Artist = () => {
   const [arData, setArData] = useState(null);
   const [arSongs, setArSongs] = useState(null);
+  const [arMVs, setArMVs] = useState(null);
+  const [arAlbums, setArAlbums] = useState(null);
+  const [similarArtists, setSimilarArtists] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { id } = router.query;
 
-  const getArDetail = async () => {
-    try {
-      setIsLoading(true);
-      const response = await axios.get(
-        `https://cf233.eu.org/artist/detail?id=${id}`
-      );
-      if (response.data.code === 200) {
-        setArData(response.data.data.artist);
-        console.log(arData);
-      }
-    } catch (error) {
-      console.log("An error occurred while fetching Ar data:", error);
-    }
-  };
-
-  const getArSongs = async () => {
-    try {
-      const response = await axios.get(
-        `https://cf233.eu.org/artist/top/song?id=${id}`
-      );
-      if (response.data.code === 200) {
-        setArSongs(response.data.songs);
-        setIsLoading(false);
-      }
-    } catch (error) {
-      console.log("An error occurred while fetching ArSongs:", error);
-    }
-  };
-
   useEffect(() => {
-    getArDetail();
-    getArSongs();
+    if (id) {
+      const getArDetail = async () => {
+        try {
+          setIsLoading(true);
+          const arDataResponse = await axios.get(
+            `https://cf233.eu.org/artist/detail?id=${id}`
+          );
+          if (arDataResponse.data.code === 200) {
+            setArData(arDataResponse.data.data.artist);
+          }
+        } catch (error) {
+          console.error("An error occurred while fetching Ar data:", error);
+        }
+      };
+
+      const getArSongs = async () => {
+        try {
+          const arSongsResponse = await axios.get(
+            `https://cf233.eu.org/artist/top/song?id=${id}`
+          );
+          if (arSongsResponse.data.code === 200) {
+            setArSongs(arSongsResponse.data.songs);
+          }
+        } catch (error) {
+          console.error("An error occurred while fetching ArSongs:", error);
+        }
+      };
+
+      const getArMVs = async () => {
+        try {
+          const arMVsResponse = await axios.get(
+            `https://cf233.eu.org/artist/mv?id=${id}`
+          );
+          if (arMVsResponse.data.code === 200) {
+            setArMVs(arMVsResponse.data.mvs);
+          }
+        } catch (error) {
+          console.error("An error occurred while fetching ArMVs:", error);
+        }
+      };
+
+      const getArAlbums = async () => {
+        try {
+          const arAlbumsResponse = await axios.get(
+            `https://cf233.eu.org/artist/album?id=${id}&limit=5`
+          );
+          if (arAlbumsResponse.data.code === 200) {
+            setArAlbums(arAlbumsResponse.data.hotAlbums);
+          }
+        } catch (error) {
+          console.error("An error occurred while fetching ArAlbums:", error);
+        }
+      };
+
+      const getSimilarArtists = async () => {
+        try {
+          const similarArtistsResponse = await axios.get(
+            `https://cf233.eu.org/simi/artist?id=${id}`,
+            {
+              withCredentials: true,
+            }
+          );
+          if (similarArtistsResponse.data.code === 200) {
+            setSimilarArtists(similarArtistsResponse.data.artists);
+            console.log(similarArtists);
+          }
+        } catch (error) {
+          console.error(
+            "An error occurred while fetching SimilarArtists:",
+            error
+          );
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      getArDetail();
+      getArSongs();
+      getArMVs();
+      getArAlbums();
+      getSimilarArtists();
+    }
+
+    return () => {
+      // 清理函数
+    };
   }, [id]);
 
   return (
@@ -64,38 +123,107 @@ const Artist = () => {
               />
             </LazyLoad>
           </div>
-          <div className="absolute flex flex-row -mt-80 md:-mt-24 sm:-mt-24 px-6 md:px-12 sm:px-12 space-x-4 py-2 text-white text-2xl md:text-3xl sm:text-4xl">
+          <div className="absolute flex flex-row -mt-96 md:-mt-24 sm:-mt-24 px-6 md:px-8 sm:px-12 space-x-4 py-2 text-white text-2xl md:text-3xl sm:text-4xl">
             <Icon
               icon="bi:play-circle-fill"
-              className="text-red-600 bg-white rounded-full cursor-pointer mt-5"
+              className="text-red-600 cursor-pointer mt-5"
             />
             <h1 className="font-semibold mt-4">{arData.name}</h1>
           </div>
         </div>
       )}
-      <br />
-      <Heading>歌手50首热门单曲</Heading>
 
-      <div className="px-0 mt-6 mb-16 w-full">
-        {arSongs &&
-          arSongs.map((track, index) => (
-            <SongButton
-              key={track.id}
-              index={index}
-              id={track.id}
-              name={track.name}
-              duration={track.dt}
-              ar={track.ar.map((artist) => artist.name).join(" / ")}
-              picUrl={track.al.picUrl}
-            />
-          ))}
-      </div>
-
-      {isLoading && (
-        <p className="flex flex-row px-6 md:px-0 sm:px-0 justify-start -mt-6">
-          <Icon icon="eos-icons:loading" className="w-8 h-8" />
+      <>
+        <p className="-mt-56 md:mt-12 sm:mt-12 px-6 md:px-0 sm:px-0 flex flex-row overflow-x-auto space-x-3 text-sm opacity-75">
+          <a href="#song" className="hover:underline">
+            歌手50首热门单曲
+          </a>
+          <a href="#mv" className="hover:underline">
+            歌手MV
+          </a>
+          <a href="#album" className="hover:underline">
+            歌手专辑
+          </a>
+          <a href="#related" className="hover:underline">
+            相关歌手
+          </a>
         </p>
-      )}
+        <div className="mt-6">
+          <Heading id="song">歌手50首热门单曲</Heading>
+        </div>
+
+        <div className="px-0 mt-8 w-full">
+          {arSongs &&
+            arSongs.map((track, index) => (
+              <SongButton
+                key={track.id}
+                index={index}
+                id={track.id}
+                name={track.name}
+                duration={track.dt}
+                ar={track.ar.map((artist) => artist.name).join(" / ")}
+                picUrl={track.al.picUrl}
+              />
+            ))}
+        </div>
+
+        <div className="mt-6">
+          <Heading id="mv">歌手MV</Heading>
+        </div>
+        <div className="px-0 mt-8 w-full">
+          <div className="px-6 md:px-0 sm:px-0 my-4 columns-1 md:columns-2 sm:columns-3">
+            {arMVs &&
+              arMVs.map((track, index) => (
+                <MvCard
+                  key={track.id}
+                  index={index}
+                  id={track.id}
+                  name={track.name}
+                  picUrl={track.imgurl}
+                  ar={Array.from(track.artist)
+                    .map((artist) => artist.name)
+                    .join(" / ")}
+                />
+              ))}
+          </div>
+        </div>
+
+        <div className="mt-6">
+          <Heading id="album">歌手专辑</Heading>
+        </div>
+        <div className="px-0 mt-8 w-full">
+          <div className="my-4 columns-1 md:columns-2 sm:columns-3">
+            {arAlbums &&
+              arAlbums.map((al, index) => (
+                <AlbumCard
+                  key={al.id}
+                  index={index}
+                  picUrl={al.picUrl}
+                  name={al.name}
+                  id={al.id}
+                />
+              ))}
+          </div>
+        </div>
+
+        <div className="mt-6">
+          <Heading id="related">相关歌手</Heading>
+        </div>
+        <div className="px-0 mt-8 w-full">
+          <div className="px-6 md:px-0 sm:px-0 my-4 flex flex-row space-x-[-64px] overflow-x-auto">
+            {similarArtists &&
+              similarArtists.map((artist, index) => (
+                <ArtistCard
+                  key={artist.id}
+                  picUrl={artist.picUrl}
+                  name={artist.name}
+                  id={artist.id}
+                  index={index}
+                />
+              ))}
+          </div>
+        </div>
+      </>
     </div>
   );
 };

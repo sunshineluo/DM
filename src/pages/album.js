@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useContext } from "react";
-import axios from "axios";
 import { useRouter } from "next/router";
 import moment from "moment";
 import { Icon } from "@iconify/react";
@@ -7,29 +6,32 @@ import Head from "next/head";
 import { SongIdsContext } from "@/components/SongIdsContext";
 import LazyLoad from "react-lazy-load";
 import SongButton from "@/components/SongButton";
+import ReadMore from "@/components/ReadMore";
 
 const Album = () => {
   const router = useRouter();
   const id = router.query.id || null;
-  const [albumDetail, setAlbumDetail] = useState(null);
+  const [albumDetail, setAlbumDetail] = useState([]);
   const [albumTrack, setAlbumTrack] = useState(null);
   const [searchTerm, setSearchTerm] = useState(""); // 搜索关键词状态
 
-  const filteredTracks = albumTrack
-    ? albumTrack.filter((track) =>
-        track.name.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    : [];
+  const Track =
+    albumDetail !== null && albumDetail.songs !== null && albumDetail.songs;
+
+  const filteredTracks =
+    Track &&
+    Track !== null &&
+    Track.filter((track) =>
+      track.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
   const getAlbumDetail = async () => {
     try {
-      const response = await axios.get("https://cf233.eu.org/album", {
-        params: {
-          id: id,
-        },
-      });
-
-      setAlbumDetail([response.data]);
+      const response = await fetch(`https://cf233.eu.org/album?id=${id}`);
+      const data = await response.json();
+      console.log(data);
+      setAlbumDetail([data]);
+      console.log(albumDetail);
     } catch (error) {
       // 处理错误
       console.error(error);
@@ -59,7 +61,6 @@ const Album = () => {
   useEffect(() => {
     if (id !== null) {
       getAlbumDetail();
-      getAlbumTracks();
     }
   }, [id]);
 
@@ -78,50 +79,65 @@ const Album = () => {
   return (
     <div>
       <Head>
-        {albumDetail !== null &&
+        {albumDetail &&
           albumDetail.map(
             (detail, index) =>
               detail && <title key={index}>{detail.album.name}</title>
           )}
       </Head>
-      {albumDetail !== null &&
-        albumDetail.map(
-          (detail) =>
-            detail &&
-            detail.picUrl && (
-              <img
-                key={detail.id}
-                src={detail.picUrl}
-                className="fixed w-full h-screen z-[-1] blur-lg hidden"
-              />
-            )
-        )}
-      <div className="bg-neutral-100/75 dark:bg-neutral-900/75 backdrop-blur-3xl min-h-screen overflow-y-auto">
+      <div className="max-w-7xl mx-auto px-0 md:px-6 sm:px-6 py-8 mb-20 overflow-hidden">
         <div className="max-w-7xl mx-auto py-8 px-0 md:px-6 sm:px-6">
-          {albumDetail !== null &&
+          {albumDetail &&
             albumDetail.slice(0, 1).map(
               (detail, index) =>
                 detail && (
                   <div key={index}>
                     <div className="">
-                      <div className="flex flex-row space-x-4 md:space-x-6 sm:space-x-8 ml-4 md:ml-0 sm:ml-0">
-                        {detail.album.picUrl && (
-                          <LazyLoad offset={100}>
-                            <img
-                              src={detail.album.picUrl}
-                              className="rounded-xl w-24 h-24 md:h-32  md:w-32 sm:w-32 sm:h-32"
-                            />
-                          </LazyLoad>
-                        )}
-                        <div className="flex flex-col space-y-2 mt-3 md:mt-6 sm:mt-6">
-                          <h1 className="font-medium text-xl md:text-3xl sm:text-3xl">
+                      <div className="flex flex-col md:flex-row sm:flex-row space-y-6 md:space-y-0 sm:space-y-0 space-x-0 md:space-x-6 sm:space-x-8 px-6 md:px-0 sm:px-0">
+                        <div className="w-full md:w-1/3 sm:w-1/4">
+                          {detail.album.picUrl && (
+                            <LazyLoad offset={100}>
+                              <img
+                                src={detail.album.picUrl}
+                                className="rounded-xl w-full shadow-md"
+                              />
+                            </LazyLoad>
+                          )}
+                        </div>
+                        <div className="w-full md:w-2/3 sm:w-3/4 flex flex-col space-y-4">
+                          <h1 className="font-semibold text-2xl md:text-3xl sm:text-3xl">
                             {detail.album.name}
                           </h1>
-                          <p className="text-base md:text-lg sm:text-lg opacity-75">
-                            {detail.album.artists
-                              .map((artist) => artist.name)
-                              .join(" / ")}
+                          <p className="text-base md:text-lg sm:text-xl">
+                            {detail && detail.album.artists && (
+                              <span>
+                                {detail.album.artists.map((artist, index) => (
+                                  <span key={index}>
+                                    <a
+                                      className="cursor-pointer hover:underline"
+                                      onClick={() =>
+                                        router.push(`/artist?id=${artist.id}`)
+                                      }
+                                    >
+                                      {artist.name}
+                                    </a>
+                                    {index !==
+                                      detail.album.artists.length - 1 && " / "}
+                                  </span>
+                                ))}
+                              </span>
+                            )}{" "}
+                            ·{" "}
+                            <span className=" text-red-600">
+                              {moment(detail.album.publishTime).format(
+                                "YYYY年"
+                              )}
+                            </span>
                           </p>
+                          <ReadMore
+                            text={detail.album.description}
+                            maxCharCount={150}
+                          />
                         </div>
                       </div>
                     </div>
@@ -132,29 +148,31 @@ const Album = () => {
           <div className="flex flex-row justify-between">
             <div>
               <button
-                className="text-lg md:text-xl sm:text-xl mt-12 text-red-600 flex flex-row space-x-2 ml-4 md:ml-0 sm:ml-0"
+                className="text-base md:text-lg sm:text-lg mt-12 bg-red-600 text-white px-4 py-1.5 rounded-xl flex flex-row space-x-2 ml-4 md:ml-0 sm:ml-0"
                 onClick={handlePlayAll}
               >
-                <Icon icon="bi:play-circle-fill" className="mt-1 mr-1.5" />
-                播放全部
+                <svg
+                  t="1692268110901"
+                  fill="currentColor"
+                  className="icon mt-0.5 md:mt-1 sm:mt-1 mr-1 w-5 h-5"
+                  viewBox="0 0 1024 1024"
+                  version="1.1"
+                  xmlns="http://www.w3.org/2000/svg"
+                  p-id="4017"
+                >
+                  <path
+                    d="M793.6 549.802667c33.621333-19.413333 50.389333-29.098667 56.021333-41.813334a42.666667 42.666667 0 0 0 0-34.688c-5.632-12.672-22.4-22.357333-56.021333-41.770666L326.4 161.792c-33.621333-19.370667-50.389333-29.098667-64.213333-27.648a42.666667 42.666667 0 0 0-30.037334 17.365333c-8.149333 11.221333-8.149333 30.634667-8.149333 69.418667v539.477333c0 38.826667 0 58.197333 8.149333 69.418667a42.666667 42.666667 0 0 0 30.037334 17.365333c13.824 1.450667 30.592-8.277333 64.213333-27.648l467.2-269.738666z"
+                    p-id="4018"
+                  ></path>
+                </svg>
+                播放
               </button>
-            </div>
-            <div className="mt-10 flex flex-row w-1/2 md:w-1/3 sm:w-1/3">
-              <Icon
-                icon="bi:search"
-                className="absolute text-neutral-700 dark:text-neutral-300 opacity-75 w-5 h-5 mt-2.5 md:mt-3 sm:mt-3 ml-2.5"
-              />
-              <input
-                type="search"
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="搜索专辑..."
-                className="w-full px-10  py-1.5 focus:outline-none bg-neutral-50 dark:bg-neutral-950 dark:border-neutral-800 text-lg focus:ring-2 focus:ring-red-600 border-2 rounded-xl"
-              />
             </div>
           </div>
           <div className="mt-6 mb-16">
-            {filteredTracks.length > 0 || searchTerm !== "" ? (
-              filteredTracks.map((track, index) => (
+            {albumDetail &&
+              albumDetail.songs &&
+              albumDetail.songs.map((track, index) => (
                 <SongButton
                   key={track.id}
                   index={index}
@@ -164,12 +182,7 @@ const Album = () => {
                   ar={track.ar.map((artist) => artist.name).join(" / ")}
                   picUrl={track.al.picUrl}
                 />
-              ))
-            ) : (
-              <p className="flex flex-row px-6 md:px-0 sm:px-0">
-                <Icon icon="eos-icons:loading" className="w-8 h-8" />
-              </p>
-            )}
+              ))}
           </div>
         </div>
       </div>

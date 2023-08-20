@@ -4,7 +4,8 @@ import axios from "axios";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import { Icon } from "@iconify/react";
-import LazyLoad from "react-lazy-load";
+import Heading from "@/components/Heading";
+import PlaylistCard from "@/components/PlaylistCard";
 
 export default function Dashboard() {
   const [userDetail, setUserDetail] = useState([]);
@@ -78,164 +79,150 @@ export default function Dashboard() {
       <div className="max-w-7xl mx-auto px-0 py-8 overflow-y-auto mb-20">
         {userData && (
           <div>
-            <div className="flex flex-col md:flex-row sm:flex-row space-y-4 md:space-y-0 sm:space-y-0 space-x-0 md:space-x-6 sm:space-x-6">
-              <div className="w-full md:w-1/2 sm:w-1/2">
+            <div className="h-[36.5rem] overflow-hidden bg-center">
+              {userDetail.length > 0 &&
+                userDetail.map((user, index) => (
+                  <img
+                    key={index}
+                    src={user.profile.backgroundUrl}
+                    className="rounded-none md:rounded-xl sm:rounded-xl object-cover w-full"
+                  />
+                ))}
+            </div>
+            <div className="absolute flex flex-row -mt-96 md:-mt-24 sm:-mt-24 px-6 md:px-8 sm:px-12 space-x-4 py-2 text-white text-2xl md:text-3xl sm:text-4xl">
+              <Icon
+                icon="bi:patch-check-fill"
+                className="text-red-600 rounded-full cursor-pointer mt-5"
+              />
+              <h1 className="font-semibold mt-4">
                 {userDetail.length > 0 &&
                   userDetail.map((user, index) => (
-                    <img
-                      key={index}
-                      src={user.profile.backgroundUrl}
-                      className="rounded-none md:rounded-xl sm:rounded-xl"
-                    />
+                    <span key={index}>{user.profile.nickname}</span>
                   ))}
-              </div>
-              <div className="w-full md:w-1/2 sm:w-1/2 flex flex-col space-y-4">
-                <div className="flex flex-row justify-between w-full rounded-none md:rounded-xl sm:rounded-xl px-6 py-4 bg-neutral-200 dark:bg-neutral-800">
-                  <div className="flex flex-row space-x-4">
-                    {userDetail.length > 0 &&
-                      userDetail.map((user, index) => (
-                        <img
-                          key={index}
-                          src={user.profile.avatarUrl}
-                          className="rounded-full w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
-                        />
-                      ))}
-                    <div className="flex flex-row justify-between">
-                      <h1 className="font-medium text-base md:text-lg sm:text-xl mt-4">
-                        {userDetail.length > 0 &&
-                          userDetail.map((user, index) => (
-                            <span key={index}>{user.profile.nickname}</span>
-                          ))}
-                      </h1>
-                    </div>
-                  </div>
-                  <div className="flex flex-row space-x-4 md:space-x-5 sm:space-x-6">
-                    <button onClick={handleSignin}>
-                      <Icon icon="uim:calender" className="w-6 h-6 -mt-1" />
-                    </button>
-                  </div>
-                </div>
-                <div className="columns-2 text-xs md:text-[0.8rem] sm:text-base leading-snug rounded-none md:rounded-xl sm:rounded-xl px-6 py-4 bg-neutral-200 dark:bg-neutral-800">
-                  <p>
-                    <span className="mr-3">简介</span>
-                    <span className="opacity-75 w-36 md:w-56 sm:w-96 truncate">
-                      {userDetail.length > 0 &&
-                        userDetail.map((user, index) => (
-                          <span key={index}>{user.profile.signature}</span>
-                        ))}
-                    </span>
-                  </p>
-                  <p className="mt-6">
-                    <span className="mr-3">加入</span>
-                    <span className="opacity-75">
-                      {moment(userData.data.account.createTime).format(
-                        "YYYY年MM月DD日"
-                      )}
-                    </span>
-                  </p>
-
-                  <p className="mt-6">
-                    <span className="mr-3">生日</span>
-                    <span className="opacity-75">
-                      {moment(userData.data.profile.birthday).format(
-                        "YYYY年MM月DD日"
-                      )}
-                    </span>
-                  </p>
-
-                  <p>
-                    <span className="mr-3">最后登录</span>
-                    <span className="opacity-75">
-                      {moment(userData.data.profile.lastLoginTime).format(
-                        "YYYY年MM月DD日"
-                      )}
-                    </span>
-                  </p>
-
-                  <p className="mt-6">
-                    <span className="mr-3">等级</span>
-                    <span className="opacity-75">
-                      Lv.
-                      {userDetail.length > 0 &&
-                        userDetail.map((user, index) => (
-                          <span key={index}>{user.level}</span>
-                        ))}
-                    </span>
-                  </p>
-
-                  <p className="mt-6">
-                    <span className="mr-3">听歌</span>
-                    <span className="opacity-75">
-                      {userDetail.length > 0 &&
-                        userDetail.map((user, index) => (
-                          <span key={index}>{user.listenSongs}</span>
-                        ))}
-                      首
-                    </span>
-                  </p>
-                </div>
-
-                <div className="text-xs md:text-xs sm:text-base leading-snug rounded-none md:rounded-xl sm:rounded-xl px-6 py-4 bg-neutral-200 dark:bg-neutral-800">
-                  <div className="flex flex-row justify-between">
-                    <h2 className="font-medium mb-2">用户歌单</h2>
-                    <p
-                      className="text-red-600 cursor-pointer"
-                      onClick={() => router.push("/dashboard/playlist")}
-                    >
-                      查看全部
-                    </p>
-                  </div>
-                  <div className="columns-2">
-                    {playlists.length > 0 &&
-                      playlists.slice(0, 2).map((playlist, index) => (
-                        <button
-                          key={playlist.id}
-                          onClick={() =>
-                            router.push(`/playlist?id=${playlist.id}`)
-                          }
-                          className={`flex flex-row space-x-4 w-full rounded-none md:rounded-xl sm:rounded-xl py-4 ${
-                            index % 2 === 0
-                              ? "bg-neutral-200 dark:bg-neutral-800"
-                              : "odd"
-                          }`}
-                        >
-                          <LazyLoad offset={100}>
-                            <img
-                              src={playlist.coverImgUrl}
-                              className="rounded-xl w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
-                            />
-                          </LazyLoad>
-
-                          <div className="flex flex-col space-y-1 mt-1">
-                            <span className="font-medium text-left w-full flex-nowrap flex overflow-hidden">
-                              {playlist.name}
-                            </span>
-                            <span className="opacity-75 text-left">
-                              {playlist.playCount}次播放
-                            </span>
-                          </div>
-                        </button>
-                      ))}
-                  </div>
-                </div>
-
-                <div className="text-xs md:text-xs sm:text-base leading-snug rounded-none md:rounded-xl sm:rounded-xl px-6 py-4 bg-neutral-200 dark:bg-neutral-800">
-                  <h2 className="font-medium mb-2 text-red-600">危险操作</h2>
-                  <button
-                    onClick={logout}
-                    className="bg-red-600 text-white px-6 py-2 rounded-xl"
-                  >
-                    退出当前账户
-                  </button>
-
-                  <p className="text-[0.54rem] md:text-[0.64rem] sm:text-sm opacity-75 mt-2">
-                    ***请注意：登出后所有存储在本地的用户信息将被抹掉，您可能需要再次登录以访问您的账户信息。您可以在/login页面查看实时登录信息（显示在console.log中）
-                  </p>
-                </div>
-              </div>
+              </h1>
             </div>
           </div>
         )}
+
+        <p className="-mt-56 md:mt-12 sm:mt-12 px-6 md:px-0 sm:px-0 flex flex-row overflow-x-auto space-x-3 text-sm opacity-75">
+          <a href="#info" className="hover:underline">
+            个人信息
+          </a>
+          <a href="#playlist" className="hover:underline">
+            歌单
+          </a>
+          <a href="#logout" className="hover:underline">
+            登出
+          </a>
+        </p>
+        <div className="mt-6">
+          <Heading id="info">个人信息</Heading>
+        </div>
+
+        {userData && (
+          <div className="mt-8 font-medium text-2xl md:text-3xl sm:text-4xl">
+            <p className="px-6 md:px-0 sm:px-0 leading-normal">
+              加入于
+              <span className="text-red-600 font-semibold">
+                {moment(userData.data.account.createTime).format(
+                  "YYYY年MM月DD日"
+                )}
+              </span>
+              的
+              {userDetail.length > 0 &&
+                userDetail.map((user, index) => (
+                  <span key={index} className="font-semibold">
+                    {user.profile.nickname}
+                  </span>
+                ))}
+              先生/女士, 您已经在
+              <span className="font-semibold text-red-600">云村</span>
+              度过了
+              <span className="text-red-600 font-semibold">
+                {parseInt(
+                  moment(userData.data.account.createTime)
+                    .fromNow(true)
+                    .split(" ")[0]
+                )}
+              </span>
+              个春秋。 占您生命长河的
+              <span className="font-semibold text-red-600">
+                {parseInt(
+                  moment(userData.data.account.createTime)
+                    .fromNow(true)
+                    .split(" ")[0]
+                )}{" "}
+                /{" "}
+                {parseInt(
+                  moment(userData.data.profile.birthday)
+                    .fromNow(true)
+                    .split(" ")[0]
+                )}
+              </span>
+              。 您最近登录于
+              <span className="font-semibold text-red-600">
+                {moment(userData.data.profile.lastLoginTime).format(
+                  "YYYY年MM月DD日"
+                )}
+              </span>
+              。 作为等级
+              <span className="font-semibold text-red-600">
+                Lv.
+                {userDetail.length > 0 &&
+                  userDetail.map((user, index) => (
+                    <span key={index}>{user.level}</span>
+                  ))}
+              </span>
+              的用户。您已经累计听歌
+              <span className="font-semibold text-red-600">
+                {userDetail.length > 0 &&
+                  userDetail.map((user, index) => (
+                    <span key={index}>{user.listenSongs}</span>
+                  ))}
+                首
+              </span>
+              。 不忘初心，继续努力！ 希望您和您对自己的简介一样：
+              <span className="font-semibold text-red-600">
+                {userDetail.length > 0 &&
+                  userDetail.map((user, index) => (
+                    <span key={index}>{user.profile.signature}</span>
+                  ))}
+              </span>{" "}
+              —— 表里如一，如如不动。 新的一天，也要拥有好心情！
+            </p>
+          </div>
+        )}
+
+        <div className="flex flex-row justify-between mt-8">
+          <Heading id="playlist">歌单</Heading>
+        </div>
+
+        <div className="px-6 md:px-0 sm:px-0 my-6 columns-1 md:columns-2 sm:columns-3">
+          {playlists.length > 0 &&
+            playlists.map((pl, index) => (
+              <PlaylistCard
+                key={pl.id}
+                index={index}
+                picUrl={pl.coverImgUrl}
+                name={pl.name}
+                id={pl.id}
+              />
+            ))}
+        </div>
+
+        <div className="flex flex-row justify-between mt-8">
+          <Heading id="playlist">登出</Heading>
+        </div>
+
+        <div className="my-6">
+          <h2
+            onClick={logout}
+            className="font-semibold mb-2 text-red-600 text-2xl md:text-3xl sm:text-4xl cursor-pointer hover:underline px-6 md:px-0 sm:px-0"
+          >
+            危险操作!!! 三思后行
+          </h2>
+        </div>
+
         {!userData && (
           <div className="">
             <div className="max-w-lg mx-auto flex justify-center align-middle py-32">
