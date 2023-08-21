@@ -93,9 +93,17 @@ export default function SongButton({
           <span className="opacity-75 w-10 text-center align-middle flex items-center justify-center">
             {moment(duration).format("mm:ss")}
           </span>
-          {allowDel === "true" && (
-            <span onClick={handleDeleteSong(id)} className="cursor-pointer text-red-600">删除</span>
-          )}
+          {allowDel === "true" ? (
+            <span
+              onClick={() => handleDeleteSong(id)}
+              className={cn(
+                "cursor-pointer",
+                id === playingSongId ? "text-white" : "text-red-600"
+              )}
+            >
+              删除
+            </span>
+          ) : null}
         </div>
       </div>
     </button>
