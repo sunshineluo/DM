@@ -6,6 +6,8 @@ import FullSongButton from "@/components/FullSongButton";
 import ArrowHeading from "@/components/ArrowHeading";
 import PlaylistCard from "@/components/PlaylistCard";
 import MvCard from "@/components/MvCard";
+import AlbumCard from "@/components/AlbumCard";
+import ArtistCard from "@/components/ArCard";
 
 export default function Browse() {
   const router = useRouter();
@@ -14,11 +16,24 @@ export default function Browse() {
   const [newSongs, setNewSongs] = useState([]);
   const [songIds, setSongIds] = useState([]);
   const [songDetails, setSongDetails] = useState([]);
+  const [newAl, setNewAl] = useState([]);
+  const [newAr, setNewAr] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isPlaylistLoading, setIsPlaylistLoading] = useState(false);
   function cn(...classes) {
     return classes.filter(Boolean).join(" ");
   }
+
+  const fetchNewAl = async () => {
+    try {
+      const response = await fetch("https://cf233.eu.org/album/newest");
+      const data = await response.json();
+      const alData = data.albums;
+      setNewAl(alData);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const fetchNewSongs = async () => {
     try {
@@ -50,6 +65,19 @@ export default function Browse() {
     }
   };
 
+  const fetchNewAr = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch("https://cf233.eu.org/top/artists?limit=8");
+      const data = await response.json();
+      if (data && data.code === 200) {
+        setNewAr(data.artists);
+      }
+    } catch (error) {
+      console.error("An error occurred while fetching new artists:", error);
+    }
+  };
+
   const fetchSongDetails = async (songIds) => {
     try {
       const response = await fetch(
@@ -68,6 +96,8 @@ export default function Browse() {
   useEffect(() => {
     fetchNewSongs();
     fetchNewMV();
+    fetchNewAl();
+    fetchNewAr();
   }, []);
 
   useEffect(() => {
@@ -145,6 +175,37 @@ export default function Browse() {
                 picUrl={track.al.picUrl}
               />
             ))}
+      </div>
+
+      <hr className="border-neutral-200 dark:border-neutral-800 my-3" />
+      <ArrowHeading>新碟上架</ArrowHeading>
+
+      <div className="mt-4 px-6 md:px-0 sm:px-0 space-x-4 flex flex-row overflow-x-auto w-full">
+        {newAl &&
+          newAl.map((al, index) => (
+            <AlbumCard
+              key={index}
+              index={index}
+              picUrl={al.picUrl}
+              name={al.name}
+              id={al.id}
+            />
+          ))}
+      </div>
+
+      <hr className="border-neutral-200 dark:border-neutral-800 my-3" />
+      <ArrowHeading>热门歌手</ArrowHeading>
+      <div className="mt-4 px-6 md:px-0 sm:px-0 space-x-[-64px] md:space-x-[-86px] sm:space-x-[-76px] flex flex-row overflow-x-auto w-full">
+        {newAr &&
+          newAr.map((artist, index) => (
+            <ArtistCard
+              key={index}
+              index={index}
+              id={artist.id}
+              picUrl={artist.picUrl}
+              name={artist.name}
+            />
+          ))}
       </div>
 
       <hr className="border-neutral-200 dark:border-neutral-800 my-3" />

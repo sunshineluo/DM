@@ -8,6 +8,7 @@ import { SongIdsContext } from "./SongIdsContext";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useAnimation } from "framer-motion";
 import { Menu, Transition } from "@headlessui/react";
+import SongButton from "./SongButton";
 
 function cn(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -25,7 +26,7 @@ export default function Player() {
   const [songInfo, setSongInfo] = useState([]);
   const audioRef = useRef(null);
   const lyricsContainerRef = useRef(null);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
   const [played, setPlayed] = useState(0);
   const [seekValue, setSeekValue] = useState(0);
   const [currentTime, setCurrentTime] = useState(() => {
@@ -46,19 +47,72 @@ export default function Player() {
   } = useContext(SongIdsContext);
   const [playlistDetails, setPlaylistDetails] = useState([]);
   const [isLiked, setIsLiked] = useState(false);
+  const [hasLoadedPlaybackTime, setHasLoadedPlaybackTime] = useState(false);
+  const [selectedTime, setSelectedTime] = useState(-1);
+  const [showTimeMenu, setShowTimeMenu] = useState(false);
+  const [closeTimer, setCloseTimer] = useState(null);
+  const handleTimingCloseClick = () => {
+    setShowTimeMenu(true); // 点击 "定时关闭" 时显示第二个 Menu
+  };
+
+  
+  useEffect(() => {
+    if (selectedTime !== '') {
+      clearTimeout(closeTimer);
+
+      const newCloseTimer = setTimeout(() => {
+        setIsPlaying(false);
+      }, parseInt(selectedTime) * 60 * 1000);
+
+      setCloseTimer(newCloseTimer);
+    }
+  }, [selectedTime]);
+
+  const handleSelectTime = (event) => {
+    setSelectedTime(event.target.value);
+
+    clearTimeout(closeTimer);
+    setIsPlaying(true);
+  };
+
+  const timeOptions = [
+    { label: '无限制', value: '' },
+    { label: '1分钟', value: '1' },
+    { label: '5分钟', value: '5' },
+    { label: '15分钟', value: '15' },
+    { label: '30分钟', value: '30' },
+    { label: '45分钟', value: '45' },
+    { label: '60分钟', value: '60' },
+    { label: '120分钟', value: '120' },
+  ];
+
+  useEffect(() => {
+    const storedCurrentTime = localStorage.getItem("playedTime");
+    setCurrentTime(
+      storedCurrentTime !== null ? parseFloat(storedCurrentTime) : 0
+    );
+    // 将hasLoadedPlaybackTime设置为true，表示已经从localStorage中读取了播放时间
+    setHasLoadedPlaybackTime(true);
+  }, []);
+
+  useEffect(() => {
+    // 判断是否已经从localStorage中读取了播放时间
+    if (hasLoadedPlaybackTime) {
+      audioRef.current.seekTo(currentTime);
+    }
+  }, [hasLoadedPlaybackTime]);
 
   useEffect(() => {
     const storedIsPlaying = localStorage.getItem("isPlaying");
     const storedCurrentTime = localStorage.getItem("playedTime");
 
-    setIsPlaying(JSON.parse(storedIsPlaying));
+    setIsPlaying(storedIsPlaying ? JSON.parse(storedIsPlaying) : false);
 
-    setCurrentTime(parseFloat(storedCurrentTime));
+    setCurrentTime(storedCurrentTime ? parseFloat(storedCurrentTime) : 0);
 
     localStorage.setItem("currentSongIndex", JSON.stringify(currentSongIndex));
 
     return () => {
-      // 在组件卸载时保存当前的播放时间到本地存储
       localStorage.setItem("playedTime", currentTime.toString());
     };
   }, []);
@@ -87,13 +141,9 @@ export default function Player() {
 
   useEffect(() => {
     if (currentSongIndex >= songIds.length) {
-      setCurrentSongIndex(0); // 如果 currentSongIndex 不再有效，则将其设置为默认索引 0
+      setCurrentSongIndex(0);
     }
   }, [songIds]);
-
-  useEffect(() => {
-    localStorage.setItem("playedTime", currentTime.toString());
-  }, [currentTime]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -105,10 +155,8 @@ export default function Player() {
       }
     };
 
-    // 监听窗口大小改变事件
     window.addEventListener("resize", handleResize);
 
-    // 组件销毁时移除事件监听器
     return () => {
       window.removeEventListener("resize", handleResize);
     };
@@ -196,7 +244,6 @@ export default function Player() {
       }
     }
 
-    // 根据差值排序，选择最小差值对应的歌词行
     matchingLines.sort((a, b) => a.diff - b.diff);
     const currentHighlightedLine = matchingLines[0]?.text || null;
     const currentHighlightedLineTimestamp = matchingLines[0]?.timestamp || null;
@@ -231,6 +278,17 @@ export default function Player() {
     localStorage.setItem("playedTime", playedTime.toString());
   };
 
+  useEffect(() => {
+    const storedCurrentTime = localStorage.getItem("playedTime");
+    setCurrentTime(
+      storedCurrentTime !== null ? parseFloat(storedCurrentTime) : 0
+    );
+  }, []);
+
+  useEffect(() => {
+    audioRef.current.seekTo(currentTime);
+  }, []);
+
   const handleSeekChange = (newValue) => {
     setSeekValue(parseFloat(newValue));
   };
@@ -257,17 +315,6 @@ export default function Player() {
   const handleVolumeChange = (newValue) => {
     const newVolume = parseFloat(newValue);
     setVolume(newVolume);
-  };
-
-  const handlePlayMode = () => {
-    // 切换播放模式
-    if (playMode === "default") {
-      setPlayMode("loop");
-    } else if (playMode === "loop") {
-      setPlayMode("shuffle");
-    } else {
-      setPlayMode("default");
-    }
   };
 
   function shuffleArray(array) {
@@ -401,7 +448,7 @@ export default function Player() {
   };
 
   return (
-    <div className="fixed w-full max-h-screen h-screen z-[10000]">
+    <div className="transition-all duration-500 fixed w-full max-h-screen z-[10000]">
       <div></div>
       <ReactPlayer
         ref={audioRef}
@@ -425,19 +472,20 @@ export default function Player() {
           duration: 0.75,
         }}
         className={cn(
-          "fixed transition-all duration-500 ",
+          "fixed transition-all duration-500",
           isFull === "true"
             ? "z-[99999] top-0 w-full h-screen"
             : "bottom-0 w-full"
         )}
       >
-        <div>
+        <div className="transition-all duration-500">
           {songInfo.map((song) => (
             <img
               key={song.id}
               src={song.al.picUrl}
               alt="Album Cover"
               className={cn(
+                "transition-all duration-500",
                 isFull === "true"
                   ? "bg-no-repeat absolute h-screen z-[-1] left-0 top-0 inset-x-0 right-0 w-full"
                   : "hidden"
@@ -494,7 +542,9 @@ export default function Player() {
                       icon="pepicons-pop:line-x"
                       className={cn(
                         "items-center text-neutral-700 dark:text-neutral-300",
-                        display ? "opacity-0 md:opacity-75 sm:opacity-75" : "opacity-75 ",
+                        display
+                          ? "opacity-0 md:opacity-75 sm:opacity-75"
+                          : "opacity-75 ",
                         isFull === "true"
                           ? "w-10 md:w-12 h-10 md:h-12 sm:w-16 sm:h-16"
                           : "w-0 h-0"
@@ -602,6 +652,54 @@ export default function Player() {
                                 </Menu.Item>
                                 <hr className="my-2 border-neutral-300 dark:border-neutral-700 " />
 
+                                <Menu
+                                  as="div"
+                                  show={showTimeMenu}
+                                  className="relative inline-block text-left"
+                                >
+                                  <button
+                                    as="button"
+                                    onClick={handleTimingCloseClick}
+                                    className="text-center rounded-xl px-3 py-0.5 flex justify-center"
+                                  >
+                                    <Menu.Button className="ml-1.5 w-full">
+                                      定时关闭
+                                    </Menu.Button>
+                                  </button>
+                                  <Transition
+                                    as={Fragment}
+                                    enter="transition ease-out duration-100"
+                                    enterFrom="transform opacity-0 scale-95"
+                                    enterTo="transform opacity-100 scale-100"
+                                    leave="transition ease-in duration-75"
+                                    leaveFrom="transform opacity-100 scale-100"
+                                    leaveTo="transform opacity-0 scale-95"
+                                  >
+                                    <Menu.Items className="absolute border border-neutral-300 dark:border-neutral-700  right-0 mt-2 w-36 py-2 text-red-600 text-base md:text-base sm:text-lg origin-top-right bg-neutral-200 dark:bg-neutral-800 rounded-xl z-[99999]">
+                                      <div className="px-2 py-2">
+                                        <select
+                                          id="time-select"
+                                          value={selectedTime}
+                                          onChange={handleSelectTime}
+                                        >
+                                          <option value="">请选择</option>
+                                          {timeOptions.map((option) => (
+                                            <option
+                                              key={option.value}
+                                              value={option.value}
+                                            >
+                                              {option.label}
+                                            </option>
+                                          ))}
+                                        </select>
+                                        {selectedTime && <span>已选</span>}
+                                      </div>
+                                    </Menu.Items>
+                                  </Transition>
+                                </Menu>
+
+                                <hr className="my-2 border-neutral-300 dark:border-neutral-700 " />
+
                                 <Dialog.Trigger asChild>
                                   <Menu.Item
                                     as="button"
@@ -616,7 +714,7 @@ export default function Player() {
                         </Menu>
                         <Dialog.Portal>
                           <Dialog.Overlay className="DialogOverlay bg-black/25 backdrop-blur-3xl" />
-                          <Dialog.Content className="DialogContent fixed max-w-4xl mx-auto w-full h-screen bg-neutral-100 dark:bg-neutral-900 overflow-y-auto backdrop-blur-lg z-[999]">
+                          <Dialog.Content className="DialogContent fixed max-w-4xl mx-auto w-full h-screen bg-neutral-50 dark:bg-neutral-950 overflow-y-auto backdrop-blur-lg z-[999]">
                             <Dialog.Title className="DialogTitle font-medium text-3xl">
                               播放列表({playlistDetails.length})
                             </Dialog.Title>
@@ -631,51 +729,19 @@ export default function Player() {
                             <div className="flex flex-col justify-start mt-4 overflow-y-auto">
                               {playlistDetails.length > 0 &&
                                 playlistDetails.map((track, index) => {
-                                  const handleDeleteSong = (id) => {
-                                    // 在这里处理删除操作，使用传入的id参数
-                                    removeFromPlaylist(id);
-                                  };
                                   return (
-                                    <div key={track.id}>
-                                      <div
-                                        key={track.id}
-                                        className={`cursor-pointer flex flex-row justify-between w-full rounded-xl px-6 py-4 ${
-                                          index % 2 === 0
-                                            ? "bg-neutral-200 dark:bg-neutral-800"
-                                            : "odd"
-                                        }`}
-                                      >
-                                        <div
-                                          onClick={() =>
-                                            handleAddToPlaylist(track.id)
-                                          }
-                                          className="flex flex-row space-x-4"
-                                        >
-                                          <img
-                                            src={track.al.picUrl}
-                                            className="rounded-xl w-14 h-14 md:w-16 md:h-16 sm:w-16 sm:h-16"
-                                          />
-                                          <div className="flex flex-col space-y-1 mt-1">
-                                            <span className="font-medium text-left w-full flex-nowrap flex overflow-hidden">
-                                              {track.name}
-                                            </span>
-                                            <span className="text-base opacity-75 text-left truncate w-48 md:w-96 sm:w-96">
-                                              {track.ar
-                                                .map((artist) => artist.name)
-                                                .join(" / ")}
-                                            </span>
-                                          </div>
-                                        </div>
-                                        <button
-                                          onClick={() =>
-                                            handleDeleteSong(track.id)
-                                          }
-                                          className="text-red-600 dark:text-red-400 w-24 md:w-16 sm:w-8 text-right"
-                                        >
-                                          删除
-                                        </button>
-                                      </div>
-                                    </div>
+                                    <SongButton
+                                      key={track.id}
+                                      picUrl={track.al.picUrl}
+                                      index={index}
+                                      duration={track.dt}
+                                      id={track.id}
+                                      ar={track.ar
+                                        .map((artist) => artist.name)
+                                        .join(" / ")}
+                                      name={track.name}
+                                      allowDel="true"
+                                    />
                                   );
                                 })}
                             </div>

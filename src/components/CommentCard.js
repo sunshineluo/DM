@@ -22,8 +22,8 @@ export default function CommentCard({
         />
       </LazyLoad>
 
-      <div className="flex flex-col space-y-1 mt-1 w-64 md:w-96 sm:w-96">
-        <CommentReadMore text={content} maxCharCount={100} />
+      <div className="flex flex-col space-y-1 mt-1 w-56 md:w-[27.5rem] sm:w-[36rem]">
+        <CommentReadMore text={content} maxCharCount={50} />
 
         <span className="mt-2 text-xs md:text-sm sm:text-base opacity-75 truncate w-64 md:w-96 sm:w-96">
           {user} 评论于 {moment(time).format("YYYY年MM月DD日")}

@@ -13,8 +13,10 @@ const CommentReadMore = ({ text, maxCharCount }) => {
   };
 
   return (
-    <div className="text-lg md:text-xl sm:text-xl font-medium leading-normal md:leading-normal sm:leading-relaxed">
-      <p>{showFullText || !shouldTruncate ? text : truncatedText || ""}</p>
+    <div>
+      <p className="transition-all duration-500 text-lg md:text-xl sm:text-xl font-medium leading-normal md:leading-normal sm:leading-relaxed">
+        {showFullText || !shouldTruncate ? text : truncatedText || ""}
+      </p>
       {shouldTruncate && (
         <button
           className="text-red-600 font-medium"

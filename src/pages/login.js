@@ -67,10 +67,10 @@ export default function QrLogin() {
       <Head>
         <title>扫描二维码登录</title>
       </Head>
-      <h1 className="font-medium text-2xl md:text-4xl sm:text-4xl text-center">
+      <h1 className="font-semibold text-3xl md:text-4xl sm:text-5xl text-center">
         扫描二维码登录
       </h1>
-      <img id="qrImg" className="mx-auto w-2/3 md:w-1/3 sm:w-1/3 mt-12" />
+      <img id="qrImg" className="rounded-xl border-2 border-red-600 mx-auto w-2/3 md:w-1/3 sm:w-1/3 mt-12" />
 
       <p className="text-center opacity-75 mt-6">请打开网易云音乐APP扫码登录</p>
       <p
@@ -79,9 +79,9 @@ export default function QrLogin() {
       >
         已经登录？点我跳转
       </p>
-      <div className="max-w-lg mx-auto bg-neutral-200 dark:bg-neutral-800 mt-6 overflow-x-auto">
+      <div className="hidden max-w-lg mx-auto bg-neutral-200 dark:bg-neutral-800 mt-6 overflow-x-auto">
         <p className="opacity-75 font-mono text-center mb-4">console.log ↓</p>
-        <div id="info" className="info font-mono"></div>
+        <div id="info" className="info font-mono "></div>
       </div>
     </div>
   );

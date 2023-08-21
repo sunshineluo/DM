@@ -7,7 +7,14 @@ function cn(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function FullSongButton({ id, picUrl, index, name, ar }) {
+export default function FullSongButton({
+  id,
+  picUrl,
+  index,
+  name,
+  ar,
+  reason,
+}) {
   const {
     songIds,
     currentSongIndex,
@@ -26,7 +33,7 @@ export default function FullSongButton({ id, picUrl, index, name, ar }) {
   return (
     <button
       key={id}
-      className="flex flex-col space-y-2 w-full rounded-none md:rounded-xl sm:rounded-xl mb-2"
+      className="relative flex flex-col space-y-2 w-full rounded-none md:rounded-xl sm:rounded-xl mb-2"
       onMouseEnter={() => setIsHover(true)}
       onMouseLeave={() => setIsHover(false)}
       onClick={() => handleAddToPlaylist(id)}
@@ -36,7 +43,7 @@ export default function FullSongButton({ id, picUrl, index, name, ar }) {
           src={picUrl}
           alt={name}
           className={cn(
-            "rounded-xl w-40 h-40 md:w-48 md:h-48 sm:w-56 sm:h-56 shadow-md",
+            "transition-all duration-500 rounded-xl w-40 h-40 md:w-48 md:h-48 sm:w-56 sm:h-56 shadow-md",
             id === playingSongId && "opacity-75",
             isHover ? "opacity-75" : "opacity-100"
           )}
@@ -65,6 +72,12 @@ export default function FullSongButton({ id, picUrl, index, name, ar }) {
           {ar}
         </span>
       </div>
+
+      {reason ? (
+        <div className="absolute bottom-12 right-2 bg-red-600 text-white px-4 py-1 text-sm rounded-tl-xl rounded-br-xl">
+          {reason}
+        </div>
+      ) : null}
     </button>
   );
 }

@@ -3,7 +3,7 @@ import LazyLoad from "react-lazy-load";
 import { Icon } from "@iconify/react";
 import { useRouter } from "next/router";
 
-export default function PlaylistCard({ index, id, picUrl, name }) {
+export default function PlaylistCard({ index, id, picUrl, copywriter, name }) {
   const [isHover, setIsHover] = useState(false);
   const router = useRouter();
   return (
@@ -12,17 +12,22 @@ export default function PlaylistCard({ index, id, picUrl, name }) {
       key={index}
       onMouseEnter={() => setIsHover(true)}
       onMouseLeave={() => setIsHover(false)}
-      className="flex flex-col space-y-2 mb-2"
+      className="relative flex flex-col space-y-2 mb-2"
     >
       <LazyLoad offset={100}>
         <img
           src={picUrl}
-          className="rounded-xl hover:opacity-75 shadow-md w-72 md:w-80 sm:w-80  h-72 md:h-80 sm:h-80"
+          className="transition-all duration-500 rounded-xl hover:opacity-75 shadow-md w-72 md:w-80 sm:w-80  h-72 md:h-80 sm:h-80"
         />
       </LazyLoad>
       <h1 className="w-72 md:w-80 sm:w-80 text-left text-sm opacity-75 font-normal hover:underline mb-4">
         {name}
       </h1>
+
+      {copywriter ? (
+        <div className="absolute bottom-7 right-0 bg-red-600 text-white px-4 py-1 text-sm rounded-tl-xl rounded-br-xl">{copywriter}</div>
+      ) : null}
+
       {isHover && (
         <Icon
           icon="bi:play-circle-fill"

@@ -8,14 +8,17 @@ function cn(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function SongButton({ id, picUrl, index, name, ar, duration }) {
-  const {
-    songIds,
-    currentSongIndex,
-    setCurrentSongIndex,
-    addAllToPlaylist,
-    addToPlaylist,
-  } = useContext(SongIdsContext);
+export default function SongButton({
+  id,
+  picUrl,
+  allowDel,
+  index,
+  name,
+  ar,
+  duration,
+}) {
+  const { songIds, currentSongIndex, removeFromPlaylist, addToPlaylist } =
+    useContext(SongIdsContext);
   const [isHover, setIsHover] = useState(false);
 
   const playingSongId = songIds[currentSongIndex];
@@ -24,12 +27,16 @@ export default function SongButton({ id, picUrl, index, name, ar, duration }) {
     addToPlaylist(trackId);
   };
 
+  const handleDeleteSong = (id) => {
+    removeFromPlaylist(id);
+  };
+
   return (
     <button
       key={id}
       className={`flex flex-row space-x-4 w-full rounded-none md:rounded-xl sm:rounded-xl focus:bg-red-600 px-4 py-4 ${
         index % 2 === 0 && id !== playingSongId
-          ? "focus:bg-red-600  bg-neutral-200/25 hover:bg-neutral-200 dark:bg-neutral-800/25 dark:hover:bg-neutral-800"
+          ? "focus:bg-red-600  bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-900 dark:hover:bg-neutral-800"
           : "hover:bg-neutral-200 dark:hover:bg-neutral-800 focus:bg-red-600 "
       } ${
         id === playingSongId
@@ -82,9 +89,14 @@ export default function SongButton({ id, picUrl, index, name, ar, duration }) {
             {ar}
           </span>
         </div>
-        <span className="opacity-75 w-10 text-center align-middle flex items-center justify-center">
-          {moment(duration).format("mm:ss")}
-        </span>
+        <div className="flex flex-row space-x-4">
+          <span className="opacity-75 w-10 text-center align-middle flex items-center justify-center">
+            {moment(duration).format("mm:ss")}
+          </span>
+          {allowDel === "true" && (
+            <span onClick={handleDeleteSong(id)} className="cursor-pointer text-red-600">删除</span>
+          )}
+        </div>
       </div>
     </button>
   );

@@ -40,6 +40,9 @@ export default function Navbar() {
   if (router.asPath.includes("/artist")) {
     router.asPath = "/listen-now";
   }
+  if (router.asPath.includes("/recommend/")) {
+    router.asPath = "/listen-now";
+  }
   const userDataStr = localStorage.getItem("userData");
   const userData = JSON.parse(userDataStr);
   const { theme, setTheme } = useTheme();
@@ -54,6 +57,13 @@ export default function Navbar() {
   return (
     <div className="">
       <div className="hidden md:flex sm:flex max-w-7xl w-full mx-auto flex-row justify-between px-6 py-6">
+        <div>
+          <button onClick={() => router.push("/browse")}>
+            <h1 className="font-semibold text-2xl md:text-3xl mt-0 md:mt-0 sm:mt-1">
+              <span className="text-red-600">DM</span> Music
+            </h1>
+          </button>
+        </div>
         <div className="flex flex-row space-x-2 md:space-x-6 sm:space-x-6">
           {nav.map((item, index) => (
             <Link
@@ -137,7 +147,12 @@ export default function Navbar() {
               <Icon icon="ph:x-bold" className="text-red-600 w-7 h-7" />
             )}
           </button>
-          <button onClick={() => router.push("/browse")}>
+          <button
+            onClick={() => {
+              router.push("/browse");
+              setOpen(false);
+            }}
+          >
             <h1 className="font-semibold text-xl h-7">
               <span className="text-red-600">DM</span> Music
             </h1>
@@ -158,10 +173,13 @@ export default function Navbar() {
             </button>
           ) : (
             <button
-              onClick={() => router.push("/login")}
-              className="text-red-600"
+              onClick={() => {
+                router.push("/login");
+                setOpen(false);
+              }}
+              className="text-red-600 h-7 text-lg font-medium"
             >
-              <Icon icon="bi:person-circle" className="w-6 h-6git" />
+              登录
             </button>
           )}
         </div>
@@ -194,10 +212,11 @@ export default function Navbar() {
                   href={item.href}
                   onClick={() => setOpen(!open)}
                   className={cn(
-                    "px-4 py-2 border-b border-neutral-200 dark:border-neutral-800 rounded-none"
+                    "px-4 py-2 rounded-xl",
+                    item.href === router.asPath ? "bg-red-600 text-white" : ""
                   )}
                 >
-                  <button className="text-lg opacity-90">{item.title}</button>
+                  <button className="text-lg">{item.title}</button>
                 </Link>
               ))}
             </div>
