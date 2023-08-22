@@ -1,26 +1,15 @@
 {
   "rewrites": [
     {
-      "source": "/api/:path*",
-      "destination": "api/:path*"
+      "source": "/src/(.*)",
+      "destination": "https://cf233.eu.org/"
     }
   ],
-  "routes": {
-    "/api/:path*": {
-      "methods": ["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE"],
-      "headers": {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
-        "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept"
-      }
-    },
-    "/src/:file*": {
-      "methods": ["GET"],
-      "headers": {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET",
-        "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept"
-      }
+  "proxy": {
+    "headers": {
+      "Access-Control-Allow-Origin": "https://music.gengyue.eu.org/",
+      "Access-Control-Allow-Credentials": "true"
     }
   }
 }
+
