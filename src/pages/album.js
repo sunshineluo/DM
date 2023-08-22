@@ -15,46 +15,19 @@ const Album = () => {
   const [albumTrack, setAlbumTrack] = useState(null);
   const [searchTerm, setSearchTerm] = useState(""); // 搜索关键词状态
 
-  const Track =
-    albumDetail !== null && albumDetail.songs !== null && albumDetail.songs;
-
-  const filteredTracks =
-    Track &&
-    Track !== null &&
-    Track.filter((track) =>
-      track.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
   const getAlbumDetail = async () => {
     try {
       const response = await fetch(`https://cf233.eu.org/album?id=${id}`);
       const data = await response.json();
+      const songs = data.songs;
       console.log(data);
       setAlbumDetail([data]);
+      setAlbumTrack([songs]);
       console.log(albumDetail);
+      console.log(albumTrack);
     } catch (error) {
       // 处理错误
       console.error(error);
-    }
-  };
-
-  const getAlbumTracks = async () => {
-    if (albumDetail === null || !Array.isArray(albumDetail[0].songs)) {
-      alert("An error occurred while fetching song details");
-    }
-
-    const songIds = albumDetail.songs.map((song) => song.id);
-
-    try {
-      const response = await fetch(
-        `https://cf233.eu.org/song/detail?ids=${songIds.join(",")}`
-      );
-      const data = await response.json();
-      if (data && data.code === 200) {
-        setAlbumTrack(data.songs);
-      }
-    } catch (error) {
-      console.log("An error occurred while fetching song details:", error);
     }
   };
 
@@ -170,9 +143,8 @@ const Album = () => {
             </div>
           </div>
           <div className="mt-6 mb-16">
-            {albumDetail &&
-              albumDetail.songs &&
-              albumDetail.songs.map((track, index) => (
+            {albumTrack &&
+              albumTrack[0].map((track, index) => (
                 <SongButton
                   key={track.id}
                   index={index}

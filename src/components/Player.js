@@ -19,14 +19,18 @@ export default function Player() {
   const [isFull, setIsFull] = useState("false");
   const [highlightedLine, setHighlightedLine] = useState("");
   const [highlightedLineTimestamp, setHighlightedLineTimestamp] = useState("");
-  const { songIds, currentSongIndex, setCurrentSongIndex } =
-    useContext(SongIdsContext);
+  const {
+    isPlaying,
+    setIsPlaying,
+    songIds,
+    currentSongIndex,
+    setCurrentSongIndex,
+  } = useContext(SongIdsContext);
   const [playMode, setPlayMode] = useState("default"); // 默认为顺序播放模式
   const [translatedLyrics, setTranslatedLyrics] = useState([]);
   const [songInfo, setSongInfo] = useState([]);
   const audioRef = useRef(null);
   const lyricsContainerRef = useRef(null);
-  const [isPlaying, setIsPlaying] = useState(true);
   const [played, setPlayed] = useState(0);
   const [seekValue, setSeekValue] = useState(0);
   const [currentTime, setCurrentTime] = useState(() => {
@@ -55,9 +59,8 @@ export default function Player() {
     setShowTimeMenu(true); // 点击 "定时关闭" 时显示第二个 Menu
   };
 
-  
   useEffect(() => {
-    if (selectedTime !== '') {
+    if (selectedTime !== "") {
       clearTimeout(closeTimer);
 
       const newCloseTimer = setTimeout(() => {
@@ -76,14 +79,14 @@ export default function Player() {
   };
 
   const timeOptions = [
-    { label: '无限制', value: '' },
-    { label: '1分钟', value: '1' },
-    { label: '5分钟', value: '5' },
-    { label: '15分钟', value: '15' },
-    { label: '30分钟', value: '30' },
-    { label: '45分钟', value: '45' },
-    { label: '60分钟', value: '60' },
-    { label: '120分钟', value: '120' },
+    { label: "无限制", value: "" },
+    { label: "1分钟", value: "1" },
+    { label: "5分钟", value: "5" },
+    { label: "15分钟", value: "15" },
+    { label: "30分钟", value: "30" },
+    { label: "45分钟", value: "45" },
+    { label: "60分钟", value: "60" },
+    { label: "120分钟", value: "120" },
   ];
 
   useEffect(() => {
@@ -662,7 +665,7 @@ export default function Player() {
                                     onClick={handleTimingCloseClick}
                                     className="text-center rounded-xl px-3 py-0.5 flex justify-center"
                                   >
-                                    <Menu.Button className="ml-1.5 w-full">
+                                    <Menu.Button className="ml-2.5 md:ml-2.5 sm:ml-1.5 w-full">
                                       定时关闭
                                     </Menu.Button>
                                   </button>
@@ -693,6 +696,7 @@ export default function Player() {
                                           ))}
                                         </select>
                                         {selectedTime && <span>已选</span>}
+                                        {!selectedTime && <span>无限</span>}
                                       </div>
                                     </Menu.Items>
                                   </Transition>
@@ -719,7 +723,7 @@ export default function Player() {
                               播放列表({playlistDetails.length})
                             </Dialog.Title>
 
-                            <div className="flex flex-row justify-between text-red-600 dark:text-red-400 mt-6 px-3">
+                            <div className="flex flex-row justify-between text-red-600 dark:text-red-400 mt-6 px-6 md:px-0 sm:px-0">
                               <button onClick={handlePlayAll}>播放全部</button>
                               <button onClick={handleRemoveAll}>
                                 删除全部

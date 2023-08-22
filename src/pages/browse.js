@@ -214,7 +214,7 @@ export default function Browse() {
         {newMv &&
           newMv.map((track, index) => (
             <MvCard
-              key={track.key}
+              key={track.id}
               index={index}
               id={track.id}
               name={track.name}

@@ -22,8 +22,8 @@ export default function Dashboard() {
           `https://cf233.eu.org/user/detail?uid=${userData.data.account.id}`
         );
         const userDetails = response.data;
+        console.log(response.data);
         setUserDetail([userDetails]);
-        console.log(userDetail);
 
         setIsPlaylistLoading(true);
 
@@ -92,6 +92,7 @@ export default function Dashboard() {
             </div>
             <div className="absolute flex flex-row -mt-96 md:-mt-24 sm:-mt-24 px-6 md:px-8 sm:px-12 space-x-4 py-2 text-white text-2xl md:text-3xl sm:text-4xl">
               <Icon
+                onClick={() => handleSignin()}
                 icon="bi:patch-check-fill"
                 className="text-red-600 rounded-full cursor-pointer mt-5"
               />

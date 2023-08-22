@@ -136,13 +136,13 @@ const Artist = () => {
       <>
         <p className="-mt-56 md:mt-12 sm:mt-12 px-6 md:px-0 sm:px-0 flex flex-row overflow-x-auto space-x-3 text-sm opacity-75">
           <a href="#song" className="hover:underline">
-            歌手50首热门单曲
+            50首热门单曲
           </a>
           <a href="#mv" className="hover:underline">
-            歌手MV
+            MV
           </a>
           <a href="#album" className="hover:underline">
-            歌手专辑
+            专辑
           </a>
           <a href="#related" className="hover:underline">
             相关歌手
@@ -192,7 +192,7 @@ const Artist = () => {
           <Heading id="album">歌手专辑</Heading>
         </div>
         <div className="px-0 mt-8 w-full">
-          <div className="my-4 columns-1 md:columns-2 sm:columns-3">
+          <div className="px-6 md:px-0 sm:px-0 my-4 columns-1 md:columns-2 sm:columns-3">
             {arAlbums &&
               arAlbums.map((al, index) => (
                 <AlbumCard

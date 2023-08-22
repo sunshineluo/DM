@@ -1,22 +1,26 @@
 {
-    "headers": [
-      {
-        "source": "/likelist",
-        "headers": [
-          {
-            "key": "Access-Control-Allow-Origin",
-            "value": "https://music.gengyue.eu.org"
-          }
-        ]
-      },
-      {
-        "source": "/like",
-        "headers": [
-          {
-            "key": "Access-Control-Allow-Origin",
-            "value": "https://music.gengyue.eu.org"
-          }
-        ]
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "api/:path*"
+    }
+  ],
+  "routes": {
+    "/api/:path*": {
+      "methods": ["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE"],
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
+        "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept"
       }
-    ]
+    },
+    "/src/:file*": {
+      "methods": ["GET"],
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET",
+        "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept"
+      }
+    }
   }
+}
