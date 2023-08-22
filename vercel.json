@@ -1,10 +1,12 @@
 {
-  "rewrites": [
+  "headers": [
     {
       "source": "/src/(.*)",
-      "destination": "https://cf233.eu.org/",
       "headers": [
-        { "key": "Access-Control-Allow-Origin", "value": "https://music.gengyue.eu.org/" },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "https://music.gengyue.eu.org"
+        },
         { "key": "Access-Control-Allow-Credentials", "value": "true" }
       ]
     }
