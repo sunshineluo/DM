@@ -33,7 +33,7 @@ export default function Highquality() {
       <Head>
         <title>每日推荐歌单</title>
       </Head>
-      <h1 className="px-6 md:px-0 sm:px-0 font-semibold text-2xl md:text-3xl sm:text-4xl">
+      <h1 className="px-6 md:px-0 sm:px-0 font-semibold text-3xl md:text-4xl sm:text-5xl">
         每日推荐歌单
       </h1>
       <hr className="border-neutral-200 dark:border-neutral-800 my-3" />

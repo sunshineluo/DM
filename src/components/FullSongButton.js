@@ -74,7 +74,7 @@ export default function FullSongButton({
       </div>
 
       {reason ? (
-        <div className="absolute bottom-12 right-2 bg-red-600 text-white px-4 py-1 text-sm rounded-tl-xl rounded-br-xl">
+        <div className="absolute bottom-12 right-0 bg-red-600 text-white px-4 py-1 text-sm rounded-tl-xl rounded-br-xl">
           {reason}
         </div>
       ) : null}

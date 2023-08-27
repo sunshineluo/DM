@@ -13,6 +13,7 @@ import AlbumCard from "@/components/AlbumCard";
 
 const MusicSearch = () => {
   const [keywords, setKeywords] = useState("");
+  const [word, setWord] = useState("");
   const [searchResult, setSearchResult] = useState([]);
   const [songDetail, setSongDetail] = useState([]);
   const [artistDetail, setArtistDetail] = useState([]);
@@ -56,6 +57,7 @@ const MusicSearch = () => {
   const handleSearch = async (e) => {
     e.preventDefault(); // 阻止表单默认提交行为
     setIsLoading(true);
+    setWord(keywords);
 
     try {
       const [
@@ -175,8 +177,8 @@ const MusicSearch = () => {
         <title>搜索</title>
       </Head>
 
-      <h1 className="px-6 md:px-0 sm:px-0 font-semibold text-3xl md:text-4xl sm:text-5xl">
-        搜索
+      <h1 className="px-6 md:px-0 sm:px-0 font-semibold text-3xl md:text-4xl sm:text-5xl whitespace-nowrap">
+        {songDetail.length > 0 ? <>"{word}" 的搜索结果</> : <>搜索</>}
       </h1>
       <hr className="border-neutral-200 dark:border-neutral-800 my-3" />
       <div className="mt-6 flex flex-row justify-start w-full px-6 md:px-0 sm:px-0">
@@ -238,84 +240,173 @@ const MusicSearch = () => {
           </h1>
         )}
       </div>
+      {songDetail.length > 0 && (
+        <>
+          {songDetail && <Heading id="song">单曲</Heading>}
+          <hr className="border-neutral-200 dark:border-neutral-800 my-3" />
+          <div className="mt-4 px-6 md:px-0 sm:px-0 space-x-4 flex flex-row overflow-x-auto w-full">
+            {songDetail &&
+              !isLoading &&
+              songDetail
+                .slice(0, 15)
+                .map((track, index) => (
+                  <FullSongButton
+                    key={track.id}
+                    index={index}
+                    id={track.id}
+                    name={track.name}
+                    ar={track.ar.map((artist) => artist.name).join(" / ")}
+                    picUrl={track.al.picUrl}
+                    duration={track.dt}
+                  />
+                ))}
+          </div>
 
-      {songDetail && <Heading id="song">单曲</Heading>}
-      <hr className="border-neutral-200 dark:border-neutral-800 my-3" />
-      <div className="my-4 px-6 md:px-0 sm:px-0 columns-2 md:columns-4 sm:columns-5">
-        {songDetail &&
-          !isLoading &&
-          songDetail.map((track, index) => (
-            <FullSongButton
-              key={track.id}
-              index={index}
-              id={track.id}
-              name={track.name}
-              ar={track.ar.map((artist) => artist.name).join(" / ")}
-              picUrl={track.al.picUrl}
-              duration={track.dt}
-            />
-          ))}
-      </div>
+          <div className="mt-4 px-6 md:px-0 sm:px-0 space-x-4 flex flex-row overflow-x-auto w-full">
+            {songDetail &&
+              !isLoading &&
+              songDetail
+                .slice(16, 30)
+                .map((track, index) => (
+                  <FullSongButton
+                    key={track.id}
+                    index={index}
+                    id={track.id}
+                    name={track.name}
+                    ar={track.ar.map((artist) => artist.name).join(" / ")}
+                    picUrl={track.al.picUrl}
+                    duration={track.dt}
+                  />
+                ))}
+          </div>
 
-      {songDetail && !isLoading && <Heading id="artist">艺术家</Heading>}
-      <hr className="border-neutral-200 dark:border-neutral-800 my-3" />
-      <div className="px-6 md:px-0 sm:px-0 my-4 flex flex-row space-x-[-64px] overflow-x-auto">
-        {artistDetail &&
-          !isLoading &&
-          artistDetail.map((artist, index) => (
-            <ArtistCard
-              key={artist.id}
-              index={index}
-              id={artist.id}
-              picUrl={artist.picUrl}
-              name={artist.name}
-            />
-          ))}
-      </div>
-      {songDetail && !isLoading && <Heading id="playlist">歌单</Heading>}
-      <hr className="border-neutral-200 dark:border-neutral-800 my-3" />
-      <div className="px-6 md:px-0 sm:px-0 my-4 columns-1 md:columns-2 sm:columns-3">
-        {playlistDetail.length > 0 &&
-          playlistDetail.map((pl, index) => (
-            <PlaylistCard
-              key={pl.id}
-              index={index}
-              picUrl={pl.coverImgUrl}
-              name={pl.name}
-              id={pl.id}
-            />
-          ))}
-      </div>
-      {songDetail && !isLoading && <Heading id="album">专辑</Heading>}
-      <hr className="border-neutral-200 dark:border-neutral-800 my-3" />
-      <div className="px-6 md:px-0 sm:px-0 my-4 columns-1 md:columns-2 sm:columns-3">
-        {albumDetail &&
-          !isLoading &&
-          albumDetail.map((al, index) => (
-            <AlbumCard
-              key={al.id}
-              index={index}
-              picUrl={al.picUrl}
-              name={al.name}
-              id={al.id}
-            />
-          ))}
-      </div>
-      {songDetail && !isLoading && <Heading id="mv">MV</Heading>}
-      <div className="px-6 md:px-0 sm:px-0 my-4 columns-1 md:columns-2 sm:columns-3">
-        {mvDetail &&
-          !isLoading &&
-          mvDetail.map((track, index) => (
-            <MvCard
-              key={track.id}
-              index={index}
-              id={track.id}
-              name={track.name}
-              ar={track.artists.map((artist) => artist.name).join(" / ")}
-              picUrl={track.cover}
-            />
-          ))}
-      </div>
+          {songDetail && !isLoading && <Heading id="artist">艺术家</Heading>}
+          <hr className="border-neutral-200 dark:border-neutral-800 my-3" />
+          <div className="px-6 md:px-0 sm:px-0 my-4 flex flex-row space-x-[-64px] overflow-x-auto">
+            {artistDetail &&
+              !isLoading &&
+              artistDetail.map((artist, index) => (
+                <ArtistCard
+                  key={artist.id}
+                  index={index}
+                  id={artist.id}
+                  picUrl={artist.picUrl}
+                  name={artist.name}
+                />
+              ))}
+          </div>
+          {songDetail && !isLoading && <Heading id="playlist">歌单</Heading>}
+          <hr className="border-neutral-200 dark:border-neutral-800 my-3" />
+          <div className="mt-4 px-6 md:px-0 sm:px-0 space-x-4 flex flex-row overflow-x-auto w-full">
+            {playlistDetail.length > 0 &&
+              playlistDetail
+                .slice(0, 10)
+                .map((pl, index) => (
+                  <PlaylistCard
+                    key={pl.id}
+                    index={index}
+                    picUrl={pl.coverImgUrl}
+                    name={pl.name}
+                    id={pl.id}
+                  />
+                ))}
+          </div>
+          <div className="mt-4 px-6 md:px-0 sm:px-0 space-x-4 flex flex-row overflow-x-auto w-full">
+            {playlistDetail.length > 0 &&
+              playlistDetail
+                .slice(11, 20)
+                .map((pl, index) => (
+                  <PlaylistCard
+                    key={pl.id}
+                    index={index}
+                    picUrl={pl.coverImgUrl}
+                    name={pl.name}
+                    id={pl.id}
+                  />
+                ))}
+          </div>
+          <div className="mt-4 px-6 md:px-0 sm:px-0 space-x-4 flex flex-row overflow-x-auto w-full">
+            {playlistDetail.length > 0 &&
+              playlistDetail
+                .slice(20, 30)
+                .map((pl, index) => (
+                  <PlaylistCard
+                    key={pl.id}
+                    index={index}
+                    picUrl={pl.coverImgUrl}
+                    name={pl.name}
+                    id={pl.id}
+                  />
+                ))}
+          </div>
+          {songDetail && !isLoading && <Heading id="album">专辑</Heading>}
+          <hr className="border-neutral-200 dark:border-neutral-800 my-3" />
+          <div className="mt-4 px-6 md:px-0 sm:px-0 space-x-4 flex flex-row overflow-x-auto w-full">
+            {albumDetail &&
+              !isLoading &&
+              albumDetail
+                .slice(0, 15)
+                .map((al, index) => (
+                  <AlbumCard
+                    key={al.id}
+                    index={index}
+                    picUrl={al.picUrl}
+                    name={al.name}
+                    id={al.id}
+                  />
+                ))}
+          </div>
+          <div className="mt-4 px-6 md:px-0 sm:px-0 space-x-4 flex flex-row overflow-x-auto w-full">
+            {albumDetail &&
+              !isLoading &&
+              albumDetail
+                .slice(16, 30)
+                .map((al, index) => (
+                  <AlbumCard
+                    key={al.id}
+                    index={index}
+                    picUrl={al.picUrl}
+                    name={al.name}
+                    id={al.id}
+                  />
+                ))}
+          </div>
+          {songDetail && !isLoading && <Heading id="mv">MV</Heading>}
+          <hr className="border-neutral-200 dark:border-neutral-800 my-3" />
+          <div className="mt-4 px-6 md:px-0 sm:px-0 space-x-4 flex flex-row overflow-x-auto w-full">
+            {mvDetail &&
+              !isLoading &&
+              mvDetail
+                .slice(0, 15)
+                .map((track, index) => (
+                  <MvCard
+                    key={track.id}
+                    index={index}
+                    id={track.id}
+                    name={track.name}
+                    ar={track.artists.map((artist) => artist.name).join(" / ")}
+                    picUrl={track.cover}
+                  />
+                ))}
+          </div>
+          <div className="mt-4 px-6 md:px-0 sm:px-0 space-x-4 flex flex-row overflow-x-auto w-full">
+            {mvDetail &&
+              !isLoading &&
+              mvDetail
+                .slice(16, 30)
+                .map((track, index) => (
+                  <MvCard
+                    key={track.id}
+                    index={index}
+                    id={track.id}
+                    name={track.name}
+                    ar={track.artists.map((artist) => artist.name).join(" / ")}
+                    picUrl={track.cover}
+                  />
+                ))}
+          </div>
+        </>
+      )}
     </div>
   );
 };

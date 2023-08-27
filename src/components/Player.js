@@ -1082,7 +1082,7 @@ export default function Player() {
           <AnimatePresence>
             <motion.div
               className={cn(
-                "py-12 overflow-y-auto select-none ",
+                "py-12 overflow-y-auto select-none transition-all duration-500",
                 !display
                   ? "hidden"
                   : "z-[99999] block h-[50vh] md:h-screen sm:h-screen px-4 left-0 right-0 w-full md:w-1/2 sm:w-1/2",

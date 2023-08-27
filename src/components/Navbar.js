@@ -66,20 +66,21 @@ export default function Navbar() {
         </div>
         <div className="flex flex-row space-x-2 md:space-x-6 sm:space-x-6">
           {nav.map((item, index) => (
-            <Link
+            <motion.button
               key={index}
-              href={item.href}
+              onClick={() => router.push(item.href)}
+              initial={{ scale: 1 }}
+              animate={{ scale: router.asPath === item.href ? [1, 0.9, 1] : 1 }}
+              transition={{ duration: 0.5 }}
               className={cn(
-                "rounded-xl px-2.5 md:px-6 sm:px-6 py-1.5",
+                "rounded-full px-2.5 md:px-6 sm:px-6 py-2 text-neutral-700 dark:text-neutral-300 text-sm md:text-base sm:text-base",
                 router.asPath === item.href
-                  ? "bg-red-600 text-white font-medium"
-                  : ""
+                  ? "bg-neutral-200 dark:bg-neutral-800 font-semibold"
+                  : "opacity-75 font-medium"
               )}
             >
-              <button className="text-sm md:text-base sm:text-base">
-                {item.title}
-              </button>
-            </Link>
+              {item.title}
+            </motion.button>
           ))}
         </div>
         <div className="flex flex-row space-x-4 md:space-x-6 sm:space-x-8">
@@ -207,20 +208,29 @@ export default function Navbar() {
             </div>
             <div className="px-8 flex flex-col space-y-4">
               {nav.map((item, index) => (
-                <Link
+                <motion.button
                   key={index}
-                  href={item.href}
-                  onClick={() => setOpen(!open)}
+                  onClick={() => {
+                    router.push(item.href);
+                    setOpen(false);
+                  }}
+                  initial={{ scale: 1 }}
+                  animate={{
+                    scale: router.asPath === item.href ? [1, 0.9, 1] : 1,
+                  }}
+                  transition={{ duration: 0.5 }}
                   className={cn(
-                    "px-4 py-2 rounded-xl",
-                    item.href === router.asPath ? "bg-red-600 text-white" : ""
+                    "rounded-xl px-2.5 md:px-6 sm:px-6 py-2.5 text-neutral-700 dark:text-neutral-300 text-xl",
+                    router.asPath === item.href
+                      ? "bg-neutral-200 dark:bg-neutral-800 font-semibold"
+                      : "opacity-75 font-medium"
                   )}
                 >
-                  <button className="text-lg">{item.title}</button>
-                </Link>
+                  {item.title}
+                </motion.button>
               ))}
             </div>
-            <div className="mt-8 flex flex-col space-y-2">
+            <div className="mt-12 flex flex-col space-y-2 border-t py-8 dark:border-neutral-800">
               <h1 className="text-sm text-center opacity-75">主题</h1>
               <button
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}

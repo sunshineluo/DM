@@ -9,6 +9,7 @@ import SongButton from "@/components/SongButton";
 import ArtistCard from "@/components/ArCard";
 import MvCard from "@/components/MvCard";
 import AlbumCard from "@/components/AlbumCard";
+import ArReadMore from "@/components/ArtistReadMore";
 
 const Artist = () => {
   const [arData, setArData] = useState(null);
@@ -115,26 +116,30 @@ const Artist = () => {
 
       {arData && (
         <div>
-          <div className="h-[36.5rem] overflow-hidden bg-center">
+          <div className="h-[18.5rem] md:h-[36.5rem] sm:h-[36.5rem] overflow-hidden bg-center relative">
             <LazyLoad>
               <img
                 src={arData.cover}
                 className="rounded-none md:rounded-xl sm:rounded-xl object-cover w-full"
               />
             </LazyLoad>
-          </div>
-          <div className="absolute flex flex-row -mt-96 md:-mt-24 sm:-mt-24 px-6 md:px-8 sm:px-12 space-x-4 py-2 text-white text-2xl md:text-3xl sm:text-4xl">
-            <Icon
-              icon="bi:play-circle-fill"
-              className="text-red-600 cursor-pointer mt-5"
-            />
-            <h1 className="font-semibold mt-4">{arData.name}</h1>
+            <div className="absolute flex flex-row bottom-6 md:bottom-8 sm:bottom-8 px-6 md:px-8 sm:px-12 space-x-4 py-2 text-white text-2xl md:text-3xl sm:text-4xl">
+              <Icon
+                icon="bi:play-circle-fill"
+                className="text-red-600 cursor-pointer mt-5"
+              />
+              <h1 className="font-semibold mt-4">{arData.name}</h1>
+            </div>
           </div>
         </div>
       )}
 
+      <div className="px-6 md:px-0 sm:px-0 mt-12">
+        {arData && <ArReadMore text={arData.briefDesc} maxCharCount={400} />}
+      </div>
+
       <>
-        <p className="-mt-56 md:mt-12 sm:mt-12 px-6 md:px-0 sm:px-0 flex flex-row overflow-x-auto space-x-3 text-sm opacity-75">
+        <p className="mt-12 px-6 md:px-0 sm:px-0 flex flex-row overflow-x-auto space-x-3 text-sm opacity-75">
           <a href="#song" className="hover:underline">
             50首热门单曲
           </a>
@@ -171,7 +176,7 @@ const Artist = () => {
           <Heading id="mv">歌手MV</Heading>
         </div>
         <div className="px-0 mt-8 w-full">
-          <div className="px-6 md:px-0 sm:px-0 my-4 columns-1 md:columns-2 sm:columns-3">
+          <div className="mt-4 px-6 md:px-0 sm:px-0 space-x-4 flex flex-row overflow-x-auto w-full">
             {arMVs &&
               arMVs.map((track, index) => (
                 <MvCard
@@ -192,7 +197,7 @@ const Artist = () => {
           <Heading id="album">歌手专辑</Heading>
         </div>
         <div className="px-0 mt-8 w-full">
-          <div className="px-6 md:px-0 sm:px-0 my-4 columns-1 md:columns-2 sm:columns-3">
+          <div className="mt-4 px-6 md:px-0 sm:px-0 space-x-4 flex flex-row overflow-x-auto w-full">
             {arAlbums &&
               arAlbums.map((al, index) => (
                 <AlbumCard

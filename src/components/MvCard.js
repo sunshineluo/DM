@@ -12,15 +12,15 @@ export default function MvCard({ index, id, picUrl, name, ar }) {
       key={index}
       onMouseEnter={() => setIsHover(true)}
       onMouseLeave={() => setIsHover(false)}
-      className="flex flex-col space-y-2 mb-2"
+      className="flex flex-col space-y-2 mb-2 relative"
     >
       <LazyLoad offset={100}>
         <img
           src={picUrl}
-          className="relative transition-all duration-500 rounded-xl hover:opacity-75 w-96 md:w-[27.5rem] sm:w-[27.5rem] h-48 md:h-56 sm:h-64 shadow-md"
+          className="relative transition-all duration-500 rounded-xl hover:opacity-75 w-80 md:w-96 sm:w-[27.5rem] h-48 md:h-56 sm:h-64 shadow-md"
         />
       </LazyLoad>
-      <h1 className="w-80 md:w-96 sm:w-96 text-left text-sm opacity-75 font-normal hover:underline">
+      <h1 className="w-80 md:w-96 sm:w-[27.5rem] text-left text-sm opacity-75 font-normal hover:underline">
         {name}
         <br />
         {ar}

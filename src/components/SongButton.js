@@ -36,7 +36,7 @@ export default function SongButton({
       key={id}
       className={`flex flex-row space-x-4 w-full rounded-none md:rounded-xl sm:rounded-xl focus:bg-red-600 px-4 py-4 ${
         index % 2 === 0 && id !== playingSongId
-          ? "focus:bg-red-600  bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-900 dark:hover:bg-neutral-800"
+          ? "focus:bg-red-600  bg-neutral-100 hover:bg-neutral-200/50 dark:bg-neutral-900/50 dark:hover:bg-neutral-900"
           : "hover:bg-neutral-200 dark:hover:bg-neutral-800 focus:bg-red-600 "
       } ${
         id === playingSongId
@@ -47,7 +47,7 @@ export default function SongButton({
       onMouseLeave={() => setIsHover(false)}
       onClick={() => handleAddToPlaylist(id)}
     >
-      <div className="w-[2rem] flex flex-row justify-center items-center mt-3 md:mt-0 sm:mt-0">
+      <div className="w-[2rem] flex flex-row justify-center items-center">
         {id !== playingSongId && !isHover && (
           <span className="opacity-75 items-center">{index + 1}</span>
         )}
@@ -85,7 +85,7 @@ export default function SongButton({
           <span className="font-semibold text-left truncate w-48 md:w-56 sm:w-96">
             {name}
           </span>
-          <span className="opacity-75 font-medium truncate w-48 md:w-56 sm:w-96 text-left">
+          <span className="hidden md:block sm:block opacity-75 font-semibold truncate w-48 md:w-56 sm:w-96 text-left">
             {ar}
           </span>
         </div>
