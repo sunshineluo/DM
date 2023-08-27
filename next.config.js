@@ -14,6 +14,7 @@ const nextConfig = {
 
 module.exports = withOffline({
   ...nextConfig,
+  generateInDevMode: true, // 在开发模式下也生成 Service Worker 文件
   workboxOpts: {
     swDest: process.env.NEXT_EXPORT
       ? "service-worker.js"
