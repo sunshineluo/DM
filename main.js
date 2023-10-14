@@ -10,7 +10,7 @@ function createWindow() {
   });
 
   // 加载本地静态网页
-  const indexPath = isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '.next/index.html')}`;
+  const indexPath = isDev ? 'https://www.luoyangapi.top/' : `file://${path.join(__dirname, '.next/index.html')}`;
   mainWindow.loadURL(indexPath);
 }
 
